@@ -27,11 +27,10 @@ const Navbar = () => {
 
   // Sample product data for search suggestions
   const products = [
-    { id: 1, name: 'Indoor Plant' },
-    { id: 2, name: 'Outdoor Plant' },
-    { id: 3, name: 'Gardening Tools' },
-    { id: 4, name: 'Plant Care' },
-    { id: 5, name: 'Seeds' },
+    { id: 1, name: 'Fertilizer'},
+    { id: 2,name: 'Gardening Tools' },
+    { id: 3, name: 'Plant Care' },
+    { id: 4,name: 'Seeds' },
   ];
 
   const handleSearch = (e) => {
