@@ -1,8 +1,8 @@
-/* Filter Panel Styles */
+
 .filter-panel {
   width: 250px;
   padding: 20px;
-  background-color: #7db035;
+  background-color: rgb(41, 162, 11);
   color: #ffffff;
   overflow-y: auto;
   border-radius: 0;
@@ -19,7 +19,7 @@
   margin-bottom: 10px;
 }
 
-/* Checkbox Styled Options */
+
 .filter-panel__categories {
   list-style: none;
   padding: 0;
@@ -71,7 +71,7 @@
   color: #ffffff;
 }
 
-/* Active State */
+
 .filter-panel__category--active {
   background-color: #58b084;
   color: #ffffff;

@@ -1,8 +1,9 @@
 
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
-import { BrowserRouter as Router, Route, Routes, Switch } from 'react-router-dom';
-import HomePage from './pages/home/HomePage';
 import Navigation from './components/Navbar/Navigation';
+import HomePage from './pages/home/HomePage';
+import ProductPage from './pages/Product/ProductPage';
 
 
 function App() {
@@ -14,6 +15,8 @@ function App() {
       <Navigation />
     <Routes>
       <Route path='/' element={<HomePage/>}/>
+      <Route path="/product" element={<ProductPage />} />
+
     </Routes>
     </div>
     </Router>

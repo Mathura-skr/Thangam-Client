@@ -1,23 +1,60 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import FilterPanel from '../../components/Filter/FilterPanel';
-// import { useCart } from '../../context/CartContext';
-import Modal from 'react-modal';
-import './HomePage.css';
+import React, { useState } from "react";
+import Modal from "react-modal";
+import { Link, useNavigate } from "react-router-dom";
+import FilterPanel from "../../components/Filter/FilterPanel";
+import "./HomePage.css";
 
-import gardener1 from '../../assets/images/gardener1.jpg';
 
 const HomePage = () => {
   const navigate = useNavigate();
-  // const { addToCart } = useCart();
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const featuredItems = [
-    { id: 1, image: require('../../assets/images/snake_plant.png'), alt: 'Snake Plant', label: 'Indoor Plants', price: 500, rating: '4.5', description: 'Beautiful indoor plants to enhance your home decor.' },
-    { id: 2, image: require('../../assets/images/succulent_plant.png'), alt: 'Outdoor Plants', label: 'succulent Plant', price: 2005, rating: '4.7', description: 'Sturdy outdoor plants for your garden.' },
-    { id: 3, image: require('../../assets/images/tool_img2.png'), alt: 'Gardening Tools', label: 'Gardening Tools', price: 15, rating: '4.3', description: 'Essential tools for every gardener.' },
-    { id: 4, image: require('../../assets/images/pothos.png'), alt: 'Pothos plant', label: 'Plant Care', price: 10, rating: '4.6', description: 'Products to keep your plants healthy.' },
-    { id: 5, image: require('../../assets/images/seed_img2.png'), alt: 'Seeds', label: 'Seeds', price: 5, rating: '4.8', description: 'High-quality seeds for your garden.' },
+    {
+      id: 1,
+      image: require("../../assets/images/fer1.png"),
+      alt: "Urea",
+      label: "Urea",
+      price: 500,
+      rating: "4.5",
+      description: "king of fertilizers provide plants with nitrogen and to encourage the growth of green, leafy plants and is an important factor for the process of photosynthesis",
+    },
+    {
+      id: 2,
+      image: require("../../assets/images/tool_img1.png"),
+      alt: "Gardening Tools",
+      label: "Hand Shovel",
+      price: 2005,
+      rating: "4.7",
+      description: "Essential tools for every gardener",
+    },
+    {
+      id: 3,
+      image: require("../../assets/images/tool_img2.png"),
+      alt: "Gardening Tools",
+      label: "Gardening Gloves",
+      price: 15,
+      rating: "4.3",
+      description: "Essential tools for every gardener.",
+    },
+    {
+      id: 4,
+      image: require("../../assets/images/fer2.png"),
+      alt: "fertilizer",
+      label: "NPK Prime",
+      price: 10,
+      rating: "4.6",
+      description: "Essential nutrients needed for plant growth and overall plant health",
+    },
+    {
+      id: 5,
+      image: require("../../assets/images/fer3.png"),
+      alt: "Home Garden Flower",
+      label: "Home Garden Flower",
+      price: 5,
+      rating: "4.8",
+      description: "Suitable for any kind of flowering plants.",
+    },
   ];
 
   const openModal = (product) => setSelectedProduct(product);
@@ -28,22 +65,24 @@ const HomePage = () => {
       {/* Hero Section */}
       <section className="hero">
         <img
-          src={require('../../assets/images/hero_bgimg.png')}
+          src={require("../../assets/images/hero_bgimg.png")}
           alt="Hero"
           className="hero__image"
         />
         <img
-          src={require('../../assets/images/hero_img1.png')}
+          src={require("../../assets/images/hero_img1.png")}
           alt="Hero Overlay"
           className="hero__overlay-image"
         />
         <div className="hero__overlay">
           <div className="hero__content">
             <h1 className="hero__title">Welcome to THANGAM</h1>
-            <h2 className="hero__description">Buy & Rent for your garden from home!</h2>
-            <button 
+            <h2 className="hero__description">
+              Buy & Rent for your garden from home!
+            </h2>
+            <button
               className="hero__button"
-              onClick={() => navigate('/HomeService')}
+              onClick={() => navigate("")}
             >
               Book Now
             </button>
@@ -53,7 +92,6 @@ const HomePage = () => {
 
       {/* Main Content */}
       <div className="main-content">
-        {/* Filter Panel */}
         <div className="filter-container">
           <FilterPanel />
         </div>
@@ -64,42 +102,41 @@ const HomePage = () => {
           <section className="category-section">
             <h2 className="category-section__title">Shop by Category</h2>
             <div className="category-container">
-              <button className="scroll-button left" onClick={() => document.querySelector('.category-scroll').scrollBy(-200, 0)}>
+              <button
+                className="scroll-button left"
+                onClick={() =>
+                  document.querySelector(".category-scroll").scrollBy(-200, 0)
+                }
+              >
                 &lt;
               </button>
               <div className="category-scroll">
                 <Link to="/product" className="category-item">
                   <div className="category-image">
-                    <img src={require('../../assets/images/plant1.jpg')} alt="Indoor Plants" />
-                  </div>
-                  <p className="category-label">Indoor Plants</p>
-                </Link>
-                <Link to="/product" className="category-item">
-                  <div className="category-image">
-                    <img src={require('../../assets/images/outdoor_img.jpg')} alt="Outdoor Plants" />
-                  </div>
-                  <p className="category-label">Outdoor Plants</p>
-                </Link>
-                <Link to="/product" className="category-item">
-                  <div className="category-image">
-                    <img src={require('../../assets/images/tool_img2.png')} alt="Gardening Tools" />
+                    <img
+                      src={require("../../assets/images/tool_img2.png")}
+                      alt="Gardening Tools"
+                    />
                   </div>
                   <p className="category-label">Tools & Equipments</p>
                 </Link>
+
                 <Link to="/product" className="category-item">
                   <div className="category-image">
-                    <img src={require('../../assets/images/pot_img2.png')} alt="Plant Care" />
+                    <img
+                      src={require("../../assets/images/fer2.png")}
+                      alt="fertilizer"
+                    />
                   </div>
-                  <p className="category-label">Pots & Supplies</p>
-                </Link>
-                <Link to="/product" className="category-item">
-                  <div className="category-image">
-                    <img src={require('../../assets/images/seed_img2.png')} alt="Seeds" />
-                  </div>
-                  <p className="category-label">Seeds & Fertilizers</p>
+                  <p className="category-label">Fertilizers</p>
                 </Link>
               </div>
-              <button className="scroll-button right" onClick={() => document.querySelector('.category-scroll').scrollBy(200, 0)}>
+              <button
+                className="scroll-button right"
+                onClick={() =>
+                  document.querySelector(".category-scroll").scrollBy(200, 0)
+                }
+              >
                 &gt;
               </button>
             </div>
@@ -108,7 +145,12 @@ const HomePage = () => {
           {/* Featured Products Section - Now Second */}
           <h2 className="featured-section__title">Featured Products</h2>
           <div className="featured-container">
-            <button className="scroll-button left" onClick={() => document.querySelector('.featured-scroll').scrollBy(-200, 0)}>
+            <button
+              className="scroll-button left"
+              onClick={() =>
+                document.querySelector(".featured-scroll").scrollBy(-200, 0)
+              }
+            >
               &lt;
             </button>
             <div className="featured-scroll">
@@ -122,11 +164,14 @@ const HomePage = () => {
                     <p className="featured-price">₨ {item.price.toFixed(2)}</p>
                     <p className="featured-rating">Rating: {item.rating}</p>
                     <div className="button-container">
-                      <button className="add-to-cart-button" >
-                      {/* onClick={() => addToCart(item)} */}
+                      <button className="add-to-cart-button">
+                        {/* onClick={} */}
                         Add to Cart
                       </button>
-                      <button className="buy-now-button" onClick={() => navigate('/checkout')}>
+                      <button
+                        className="buy-now-button"
+                        onClick={() => navigate("/checkout")}
+                      >
                         Buy Now
                       </button>
                     </div>
@@ -134,7 +179,12 @@ const HomePage = () => {
                 </div>
               ))}
             </div>
-            <button className="scroll-button right" onClick={() => document.querySelector('.featured-scroll').scrollBy(200, 0)}>
+            <button
+              className="scroll-button right"
+              onClick={() =>
+                document.querySelector(".featured-scroll").scrollBy(200, 0)
+              }
+            >
               &gt;
             </button>
           </div>
@@ -142,9 +192,9 @@ const HomePage = () => {
           {/* New Browse More Section */}
           <section className="browse-more-section">
             <h2 className="browse-more-title">Browse More Products</h2>
-            <button 
+            <button
               className="browse-more-button"
-              onClick={() => navigate('/product')}
+              onClick={() => navigate("/product")}
             >
               Explore Our Products
             </button>
@@ -162,21 +212,36 @@ const HomePage = () => {
           overlayClassName="product-modal-overlay"
         >
           <div className="modal-content">
-            <img src={selectedProduct.image} alt={selectedProduct.label} className="modal-product-image" />
+            <img
+              src={selectedProduct.image}
+              alt={selectedProduct.label}
+              className="modal-product-image"
+            />
             <h2 className="modal-product-name">{selectedProduct.label}</h2>
-            <p className="modal-product-category">Category: {selectedProduct.alt}</p>
-            <p className="modal-product-rating">Rating: {selectedProduct.rating} ★</p>
-            <p className="modal-product-description">Description: {selectedProduct.description}</p>
+            <p className="modal-product-category">
+              Category: {selectedProduct.alt}
+            </p>
+            <p className="modal-product-rating">
+              Rating: {selectedProduct.rating} ★
+            </p>
+            <p className="modal-product-description">
+              Description: {selectedProduct.description}
+            </p>
             <div className="button-container">
-              <button className="add-to-cart-button" >
-              {/* onClick={() => addToCart(selectedProduct)} */}
+              <button className="add-to-cart-button">
+                onClick={}
                 Add to Cart
               </button>
-              <button className="buy-now-button" onClick={() => navigate('/checkout')}>
+              <button
+                className="buy-now-button"
+                onClick={() => navigate("")}
+              >
                 Buy Now
               </button>
             </div>
-            <button onClick={closeModal} className="close-modal-button">Close</button>
+            <button onClick={closeModal} className="close-modal-button">
+              Close
+            </button>
           </div>
         </Modal>
       )}

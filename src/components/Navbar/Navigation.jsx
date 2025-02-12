@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './Navbar.css';
 import { FaUserCircle, FaEye, FaEyeSlash, FaShoppingCart } from 'react-icons/fa';
-// import { useAuth } from '../../context/AuthContext';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-// import { authAPI } from '../../axios';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -14,16 +12,15 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showProfile, setShowProfile] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
     severity: 'success'
   });
-  const [suggestions, setSuggestions] = useState([]); // State for search suggestions
+  const [suggestions, setSuggestions] = useState([]); 
 
   const navigate = useNavigate();
-  // const { user, logout } = useAuth();
+
 
   // Sample product data for search suggestions
   const products = [
@@ -53,24 +50,7 @@ const Navbar = () => {
   };
 
   const handleLogout = async () => {
-    // try {
-    //   await authAPI.logout();
-    //   logout();
-    //   setShowProfile(false);
-    //   setSnackbar({
-    //     open: true,
-    //     message: 'Logged out successfully!',
-    //     severity: 'success'
-    //   });
-    //   navigate('/login');
-    // } catch (error) {
-    //   console.error('Logout error:', error);
-    //   setSnackbar({
-    //     open: true,
-    //     message: 'Error logging out. Please try again.',
-    //     severity: 'error'
-    //   });
-    // }
+  
   };
 
   const handleCloseSnackbar = (event, reason) => {
@@ -80,13 +60,6 @@ const Navbar = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  const toggleProfile = () => {
-    setShowProfile(!showProfile);
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
 
   // Close profile dropdown when clicking outside
   React.useEffect(() => {
@@ -119,7 +92,7 @@ const Navbar = () => {
         <form onSubmit={handleSearch}>
           <input
             type="text"
-            placeholder="Search for plants or tools"
+            placeholder="Search for fertilizer or tools"
             value={searchQuery}
             onChange={handleSearchChange}
           />
@@ -140,47 +113,6 @@ const Navbar = () => {
           <span className="cart-label">Cart</span>
         </div>
       </Link>
-
-      {/* {user ? (
-        <div className="navbar__profile">
-          <div className="profile-icon" onClick={toggleProfile}>
-            <div className="profile-icon-container">
-              <FaUserCircle className="avatar-icon" />
-              <span className="profile-label">Profile</span>
-            </div>
-            <span className="username">{user.fullName}</span>
-          </div>
-          {showProfile && (
-            <div className="profile-dropdown">
-              <div className="profile-info">
-                <h3>{user.fullName}</h3>
-                <p>{user.email}</p>
-                <div className="password-field">
-                  <span>Password: </span>
-                  <span>{showPassword ? user.password : '••••••••'}</span>
-                  <button 
-                    className="toggle-password"
-                    onClick={togglePasswordVisibility}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
-                  </button>
-                </div>
-              </div>
-              <button onClick={handleLogout} className="logout-button">
-                Logout
-              </button>
-            </div>
-          )}
-        </div>
-      ) : (
-        <Link to="/login" className="navbar__login">
-          <div className="profile-icon-container">
-            <FaUserCircle className="avatar-icon" />
-            <span className="profile-label">Profile</span>
-          </div>
-        </Link>
-      )} */}
 
       <Snackbar 
         open={snackbar.open} 
