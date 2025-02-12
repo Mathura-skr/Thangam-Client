@@ -7,13 +7,8 @@ const FilterPanel = () => {
   const [selected, setSelected] = useState(null);
 
   const categories = [
-    { id: 1, name: "Indoor Plants", path: "/product" },
-    { id: 2, name: "Outdoor Plants", path: "/product" },
-    { id: 3, name: "Garden Accessories", path: "/product" },
-    { id: 4, name: "Tools", path: "/product" },
-    { id: 5, name: "Fertilizers", path: "/product" },
-    { id: 6, name: "Plant Seeds", path: "/product" },
-    { id: 7, name: "Pots and Vase", path: "/product" },
+    { id: 1, name: "Tools", path: "/product" },
+    { id: 2, name: "Fertilizers", path: "/product" },
   ];
 
   const handleSelect = (id, path) => {
