@@ -1,20 +1,24 @@
 import React from 'react';
-import './ProductCard.css';
 
 const ProductCard = ({ product, handleBuyNow }) => {
- 
-
   return (
-    <div className="product-card">
-      <img src={product.image} alt={product.name} className="product-image" />
-      <h3 className="product-name">{product.name}</h3>
-      <p className="product-price">Price: ₨ {product.price.toFixed(2)}</p>
-      <p className="product-rating">Rating: {product.rating} ★</p>
-      <div className="button-container">
-        <button className="add-to-cart-button" >
+    <div className="bg-white rounded-lg shadow-md p-4 text-center transition-transform transform hover:-translate-y-1 w-48 h-72 flex flex-col justify-between sm:w-56 sm:h-80 md:w-64 md:h-96">
+      <img 
+        src={product.image} 
+        alt={product.name} 
+        className="w-full h-32 object-cover rounded-md sm:h-40 md:h-48"
+      />
+      <h3 className="text-lg font-semibold mt-2 truncate">{product.name}</h3>
+      <p className="text-green-600 font-medium">Price: ₨ {product.price.toFixed(2)}</p>
+      <p className="text-yellow-500 text-sm">Rating: {product.rating} ★</p>
+      <div className="flex justify-between mt-auto">
+        <button className="bg-orange-500 text-white rounded px-3 py-1 text-sm hover:bg-orange-600 w-1/2 mr-1">
           Add to Cart
         </button>
-        <button className="buy-now-button" onClick={() => handleBuyNow(product)}>
+        <button 
+          className="bg-green-600 text-white rounded px-3 py-1 text-sm hover:bg-green-700 w-1/2 ml-1" 
+          onClick={() => handleBuyNow(product)}
+        >
           Buy Now
         </button>
       </div>

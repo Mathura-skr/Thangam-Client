@@ -41,5 +41,12 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss7-compat": "^2.2.17",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.2",
+    "postcss-loader": "^8.1.1",
+    "tailwindcss": "^4.0.7"
   }
 }

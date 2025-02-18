@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import Modal from "react-modal";
 import { Link, useNavigate } from "react-router-dom";
 import FilterPanel from "../../components/Filter/FilterPanel";
-import "./HomePage.css";
-
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -17,7 +15,7 @@ const HomePage = () => {
       label: "Urea",
       price: 500,
       rating: "4.5",
-      description: "king of fertilizers provide plants with nitrogen and to encourage the growth of green, leafy plants and is an important factor for the process of photosynthesis",
+      description: "Provides plants with nitrogen for growth and photosynthesis."
     },
     {
       id: 2,
@@ -26,62 +24,32 @@ const HomePage = () => {
       label: "Hand Shovel",
       price: 2005,
       rating: "4.7",
-      description: "Essential tools for every gardener",
-    },
-    {
-      id: 3,
-      image: require("../../assets/images/tool_img2.png"),
-      alt: "Gardening Tools",
-      label: "Gardening Gloves",
-      price: 15,
-      rating: "4.3",
-      description: "Essential tools for every gardener.",
-    },
-    {
-      id: 4,
-      image: require("../../assets/images/fer2.png"),
-      alt: "fertilizer",
-      label: "NPK Prime",
-      price: 10,
-      rating: "4.6",
-      description: "Essential nutrients needed for plant growth and overall plant health",
-    },
-    {
-      id: 5,
-      image: require("../../assets/images/fer3.png"),
-      alt: "Home Garden Flower",
-      label: "Home Garden Flower",
-      price: 5,
-      rating: "4.8",
-      description: "Suitable for any kind of flowering plants.",
-    },
+      description: "Essential tools for every gardener."
+    }
   ];
 
   const openModal = (product) => setSelectedProduct(product);
   const closeModal = () => setSelectedProduct(null);
 
   return (
-    <div className="homepage">
-      {/* Hero Section */}
-      <section className="hero">
+    <div className="flex flex-col min-h-screen">
+      <section className="relative w-full h-[600px]">
         <img
           src={require("../../assets/images/hero_bgimg.png")}
           alt="Hero"
-          className="hero__image"
+          className="w-full h-full object-cover"
         />
         <img
           src={require("../../assets/images/hero_img1.png")}
           alt="Hero Overlay"
-          className="hero__overlay-image"
+          className="absolute top-16 right-0 h-full max-w-full object-contain z-10"
         />
-        <div className="hero__overlay">
-          <div className="hero__content">
-            <h1 className="hero__title">Welcome to THANGAM</h1>
-            <h2 className="hero__description">
-              Buy & Rent for your garden from home!
-            </h2>
+        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white">
+          <div className="max-w-lg text-center">
+            <h1 className="text-5xl font-bold mb-4 shadow-lg">Welcome to THANGAM</h1>
+            <h2 className="text-xl mb-6 shadow-md">Buy & Rent for your garden from home!</h2>
             <button
-              className="hero__button"
+              className="px-6 py-2 text-lg bg-green-500 hover:bg-green-600 rounded-md"
               onClick={() => navigate("")}
             >
               Book Now
@@ -90,161 +58,38 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Main Content */}
-      <div className="main-content">
-        <div className="filter-container">
+      <div className="flex flex-col lg:flex-row p-4 bg-gray-100 gap-6">
+        <div className="lg:w-1/4 bg-green-500 rounded-lg p-4 sticky top-24">
           <FilterPanel />
         </div>
 
-        {/* Right Side Content */}
-        <div className="featured-section">
-          {/* Category Section - Now First */}
-          <section className="category-section">
-            <h2 className="category-section__title">Shop by Category</h2>
-            <div className="category-container">
-              <button
-                className="scroll-button left"
-                onClick={() =>
-                  document.querySelector(".category-scroll").scrollBy(-200, 0)
-                }
-              >
-                &lt;
-              </button>
-              <div className="category-scroll">
-                <Link to="/product" className="category-item">
-                  <div className="category-image">
-                    <img
-                      src={require("../../assets/images/tool_img2.png")}
-                      alt="Gardening Tools"
-                    />
-                  </div>
-                  <p className="category-label">Tools & Equipments</p>
-                </Link>
-
-                <Link to="/product" className="category-item">
-                  <div className="category-image">
-                    <img
-                      src={require("../../assets/images/fer2.png")}
-                      alt="fertilizer"
-                    />
-                  </div>
-                  <p className="category-label">Fertilizers</p>
-                </Link>
-              </div>
-              <button
-                className="scroll-button right"
-                onClick={() =>
-                  document.querySelector(".category-scroll").scrollBy(200, 0)
-                }
-              >
-                &gt;
-              </button>
-            </div>
-          </section>
-
-          {/* Featured Products Section - Now Second */}
-          <h2 className="featured-section__title">Featured Products</h2>
-          <div className="featured-container">
-            <button
-              className="scroll-button left"
-              onClick={() =>
-                document.querySelector(".featured-scroll").scrollBy(-200, 0)
-              }
-            >
-              &lt;
-            </button>
-            <div className="featured-scroll">
-              {featuredItems.map((item) => (
-                <div className="featured-item" key={item.id}>
-                  <div className="featured-image">
-                    <img src={item.image} alt={item.alt} />
-                  </div>
-                  <div className="featured-details">
-                    <p className="featured-label">{item.label}</p>
-                    <p className="featured-price">₨ {item.price.toFixed(2)}</p>
-                    <p className="featured-rating">Rating: {item.rating}</p>
-                    <div className="button-container">
-                      <button className="add-to-cart-button">
-                        {/* onClick={} */}
-                        Add to Cart
-                      </button>
-                      <button
-                        className="buy-now-button"
-                        onClick={() => navigate("/checkout")}
-                      >
-                        Buy Now
-                      </button>
-                    </div>
+        <div className="flex-1 bg-white rounded-lg p-6">
+          <h2 className="text-2xl font-semibold mb-4">Featured Products</h2>
+          <div className="flex overflow-x-auto space-x-4 p-2 scrollbar-hide">
+            {featuredItems.map((item) => (
+              <div key={item.id} className="w-72 p-4 border rounded-lg bg-white shadow-md">
+                <div className="w-full h-48 overflow-hidden border-b">
+                  <img src={item.image} alt={item.alt} className="w-full h-full object-cover" />
+                </div>
+                <div className="mt-4">
+                  <p className="text-lg font-semibold">{item.label}</p>
+                  <p className="text-gray-700">₨ {item.price.toFixed(2)}</p>
+                  <p className="text-gray-500">Rating: {item.rating}</p>
+                  <div className="mt-2 flex space-x-2">
+                    <button className="px-4 py-2 bg-green-500 text-white rounded">Add to Cart</button>
+                    <button
+                      className="px-4 py-2 bg-blue-500 text-white rounded"
+                      onClick={() => navigate("/checkout")}
+                    >
+                      Buy Now
+                    </button>
                   </div>
                 </div>
-              ))}
-            </div>
-            <button
-              className="scroll-button right"
-              onClick={() =>
-                document.querySelector(".featured-scroll").scrollBy(200, 0)
-              }
-            >
-              &gt;
-            </button>
+              </div>
+            ))}
           </div>
-
-          {/* New Browse More Section */}
-          <section className="browse-more-section">
-            <h2 className="browse-more-title">Browse More Products</h2>
-            <button
-              className="browse-more-button"
-              onClick={() => navigate("/product")}
-            >
-              Explore Our Products
-            </button>
-          </section>
         </div>
       </div>
-
-      {/* Modal for Product Details */}
-      {selectedProduct && (
-        <Modal
-          isOpen={!!selectedProduct}
-          onRequestClose={closeModal}
-          contentLabel="Product Details"
-          className="product-modal"
-          overlayClassName="product-modal-overlay"
-        >
-          <div className="modal-content">
-            <img
-              src={selectedProduct.image}
-              alt={selectedProduct.label}
-              className="modal-product-image"
-            />
-            <h2 className="modal-product-name">{selectedProduct.label}</h2>
-            <p className="modal-product-category">
-              Category: {selectedProduct.alt}
-            </p>
-            <p className="modal-product-rating">
-              Rating: {selectedProduct.rating} ★
-            </p>
-            <p className="modal-product-description">
-              Description: {selectedProduct.description}
-            </p>
-            <div className="button-container">
-              <button className="add-to-cart-button">
-                onClick={}
-                Add to Cart
-              </button>
-              <button
-                className="buy-now-button"
-                onClick={() => navigate("")}
-              >
-                Buy Now
-              </button>
-            </div>
-            <button onClick={closeModal} className="close-modal-button">
-              Close
-            </button>
-          </div>
-        </Modal>
-      )}
     </div>
   );
 };

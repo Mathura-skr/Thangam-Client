@@ -1,110 +1,66 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import FilterPanel from '../../components/Filter/FilterPanel';
-import './ProductPage.css';
-
 
 const ProductPage = () => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
+  const getRandomPrice = () => Math.floor(Math.random() * (900 - 200 + 1)) + 200;
 
-  const getRandomPrice = () => {
-    return Math.floor(Math.random() * (900 - 200 + 1)) + 200; // Random price between 200 and 900
-  };
-
-  // Sample products data
   const products = [
     { id: 1, name: "Garden Tools", category: "Tools", rating: 4.8, price: getRandomPrice(), image: require('../../assets/images/tool_img1.png') },
     { id: 2, name: "Garden Tools", category: "Tools", rating: 4.8, price: getRandomPrice(), image: require('../../assets/images/tool_img2.png') },
-    { id: 3, name: "Garden Tools", category: "Tools", rating: 4.8, price: getRandomPrice(), image: require('../../assets/images/tool_img1.png') },
-    { id: 4, name: "Garden Tools", category: "Tools", rating: 4.8, price: getRandomPrice(), image: require('../../assets/images/tool_img2.png') },
-    { id: 5, name: "Garden Tools", category: "Tools", rating: 4.8, price: getRandomPrice(), image: require('../../assets/images/tool_img1.png') },
-    { id: 6, name: "Garden Tools", category: "Tools", rating: 4.8, price: getRandomPrice(), image: require('../../assets/images/tool_img2.png') },
-    
     { id: 7, name: "Fertilizers", category: "Fertilizers", rating: 4.6, price: getRandomPrice(), image: require('../../assets/images/fer1.png') },
     { id: 8, name: "Fertilizers", category: "Fertilizers", rating: 4.6, price: getRandomPrice(), image: require('../../assets/images/fer2.png') },
-    { id: 9, name: "Fertilizers", category: "Fertilizers", rating: 4.6, price: getRandomPrice(), image: require('../../assets/images/fer3.png') },
-    { id: 10, name: "Fertilizers", category: "Fertilizers", rating: 4.6, price: getRandomPrice(), image: require('../../assets/images/fer1.png') },
-    { id: 11, name: "Fertilizers", category: "Fertilizers", rating: 4.6, price: getRandomPrice(), image: require('../../assets/images/fer2.png') },
-    
-
-
   ];
 
   const sections = [
-
     { title: "Tools and Equipments", products: products.filter(p => p.category === "Tools") },
     { title: "Seeds and Fertilizers", products: products.filter(p => p.category === "Fertilizers") },
   ];
 
-  const handleBuyNow = () => {
- 
-  };
-
   useEffect(() => {
     const hash = window.location.hash;
     if (hash) {
-      const section = document.querySelector(`.product-section${hash}`);
-      if (section) {
-        section.scrollIntoView({ behavior: 'smooth' });
-      }
+      document.getElementById(hash.replace('#', ''))?.scrollIntoView({ behavior: 'smooth' });
     }
   }, []);
 
-  const ProductCard = ({ product, handleBuyNow }) => (
-    <div className="product-card">
-      <img src={product.image} alt={product.name} />
-      <h3>{product.name}</h3>
-      <p>Price: ₨ {product.price.toFixed(2)}</p>
-      <p className="product-rating">Rating: {product.rating} ★</p>
-      <div className="button-container">
-        <button className="buy-now-button" onClick={() => handleBuyNow(product)}>Buy Now</button>
-      </div>
+  const ProductCard = ({ product }) => (
+    <div className="w-72 p-4 bg-white rounded-lg shadow-md flex flex-col justify-between text-center h-96">
+      <img src={product.image} alt={product.name} className="w-full h-40 object-cover rounded-md" />
+      <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
+      <p className="text-gray-600">Price: ₨ {product.price.toFixed(2)}</p>
+      <p className="text-yellow-500">Rating: {product.rating} ★</p>
+      <button className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Buy Now</button>
     </div>
   );
 
   return (
-    <div className="productpage">
-      {/* Hero Section */}
-      <section className="hero">
-        <img
-          src={require('../../assets/images/hero_bgimg.png')}
-          alt="Hero"
-          className="hero__image"
-        />
-        <img
-          src={require('../../assets/images/hero_img1.png')}
-          alt="Hero Overlay"
-          className="hero__overlay-image"
-        />
-        <div className="hero__overlay">
-          <div className="hero__content">
-            <h1 className="hero__title">Welcome to THANGAM</h1>
-            <h2 className="hero__description">Buy & Rent for your garden from home!</h2>
+    <div className="min-h-screen bg-gray-100">
+      <section className="relative w-full h-96">
+        <img src={require('../../assets/images/hero_bgimg.png')} alt="Hero" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold">Welcome to THANGAM</h1>
+            <h2 className="text-2xl mt-2">Buy & Rent for your garden from home!</h2>
           </div>
         </div>
       </section>
 
-      {/* Main Content */}
-      <div className="main-content">
-        {/* Filter Panel */}
-        <div className="filter-container">
+      <div className="container mx-auto p-4 flex flex-col md:flex-row gap-4">
+        <div className="w-full md:w-1/4">
           <FilterPanel />
         </div>
-
-        {/* Product Sections */}
-        <div className="products-section">
+        <div className="w-full md:w-3/4">
           {sections.map(section => (
-            <div key={section.title} className={`product-section ${section.title.replace(/\s+/g, '-').toLowerCase()}`} id={section.title.toLowerCase().replace(/\s+/g, '-')}>
-              <h2>{section.title}</h2>
-              <div className="product-cards-container">
-                <button className="scroll-button left" onClick={() => document.querySelector(`.${section.title.replace(/\s+/g, '-').toLowerCase()} .product-cards-wrapper`).scrollBy(-200, 0)}>❮</button>
-                <div className="product-cards-wrapper">
-                  {section.products.map(product => (
-                    <ProductCard key={product.id} product={product} handleBuyNow={handleBuyNow} />
-                  ))}
-                </div>
-                <button className="scroll-button right" onClick={() => document.querySelector(`.${section.title.replace(/\s+/g, '-').toLowerCase()} .product-cards-wrapper`).scrollBy(200, 0)}>❯</button>
+            <div key={section.title} id={section.title.toLowerCase().replace(/\s+/g, '-')}
+              className="mb-8">
+              <h2 className="text-2xl font-bold mb-4">{section.title}</h2>
+              <div className="flex gap-4 overflow-x-auto">
+                {section.products.map(product => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
               </div>
             </div>
           ))}
