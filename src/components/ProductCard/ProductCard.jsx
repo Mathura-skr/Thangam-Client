@@ -16,7 +16,7 @@ const ProductCard = ({ product, handleBuyNow }) => {
           Add to Cart
         </button>
         <button 
-          className="bg-green-600 text-white rounded px-3 py-1 text-sm hover:bg-green-700 w-1/2 ml-1" 
+          className="bg-black text-white rounded px-3 py-1 text-sm hover:outline hover:outline-2 hover:outline-black hover:rounded-md w-1/2 ml-1" 
           onClick={() => handleBuyNow(product)}
         >
           Buy Now

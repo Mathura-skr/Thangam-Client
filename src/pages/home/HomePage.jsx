@@ -49,7 +49,7 @@ const HomePage = () => {
             <h1 className="text-5xl font-bold mb-4 shadow-lg">Welcome to THANGAM</h1>
             <h2 className="text-xl mb-6 shadow-md">Buy & Rent for your garden from home!</h2>
             <button
-              className="px-6 py-2 text-lg bg-green-500 hover:bg-green-600 rounded-md"
+              className="px-6 py-2 text-lg bg-green-800 outline outline-2 outline-transparent hover:outline-white rounded-md"
               onClick={() => navigate("")}
             >
               Book Now
@@ -59,7 +59,7 @@ const HomePage = () => {
       </section>
 
       <div className="flex flex-col lg:flex-row p-4 bg-gray-100 gap-6">
-        <div className="lg:w-1/4 bg-green-500 rounded-lg p-4 sticky top-24">
+        <div className="lg:w-1/4 bg-white rounded-lg p-4 sticky top-24">
           <FilterPanel />
         </div>
 
@@ -76,9 +76,9 @@ const HomePage = () => {
                   <p className="text-gray-700">₨ {item.price.toFixed(2)}</p>
                   <p className="text-gray-500">Rating: {item.rating}</p>
                   <div className="mt-2 flex space-x-2">
-                    <button className="px-4 py-2 bg-green-500 text-white rounded">Add to Cart</button>
+                    <button className="px-4 py-2 bg-black text-white rounded">Add to Cart</button>
                     <button
-                      className="px-4 py-2 bg-blue-500 text-white rounded"
+                      className="px-4 py-2 bg-black text-white rounded"
                       onClick={() => navigate("/checkout")}
                     >
                       Buy Now

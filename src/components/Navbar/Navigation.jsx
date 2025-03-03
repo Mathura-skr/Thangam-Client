@@ -43,16 +43,16 @@ const Navbar = () => {
   }, [showProfile]);
 
   return (
-    <nav className="sticky top-0 z-50 flex items-center justify-between bg-green-600 px-5 py-3 shadow-md">
+    <nav className="sticky top-0 z-50 flex items-center justify-between bg-white outline px-5 py-3 shadow-md">
       <div className="cursor-pointer" onClick={() => navigate('/')}> 
         <img src={require('../../assets/images/logo1.png')} alt="Logo" className="w-36 md:w-44" />
       </div>
 
-      <ul className="hidden md:flex gap-6 text-white font-semibold">
-        <li><Link to="/" className="hover:text-yellow-300">Home</Link></li>
-        <li><Link to="/product" className="hover:text-yellow-300">Products</Link></li>
-        <li><Link to="/about" className="hover:text-yellow-300">About</Link></li>
-        <li><Link to="/contact" className="hover:text-yellow-300">Contact</Link></li>
+      <ul className="hidden md:flex gap-6 font-semibold">
+        <li><Link to="/" className="hover:outline hover:outline-2 hover:outline-black hover:rounded-md px-4 py-2">Home</Link></li>
+        <li><Link to="/product" className="hover:outline hover:outline-2 hover:outline-black hover:rounded-md px-4 py-2">Products</Link></li>
+        <li><Link to="/about" className="hover:outline hover:outline-2 hover:outline-black hover:rounded-md px-4 py-2">About</Link></li>
+        <li><Link to="/contact" className="hover:outline hover:outline-2 hover:outline-black hover:rounded-md px-4 py-2">Contact</Link></li>
       </ul>
 
       <div className="flex items-center gap-4">
@@ -76,7 +76,7 @@ const Navbar = () => {
           )}
         </div>
 
-        <Link to="/cart" className="flex flex-col items-center text-white hover:text-yellow-300">
+        <Link to="/cart" className="flex flex-col items-center text-white hover:outline hover:outline-2 hover:outline-black hover:rounded-md px-4 py-2">
           <FaShoppingCart className="text-2xl" />
           <span className="text-xs">Cart</span>
         </Link>
