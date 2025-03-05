@@ -10,7 +10,7 @@ export default function NewProduct() {
 
   ];
 
-  const submitHandler = (e) => {};
+  const submitHandler = () => {};
 
   return (
     <div className="flex flex-col md:flex-row">
@@ -113,7 +113,7 @@ export default function NewProduct() {
               <button
                 id="login_button"
                 type="submit"
-                className="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition duration-200"
+                className="w-full bg-gray-900 text-white py-2 rounded-lg hover:bg-gray-400 transition duration-200"
               >
                 CREATE
               </button>

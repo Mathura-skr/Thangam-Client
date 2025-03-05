@@ -1,55 +1,111 @@
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import Box from "@mui/material/Box";
+import { Button, Chip } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import Sidebar from "./Sidebar";
+import { toast } from "react-toastify";
+
+const paginationModel = { page: 0, pageSize: 5 };
 
 export default function OrderList() {
-    const data = {
-        columns: [
-            { label: 'ID', field: 'id', sort: 'asc' },
-            { label: 'Number of Items', field: 'noOfItems', sort: 'asc' },
-            { label: 'Amount', field: 'amount', sort: 'asc' },
-            { label: 'Status', field: 'status', sort: 'asc' },
-            { label: 'Actions', field: 'actions', sort: 'asc' }
-        ],
-        rows: []
+    const [orders, setOrders] = useState([
+        { id: 1, customerName: "Alice Johnson", totalAmount: 120, status: "Pending" },
+        { id: 2, customerName: "Bob Smith", totalAmount: 75, status: "Shipped" },
+        { id: 3, customerName: "Charlie Brown", totalAmount: 200, status: "Pending" },
+        { id: 4, customerName: "David Wilson", totalAmount: 50, status: "Processing" },
+        { id: 5, customerName: "Emma Davis", totalAmount: 90, status: "Shipped" },
+    ]);
+
+    // Delete Order
+    const deleteOrder = (id) => {
+        setOrders(orders.filter((order) => order.id !== id));
+        toast.success("Order deleted successfully!");
     };
 
+    // Mark Order as Shipped
+    const markAsShipped = (id) => {
+        setOrders(
+            orders.map((order) =>
+                order.id === id ? { ...order, status: "Shipped" } : order
+            )
+        );
+        toast.info("Order marked as shipped!");
+    };
+
+    const columns = [
+        { field: "id", headerName: "Order ID", flex: 1, headerClassName: "super-app-theme--header" },
+        { field: "customerName", headerName: "Customer Name", flex: 1, headerClassName: "super-app-theme--header" },
+        { field: "totalAmount", headerName: "Total Amount ($)", type: "number", flex: 1, headerClassName: "super-app-theme--header" },
+        {
+            field: "status",
+            headerName: "Status",
+            flex: 1,
+            headerClassName: "super-app-theme--header",
+            renderCell: (params) => (
+                <Chip
+                    label={params.value}
+                    color={params.value === "Shipped" ? "success" : params.value === "Processing" ? "warning" : "default"}
+                />
+            ),
+        },
+        {
+            field: "actions",
+            headerName: "Actions",
+            flex: 1,
+            headerClassName: "super-app-theme--header",
+            renderCell: (params) => (
+                <Box sx={{ display: "flex", gap: 1 }}>
+                    {params.row.status !== "Shipped" && (
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            size="small"
+                            onClick={() => markAsShipped(params.row.id)}
+                        >
+                            <LocalShippingIcon />
+                        </Button>
+                    )}
+                    <Button
+                        variant="contained"
+                        color="error"
+                        size="small"
+                        onClick={() => deleteOrder(params.row.id)}
+                    >
+                        <DeleteIcon />
+                    </Button>
+                </Box>
+            ),
+        },
+    ];
+
     return (
-        <div className="flex flex-col md:flex-row min-h-screen">
-            <div className="w-full md:w-1/4 bg-gray-900 text-white">
+        <div className="flex flex-col md:flex-row">
+            <div className="w-full md:w-1/5">
                 <Sidebar />
             </div>
-            <div className="w-full md:w-3/4 p-6">
-                <h1 className="text-3xl font-semibold mb-4">Order List</h1>
-                <Fragment>
-                    <div className="overflow-x-auto shadow-lg rounded-lg">
-                        <table className="min-w-full border-collapse">
-                            <thead>
-                                <tr className="bg-gray-200">
-                                    {data.columns.map((col) => (
-                                        <th key={col.field} className="px-4 py-2 border-b text-left">{col.label}</th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {data.rows.length > 0 ? data.rows.map((order, index) => (
-                                    <tr key={index} className="hover:bg-gray-50">
-                                        <td className="px-4 py-2 border-b">{order.id}</td>
-                                        <td className="px-4 py-2 border-b">{order.noOfItems}</td>
-                                        <td className="px-4 py-2 border-b">{order.amount}</td>
-                                        <td className="px-4 py-2 border-b">{order.status}</td>
-                                        <td className="px-4 py-2 border-b flex space-x-2">
-                                            {/* Action buttons can be added here */}
-                                        </td>
-                                    </tr>
-                                )) : (
-                                    <tr>
-                                        <td colSpan={5} className="text-center py-4">No orders found</td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </Fragment>
+            <div className="flex flex-col md:w-4/5 p-6">
+                <h1 className="text-2xl font-bold my-4">Order List</h1>
+                <Box
+                    sx={{
+                        height: '90%',
+                        width: "100%",
+                        "& .super-app-theme--header": {
+                            backgroundColor: "rgb(0, 0, 0)",
+                            color: "white",
+                        },
+                    }}
+                >
+                    <DataGrid
+                        rows={orders}
+                        columns={columns}
+                        initialState={{ pagination: { paginationModel } }}
+                        pageSizeOptions={[5, 10]}
+                        sx={{ border: 1 }}
+                        slots={{ toolbar: GridToolbar }}
+                    />
+                </Box>
             </div>
         </div>
     );

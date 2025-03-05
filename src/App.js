@@ -14,7 +14,17 @@ import OrderList from './pages/Admin/OrderList';
 import UpdateOrder from './pages/Admin/UpdateOrder';
 import UserList from './pages/Admin/UserList';
 import UpdateUser from './pages/Admin/UpdateUser';
+import EmployeeList from './pages/Admin/EmployeeList';
+import UpdateEmployee from './pages/Admin/UpdateEmployee';
 import ReviewList from './pages/Admin/ReviewList';
+import SupplierList from './pages/Admin/SupplierList';
+import UpdateSupplier from './pages/Admin/UpdateSupplier';
+import AdminSettings from './pages/Admin/AdminSettings';
+import AddEmployee from './pages/Admin/AddEmployee';
+import AddUser from './pages/Admin/AddUser';
+import AddSupplier from './pages/Admin/AddSupplier';
+
+
 
 
 
@@ -37,8 +47,16 @@ function App() {
           <Route path='/admin/orders' element={<OrderList />} />
           <Route path='/admin/order/:id' element={<UpdateOrder />} />
           <Route path='/admin/users' element={<UserList />} />
+          <Route path='/admin/users/create' element={<AddUser />} />
           <Route path='/admin/user/:id' element={<UpdateUser />} />
+          <Route path='/admin/employees' element={<EmployeeList />} />
+          <Route path='/admin/employees/create' element={<AddEmployee />} />
+          <Route path='/admin/employee/:id' element={<UpdateEmployee />} />
+          <Route path='/admin/suppliers' element={<SupplierList />} />
+          <Route path='/admin/suppliers/create' element={<AddSupplier />} />
+          <Route path='/admin/supplier/:id' element={<UpdateSupplier />} />
           <Route path='/admin/reviews' element={<ReviewList />} />
+          <Route path='/admin/settings' element={<AdminSettings />} />
 
         </Routes>
       </div>

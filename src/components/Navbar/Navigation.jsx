@@ -65,7 +65,7 @@ const Navbar = () => {
               onChange={handleSearchChange}
               className="w-full min-w-[150px] max-w-[250px] p-2 text-sm border rounded focus:outline-none"
             />
-            <button type="submit" className="px-4 py-2 bg-green-800 text-white rounded hover:bg-green-700">Search</button>
+            <button type="submit" className="px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-700">Search</button>
           </form>
           {suggestions.length > 0 && (
             <ul className="absolute top-12 left-0 bg-white shadow-md rounded p-2 w-full">

@@ -3,43 +3,45 @@ import { Link } from "react-router-dom";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import { Button } from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import Sidebar from "./Sidebar";
 import { toast } from "react-toastify";
 
 const paginationModel = { page: 0, pageSize: 5 };
 
-export default function UserList() {
-    const [users, setUsers] = useState([
-        { id: 1, name: "Alice Johnson", mobile: "123-456-7890", email: "alice@example.com", totalOrders: 5 },
-        { id: 2, name: "Bob Smith", mobile: "987-654-3210", email: "bob@example.com", totalOrders: 3 },
-        { id: 3, name: "Charlie Brown", mobile: "456-789-1234", email: "charlie@example.com", totalOrders: 7 },
-        { id: 4, name: "David Wilson", mobile: "321-654-9870", email: "david@example.com", totalOrders: 2 },
-        { id: 5, name: "Emma Davis", mobile: "654-321-7890", email: "emma@example.com", totalOrders: 4 },
+export default function SuppliersList() {
+    const [suppliers, setSuppliers] = useState([
+        { id: 1, pid: "F1001", category: "Fertilizer", products: "Organic Compost, Urea", date: "2024-02-15", mobile: "123-456-7890", address: "123 Greenway St, NY" },
+        { id: 2, pid: "T1002", category: "Tools", products: "Shovels, Rakes", date: "2024-01-20", mobile: "987-654-3210", address: "456 Farm Ln, CA" },
+        { id: 3, pid: "F1003", category: "Fertilizer", products: "Potash, NPK Mix", date: "2024-03-10", mobile: "456-789-1234", address: "789 Harvest Rd, TX" },
+        { id: 4, pid: "T1004", category: "Tools", products: "Pruners, Hoes", date: "2024-02-28", mobile: "321-654-9870", address: "321 Field Ave, FL" },
+        { id: 5, pid: "F1005", category: "Fertilizer", products: "Liquid Fertilizer, Bone Meal", date: "2024-01-05", mobile: "654-321-7890", address: "654 Growers St, WA" },
     ]);
 
-    const deleteUser = (id) => {
-        setUsers(users.filter((user) => user.id !== id));
-        toast.success("User deleted successfully!");
+    const deleteSupplier = (id) => {
+        setSuppliers(suppliers.filter((supplier) => supplier.id !== id));
+        toast.success("Supplier deleted successfully!");
     };
 
     const columns = [
-        { field: "id", headerName: "ID", flex: 1, headerClassName: "super-app-theme--header" },
-        { field: "name", headerName: "Name", flex: 1.2, headerClassName: "super-app-theme--header" },
+        { field: "id", headerName: "ID", flex: 0.5, headerClassName: "super-app-theme--header" },
+        { field: "pid", headerName: "PID", flex: 0.8, headerClassName: "super-app-theme--header" },
+        { field: "category", headerName: "Category", flex: 1, headerClassName: "super-app-theme--header" },
+        { field: "products", headerName: "Products", flex: 1.5, headerClassName: "super-app-theme--header" },
+        { field: "date", headerName: "Date", flex: 1, headerClassName: "super-app-theme--header" },
         { field: "mobile", headerName: "Mobile", flex: 1.2, headerClassName: "super-app-theme--header" },
-        { field: "email", headerName: "Email", flex: 1.5, headerClassName: "super-app-theme--header" },
-        { field: "totalOrders", headerName: "Total Orders", type: "number", flex: 1, headerClassName: "super-app-theme--header" },
+        { field: "address", headerName: "Address", flex: 1.5, headerClassName: "super-app-theme--header" },
         {
             field: "actions",
             headerName: "Actions",
-            flex: 1.5,
+            flex: 1.2,
             headerClassName: "super-app-theme--header",
             renderCell: (params) => (
                 <Box sx={{ display: "flex", justifyContent: "center", gap: 0.5, width: "100%" }}>
                     <Box>
-                        <Link to={`/admin/user/${params.row.id}`}>
+                        <Link to={`/admin/supplier/${params.row.id}`}>
                             <Button variant="contained" color="primary" size="small">
                                 <EditIcon />
                             </Button>
@@ -50,7 +52,7 @@ export default function UserList() {
                             variant="contained"
                             color="error"
                             size="small"
-                            onClick={() => deleteUser(params.row.id)}
+                            onClick={() => deleteSupplier(params.row.id)}
                         >
                             <DeleteIcon />
                         </Button>
@@ -66,18 +68,21 @@ export default function UserList() {
                 <Sidebar />
             </div>
             <div className="flex flex-col md:w-4/5 p-6">
-            <div className="flex justify-between items-center mb-4">
-                    <h1 className="text-2xl font-bold">Users List</h1>
-                    <Link to="/admin/users/create">
+                {/* Header with Add Supplier Button */}
+                <div className="flex justify-between items-center mb-4">
+                    <h1 className="text-2xl font-bold">Suppliers List</h1>
+                    <Link to="/admin/suppliers/create">
                     <Button
                         variant="contained"
                         color="primary"
                         startIcon={<AddIcon />}
                     >
-                        Add user
+                        Add Supplier
                     </Button>
                     </Link>
                 </div>
+
+                {/* Data Grid */}
                 <Box
                     sx={{
                         height: '90%',
@@ -89,7 +94,7 @@ export default function UserList() {
                     }}
                 >
                     <DataGrid
-                        rows={users}
+                        rows={suppliers}
                         columns={columns}
                         initialState={{ pagination: { paginationModel } }}
                         pageSizeOptions={[5, 10]}

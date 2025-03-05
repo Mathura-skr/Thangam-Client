@@ -11,26 +11,26 @@ import { toast } from "react-toastify";
 
 const paginationModel = { page: 0, pageSize: 5 };
 
-export default function UserList() {
-    const [users, setUsers] = useState([
-        { id: 1, name: "Alice Johnson", mobile: "123-456-7890", email: "alice@example.com", totalOrders: 5 },
-        { id: 2, name: "Bob Smith", mobile: "987-654-3210", email: "bob@example.com", totalOrders: 3 },
-        { id: 3, name: "Charlie Brown", mobile: "456-789-1234", email: "charlie@example.com", totalOrders: 7 },
-        { id: 4, name: "David Wilson", mobile: "321-654-9870", email: "david@example.com", totalOrders: 2 },
-        { id: 5, name: "Emma Davis", mobile: "654-321-7890", email: "emma@example.com", totalOrders: 4 },
+export default function EmployeeList() {
+    const [employees, setEmployees] = useState([
+        { id: 1, name: "Alice Johnson", mobile: "123-456-7890", email: "alice@example.com", address: "123 Main St, NY", },
+        { id: 2, name: "Bob Smith", mobile: "987-654-3210", email: "bob@example.com", address: "456 Elm St, CA", },
+        { id: 3, name: "Charlie Brown", mobile: "456-789-1234", email: "charlie@example.com", address: "789 Pine St, TX", },
+        { id: 4, name: "David Wilson", mobile: "321-654-9870", email: "david@example.com", address: "321 Oak St, FL", },
+        { id: 5, name: "Emma Davis", mobile: "654-321-7890", email: "emma@example.com", address: "654 Cedar St, WA", },
     ]);
 
-    const deleteUser = (id) => {
-        setUsers(users.filter((user) => user.id !== id));
-        toast.success("User deleted successfully!");
+    const deleteEmployee = (id) => {
+        setEmployees(employees.filter((employee) => employee.id !== id));
+        toast.success("Employee deleted successfully!");
     };
 
     const columns = [
-        { field: "id", headerName: "ID", flex: 1, headerClassName: "super-app-theme--header" },
+        { field: "id", headerName: "ID", flex: 0.8, headerClassName: "super-app-theme--header" },
         { field: "name", headerName: "Name", flex: 1.2, headerClassName: "super-app-theme--header" },
         { field: "mobile", headerName: "Mobile", flex: 1.2, headerClassName: "super-app-theme--header" },
         { field: "email", headerName: "Email", flex: 1.5, headerClassName: "super-app-theme--header" },
-        { field: "totalOrders", headerName: "Total Orders", type: "number", flex: 1, headerClassName: "super-app-theme--header" },
+        { field: "address", headerName: "Address", flex: 1.5, headerClassName: "super-app-theme--header" },
         {
             field: "actions",
             headerName: "Actions",
@@ -39,7 +39,7 @@ export default function UserList() {
             renderCell: (params) => (
                 <Box sx={{ display: "flex", justifyContent: "center", gap: 0.5, width: "100%" }}>
                     <Box>
-                        <Link to={`/admin/user/${params.row.id}`}>
+                        <Link to={`/admin/employee/${params.row.id}`}>
                             <Button variant="contained" color="primary" size="small">
                                 <EditIcon />
                             </Button>
@@ -50,7 +50,7 @@ export default function UserList() {
                             variant="contained"
                             color="error"
                             size="small"
-                            onClick={() => deleteUser(params.row.id)}
+                            onClick={() => deleteEmployee(params.row.id)}
                         >
                             <DeleteIcon />
                         </Button>
@@ -66,16 +66,16 @@ export default function UserList() {
                 <Sidebar />
             </div>
             <div className="flex flex-col md:w-4/5 p-6">
-            <div className="flex justify-between items-center mb-4">
-                    <h1 className="text-2xl font-bold">Users List</h1>
-                    <Link to="/admin/users/create">
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        startIcon={<AddIcon />}
-                    >
-                        Add user
-                    </Button>
+                <div className="flex justify-between items-center mb-4">
+                    <h1 className="text-2xl font-bold">Employee List</h1>
+                    <Link to="/admin/employees/create">
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<AddIcon />}
+                        >
+                            Add Employee
+                        </Button>
                     </Link>
                 </div>
                 <Box
@@ -89,7 +89,7 @@ export default function UserList() {
                     }}
                 >
                     <DataGrid
-                        rows={users}
+                        rows={employees}
                         columns={columns}
                         initialState={{ pagination: { paginationModel } }}
                         pageSizeOptions={[5, 10]}
