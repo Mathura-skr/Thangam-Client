@@ -39,7 +39,7 @@ const ProductPage = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <section className="relative w-full h-96">
-        <img src={require('../../assets/images/hero_bgimg.png')} alt="Hero" className="w-full h-full object-cover" />
+        <img src={require('../../assets/images/hero_bgimg.jpg')} alt="Hero" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white">
           <div className="text-center">
             <h1 className="text-4xl font-bold">Welcome to THANGAM</h1>

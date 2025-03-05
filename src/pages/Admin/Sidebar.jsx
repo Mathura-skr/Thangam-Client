@@ -9,6 +9,7 @@ import Diversity1Icon from '@mui/icons-material/Diversity1';
 import DeliveryDiningIcon from '@mui/icons-material/DeliveryDining';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import SettingsIcon from '@mui/icons-material/Settings';
+import RecyclingIcon from '@mui/icons-material/Recycling';
 
 export default function Sidebar() {
     const navigate = useNavigate();
@@ -64,6 +65,12 @@ export default function Sidebar() {
                         <Link to="/admin/orders" className="flex items-center space-x-2 p-2 rounded hover:bg-gray-700">
                             <LocalShippingIcon />
                             <span>Orders</span>
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/admin/rental" className="flex items-center space-x-2 p-2 rounded hover:bg-gray-700">
+                            <RecyclingIcon  />
+                            <span>Rent</span>
                         </Link>
                     </li>
 

@@ -23,6 +23,8 @@ import AdminSettings from './pages/Admin/AdminSettings';
 import AddEmployee from './pages/Admin/AddEmployee';
 import AddUser from './pages/Admin/AddUser';
 import AddSupplier from './pages/Admin/AddSupplier';
+import RentalList from './pages/Admin/RentalList';
+
 
 
 
@@ -56,6 +58,7 @@ function App() {
           <Route path='/admin/suppliers/create' element={<AddSupplier />} />
           <Route path='/admin/supplier/:id' element={<UpdateSupplier />} />
           <Route path='/admin/reviews' element={<ReviewList />} />
+          <Route path='/admin/rental' element={<RentalList />} />
           <Route path='/admin/settings' element={<AdminSettings />} />
 
         </Routes>
