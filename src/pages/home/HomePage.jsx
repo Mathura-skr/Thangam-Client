@@ -35,15 +35,15 @@ const HomePage = () => {
     <div className="flex flex-col min-h-screen">
       <section className="relative w-full h-[600px]">
         <img
-          src={require("../../assets/images/hero_bgimg.png")}
+          src={require("../../assets/images/hero_bgimg.jpg")}
           alt="Hero"
           className="w-full h-full object-cover"
         />
-        <img
+        {/* <img
           src={require("../../assets/images/hero_img1.png")}
           alt="Hero Overlay"
           className="absolute top-16 right-0 h-full max-w-full object-contain z-10"
-        />
+        /> */}
         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white">
           <div className="max-w-lg text-center">
             <h1 className="text-5xl font-bold mb-4 shadow-lg">Welcome to THANGAM</h1>
