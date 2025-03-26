@@ -1,41 +1,79 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
-const FilterPanel = () => {
-  const navigate = useNavigate();
+const FilterPanel = ({ applyFilter }) => {
   const [selected, setSelected] = useState(null);
 
   const categories = [
-    { id: 1, name: "Tools", path: "/product" },
-    { id: 2, name: "Fertilizers", path: "/product" },
+    { id: "tools", name: "Tools" },
+    { id: "fertilizers", name: "Fertilizers" }
   ];
 
-  const handleSelect = (id, path) => {
+  const subCategories = {
+    tools: ["Hand Tools", "Land Movers", "Cleaning Tools", "Protective Accessories", "Watering Systems"],
+    fertilizers: ["Organic", "Chemical", "Compost"]
+  };
+
+  const brands = {
+    tools: ["Bosch", "Makita", "DeWalt"],
+    fertilizers: ["GreenGrow", "FarmRich", "AgriBoost"]
+  };
+
+  const sizes = ["5kg", "10kg", "20kg"];
+
+  const handleSelect = (id) => {
     setSelected(id);
-    navigate(path);
+    applyFilter({ category: id });
   };
 
   return (
-    <div className="w-64 p-5  text-white overflow-y-auto rounded-md md:w-80 lg:w-96">
+    <div className="w-64 p-5 overflow-y-auto rounded-md">
       <h2 className="text-xl mb-4">Filter by Category</h2>
       <ul className="list-none p-0 m-0">
         {categories.map((category) => (
           <li
             key={category.id}
-            className={`flex items-center mb-4 p-2 border-2 transition duration-300 cursor-pointer ${
-              selected === category.id ? " outline outline-blackk" : "border-transparent"
-            } hover:border-white`}
-            onClick={() => handleSelect(category.id, category.path)}
+            className={`cursor-pointer p-2 border ${selected === category.id ? "border-black" : "border-gray-200"}`}
+            onClick={() => handleSelect(category.id)}
           >
-            <span
-              className={`w-5 h-5 mr-3 border-2 border-white flex items-center justify-center transition-transform ${
-                selected === category.id ? "bg-white scale-100" : "scale-0"
-              }`}
-            ></span>
-            <span className="text-base">{category.name}</span>
+            {category.name}
           </li>
         ))}
       </ul>
+
+      {selected && (
+        <>
+          <h3 className="mt-4">Subcategories</h3>
+          <ul>
+            {subCategories[selected]?.map((sub) => (
+              <li key={sub} className="cursor-pointer" onClick={() => applyFilter({ category: selected, subCategory: sub })}>
+                {sub}
+              </li>
+            ))}
+          </ul>
+
+          <h3 className="mt-4">Brands</h3>
+          <ul>
+            {brands[selected]?.map((brand) => (
+              <li key={brand} className="cursor-pointer" onClick={() => applyFilter({ category: selected, brand })}>
+                {brand}
+              </li>
+            ))}
+          </ul>
+
+          {selected === "fertilizers" && (
+            <>
+              <h3 className="mt-4">Size</h3>
+              <ul>
+                {sizes.map((size) => (
+                  <li key={size} className="cursor-pointer" onClick={() => applyFilter({ category: selected, size })}>
+                    {size}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </>
+      )}
     </div>
   );
 };

@@ -58,8 +58,8 @@ const HomePage = () => {
         </div>
       </section>
 
-      <div className="flex flex-col lg:flex-row p-4 bg-gray-100 gap-6">
-        <div className="lg:w-1/4 bg-white rounded-lg p-4 sticky top-24">
+      <div className="flex flex-col lg:flex-row p-4 bg-red-100 gap-6">
+        <div className="lg:w-[20%] bg-white rounded-lg p-4 sticky top-24">
           <FilterPanel />
         </div>
 

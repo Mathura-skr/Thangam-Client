@@ -1,45 +1,42 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import FilterPanel from '../../components/Filter/FilterPanel';
+import React, { useEffect, useState } from "react";
+import FilterPanel from "../../components/Filter/FilterPanel";
+import ProductCard from '../../components/ProductCard/ProductCard';
 
 const ProductPage = () => {
-  const navigate = useNavigate();
-
   const getRandomPrice = () => Math.floor(Math.random() * (900 - 200 + 1)) + 200;
 
   const products = [
-    { id: 1, name: "Garden Tools", category: "Tools", rating: 4.8, price: getRandomPrice(), image: require('../../assets/images/tool_img1.png') },
-    { id: 2, name: "Garden Tools", category: "Tools", rating: 4.8, price: getRandomPrice(), image: require('../../assets/images/tool_img2.png') },
-    { id: 7, name: "Fertilizers", category: "Fertilizers", rating: 4.6, price: getRandomPrice(), image: require('../../assets/images/fer1.png') },
-    { id: 8, name: "Fertilizers", category: "Fertilizers", rating: 4.6, price: getRandomPrice(), image: require('../../assets/images/fer2.png') },
+    { id: 1, name: "Bosch Drill", category: "tools", subCategory: "Hand Tools", brand: "Bosch", rating: 4.8, price: getRandomPrice(), image: require("../../assets/images/tool_img1.png") },
+    { id: 2, name: "Makita Saw", category: "tools", subCategory: "Land Movers", brand: "Makita", rating: 4.8, price: getRandomPrice(), image: require("../../assets/images/tool_img2.png") },
+    { id: 3, name: "FarmRich Fertilizer", category: "fertilizers", brand: "FarmRich", size: "10kg", rating: 4.6, price: getRandomPrice(), image: require("../../assets/images/fer1.png") },
+    { id: 4, name: "AgriBoost Compost", category: "fertilizers", brand: "AgriBoost", size: "5kg", rating: 4.6, price: getRandomPrice(), image: require("../../assets/images/fer2.png") }
   ];
 
-  const sections = [
-    { title: "Tools and Equipments", products: products.filter(p => p.category === "Tools") },
-    { title: "Seeds and Fertilizers", products: products.filter(p => p.category === "Fertilizers") },
-  ];
+  const [filteredProducts, setFilteredProducts] = useState(products);
 
-  useEffect(() => {
-    const hash = window.location.hash;
-    if (hash) {
-      document.getElementById(hash.replace('#', ''))?.scrollIntoView({ behavior: 'smooth' });
+  const applyFilter = (filter) => {
+    let filtered = products;
+
+    if (filter.category) {
+      filtered = filtered.filter((p) => p.category === filter.category);
     }
-  }, []);
+    if (filter.subCategory) {
+      filtered = filtered.filter((p) => p.subCategory === filter.subCategory);
+    }
+    if (filter.brand) {
+      filtered = filtered.filter((p) => p.brand === filter.brand);
+    }
+    if (filter.size) {
+      filtered = filtered.filter((p) => p.size === filter.size);
+    }
 
-  const ProductCard = ({ product }) => (
-    <div className="w-72 p-4 bg-white rounded-lg shadow-md flex flex-col justify-between text-center h-96">
-      <img src={product.image} alt={product.name} className="w-full h-40 object-cover rounded-md" />
-      <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
-      <p className="text-gray-600">Price: ₨ {product.price.toFixed(2)}</p>
-      <p className="text-yellow-500">Rating: {product.rating} ★</p>
-      <button className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Buy Now</button>
-    </div>
-  );
+    setFilteredProducts(filtered);
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
       <section className="relative w-full h-96">
-        <img src={require('../../assets/images/hero_bgimg.jpg')} alt="Hero" className="w-full h-full object-cover" />
+        <img src={require("../../assets/images/hero_bgimg.jpg")} alt="Hero" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white">
           <div className="text-center">
             <h1 className="text-4xl font-bold">Welcome to THANGAM</h1>
@@ -50,20 +47,18 @@ const ProductPage = () => {
 
       <div className="container mx-auto p-4 flex flex-col md:flex-row gap-4">
         <div className="w-full md:w-1/4">
-          <FilterPanel />
+          <FilterPanel applyFilter={applyFilter} />
         </div>
         <div className="w-full md:w-3/4">
-          {sections.map(section => (
-            <div key={section.title} id={section.title.toLowerCase().replace(/\s+/g, '-')}
-              className="mb-8">
-              <h2 className="text-2xl font-bold mb-4">{section.title}</h2>
-              <div className="flex gap-4 overflow-x-auto">
-                {section.products.map(product => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
+          {filteredProducts.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {filteredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
             </div>
-          ))}
+          ) : (
+            <p className="text-center text-lg text-red-500">No products found.</p>
+          )}
         </div>
       </div>
     </div>

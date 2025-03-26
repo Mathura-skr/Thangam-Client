@@ -9,8 +9,23 @@ const ProductCard = ({ product, handleBuyNow }) => {
         className="w-full h-32 object-cover rounded-md sm:h-40 md:h-48"
       />
       <h3 className="text-lg font-semibold mt-2 truncate">{product.name}</h3>
+
+      {/* Display Brand Name */}
+      {product.brand && <p className="text-gray-500 text-sm">Brand: {product.brand}</p>}
+
+      {/* Display Subcategory for Tools */}
+      {product.category.includes("tools") && (
+        <p className="text-gray-500 text-sm">Category: {product.category.replace("-", " ")}</p>
+      )}
+
+      {/* Display Size for Fertilizers */}
+      {product.size && (
+        <p className="text-gray-500 text-sm">Size: {product.size}</p>
+      )}
+
       <p className="text-green-600 font-medium">Price: ₨ {product.price.toFixed(2)}</p>
       <p className="text-yellow-500 text-sm">Rating: {product.rating} ★</p>
+
       <div className="flex justify-between mt-auto">
         <button className="bg-orange-500 text-white rounded px-3 py-1 text-sm hover:bg-orange-600 w-1/2 mr-1">
           Add to Cart

@@ -16,7 +16,7 @@ export default function Sidebar() {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <div className="flex min-h-screen w-full bg-gray-900 text-white">
+        <div className="flex min-h-screen w-full h-full bg-gray-900 text-white">
             <nav className="w-64 p-5 space-y-4">
                 <ul className="space-y-4">
                     <li>
