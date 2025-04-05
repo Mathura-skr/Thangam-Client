@@ -10,22 +10,20 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-{/* TODO: add products span to fer, tools  and blur bg  */}
-
-export default function Sidebar() {
+export default function StaffSidebar() {
     const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
     const menuItems = [
-        { icon: <SpaceDashboardIcon />, label: 'Dashboard', path: '/admin/dashboard' },
-        { icon: <BuildIcon />, label: 'Product', path: '/admin/products' },
-        { icon: <LocalShippingIcon />, label: 'Orders', path: '/admin/orders' },
-        { icon: <RecyclingIcon />, label: 'Rent', path: '/admin/rental' },
-        { icon: <DeliveryDiningIcon />, label: 'Suppliers', path: '/admin/suppliers' },
-        { icon: <MonetizationOnIcon />, label: 'Sales', path: '/admin/sales' },
-        { icon: <SettingsIcon />, label: 'Settings', path: '/admin/settings' },
+        { icon: <SpaceDashboardIcon />, label: 'Dashboard', path: '/staff/dashboard' },
+        { icon: <BuildIcon />, label: 'Product', path: '/staff/products' },
+        { icon: <LocalShippingIcon />, label: 'Orders', path: '/staff/orders' },
+        { icon: <RecyclingIcon />, label: 'Rent', path: '/staff/rental' },
+        { icon: <DeliveryDiningIcon />, label: 'Suppliers', path: '/staff/suppliers' },
+        { icon: <MonetizationOnIcon />, label: 'Sales', path: '/staff/sales' },
+        { icon: <SettingsIcon />, label: 'Settings', path: '/staff/settings' },
     ];
 
     return (

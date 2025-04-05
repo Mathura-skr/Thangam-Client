@@ -1,4 +1,4 @@
-import Sidebar from "./Sidebar";
+import Sidebar from "./StaffSidebar";
 import { Link } from "react-router-dom";
 
 // TODO: navBar, indicate admin, staff

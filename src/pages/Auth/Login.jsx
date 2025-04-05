@@ -39,8 +39,10 @@ const Login = () => {
       setLoading2(false);
       if (res.data.isAdmin === true) {
         navigate("/admin");
-      } else if (res.data.details.type === "customer") {
-        navigate("/finance");
+      } else if (res.data.details.type === "user") {
+        navigate("/");
+      }else if (res.data.details.type === "staff") {
+        navigate("/staff");
       }
       
       else if (res.data.isAdmin === false) {

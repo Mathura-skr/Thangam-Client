@@ -67,7 +67,8 @@ export default function EmployeeList() {
             </div>
             <div className="flex flex-col md:w-4/5 p-6">
                 <div className="flex justify-between items-center mb-4">
-                    <h1 className="text-2xl font-bold">Employee List</h1>
+                    <h1 className="text-2xl font-bold">Employee List</h1>   
+                    {/* TODO: update emp & others */}
                     <Link to="/admin/employees/create">
                         <Button
                             variant="contained"

@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
-import Sidebar from "./Sidebar";
-//TODO: add to admin
+import Sidebar from "./StaffSidebar";
+
 export default function ReviewList() {
     const data = {
         columns: [

@@ -1,5 +1,5 @@
 import React, { Fragment, useState } from "react";
-import Sidebar from "./Sidebar";
+import Sidebar from "./StaffSidebar";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";

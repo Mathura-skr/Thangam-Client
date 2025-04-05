@@ -10,7 +10,7 @@ const Register = () => {
   const [loading2, setLoading2] = useState(false);
 
   const [file, setFile] = useState("");
-
+// TODO: remove address
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");

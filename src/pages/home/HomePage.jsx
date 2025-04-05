@@ -30,14 +30,14 @@ const HomePage = () => {
 
   const openModal = (product) => setSelectedProduct(product);
   const closeModal = () => setSelectedProduct(null);
-
+// TODO make single paggggge
   return (
     <div className="flex flex-col min-h-screen">
-      <section className="relative w-full h-[600px]">
+      <section className="relative w-full h-[700px]">
         <img
           src={require("../../assets/images/hero_bgimg.jpg")}
           alt="Hero"
-          className="w-full h-full object-cover"
+          className="w-full  object-cover"
         />
         {/* <img
           src={require("../../assets/images/hero_img1.png")}
@@ -58,11 +58,8 @@ const HomePage = () => {
         </div>
       </section>
 
-      <div className="flex flex-col lg:flex-row p-4 bg-red-100 gap-6">
-        <div className="lg:w-[20%] bg-white rounded-lg p-4 sticky top-24">
-          <FilterPanel />
-        </div>
-
+      {/* <section className="relative w-full h-[700px]">
+       <div className="flex flex-col lg:flex-row p-4 bg-red-100 gap-6">
         <div className="flex-1 bg-white rounded-lg p-6">
           <h2 className="text-2xl font-semibold mb-4">Featured Products</h2>
           <div className="flex overflow-x-auto space-x-4 p-2 scrollbar-hide">
@@ -89,7 +86,9 @@ const HomePage = () => {
             ))}
           </div>
         </div>
-      </div>
+      </div> 
+      </section> */}
+      
     </div>
   );
 };

@@ -6,7 +6,7 @@ import { Button } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import Sidebar from "./Sidebar";
+import Sidebar from "./StaffSidebar";
 import { toast } from "react-toastify";
 
 const paginationModel = { page: 0, pageSize: 5 };
