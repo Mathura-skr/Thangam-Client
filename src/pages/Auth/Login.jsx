@@ -1,10 +1,9 @@
-import axios from "axios";
+import axios from "../../utils/axios"; 
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
-// import Spinner from "../components/spinner/LoadingSpinner";
 
 const Login = () => {
   const [credentials, setCredentials] = useState({
@@ -25,36 +24,51 @@ const Login = () => {
   const handleClick = async (e) => {
     e.preventDefault();
     dispatch({ type: "LOGIN_START" });
-
+  
     if (!credentials.email || !credentials.password) {
       Swal.fire("Please enter your email and password", "", "error");
     }
     if (!/\S+@\S+\.\S+/.test(credentials.email)) {
       Swal.fire("Please enter a valid email address", "", "error");
     }
+  
     try {
       setLoading2(true);
-      const res = await axios.post("auth/login", credentials);
-      dispatch({ type: "LOGIN_SUCCESS", payload: res.data.details });
+      const res = await axios.post("/api/auth/signin", credentials, {
+        withCredentials: true,
+      });
+  
+  
+      dispatch({ type: "LOGIN_SUCCESS", payload: res.data.result });
+  
       setLoading2(false);
-      if (res.data.isAdmin === true) {
-        navigate("/admin");
-      } else if (res.data.details.type === "user") {
+  
+      const { isAdmin, role } = res.data.result;  
+  
+  
+      if (isAdmin === 1) {
+        navigate("/admin/dashboard");
+      } else if (role === "user") {
         navigate("/");
-      }else if (res.data.details.type === "staff") {
+      } else if (role === "staff") {
         navigate("/staff");
-      }
-      
-      else if (res.data.isAdmin === false) {
+      } else {
         navigate("/");
       }
     } catch (err) {
-      dispatch({ type: "LOGIN_FAILURE", payload: err.response.data });
-      setTimeout(() => {
-        Swal.fire(err.response.data, "", "error");
-      }, 2000);
+      setLoading2(false);
+  
+      if (err.response) {
+        dispatch({ type: "LOGIN_FAILURE", payload: err.response.data });
+        Swal.fire(err.response.data.message || err.response.data, "", "error");
+      } else {
+        console.error("Error without response:", err);
+        Swal.fire("An error occurred. Please try again later.", "", "error");
+      }
     }
   };
+  
+  
 
   return (
     <div className="bg-[#F5F5F5] ">
@@ -89,15 +103,14 @@ const Login = () => {
                   </div>
                   <div className="mb-10">
                     <button
-                      disabled={loading}
+                      disabled={loading2}
                       onClick={handleClick}
                       className="w-full cursor-pointer rounded-3xl font-bold bg-gray-800 text-center hover:bg-gray-600 py-3 px-5 text-white transition hover:bg-opacity-90"
                     >
-                      Sign In
+                      {loading2 ? "Signing In..." : "Sign In"}
                     </button>
                   </div>
                 </form>
-                {/* {loading && <Spinner />} */}
 
                 <Link
                   to="/resetPassword"

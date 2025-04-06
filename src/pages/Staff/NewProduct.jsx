@@ -2,7 +2,8 @@ import React, { Fragment, useState } from "react";
 import Sidebar from "./StaffSidebar";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../../utils/axios";
+import StaffNav from '../../components/Navbar/StaffNav';
 
 export default function NewProduct() {
   const navigate = useNavigate();
@@ -99,6 +100,7 @@ export default function NewProduct() {
 
   return (
     <div className="flex flex-col md:flex-row">
+      <StaffNav/>
       <div className="w-full md:w-1/5">
         <Sidebar />
       </div>

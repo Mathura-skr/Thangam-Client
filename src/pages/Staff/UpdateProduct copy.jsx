@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import Sidebar from "./Sidebar";
+import Sidebar from "./StaffSidebar";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 

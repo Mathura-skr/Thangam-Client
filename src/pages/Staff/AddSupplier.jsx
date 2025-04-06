@@ -1,5 +1,6 @@
 import { Fragment, useState } from "react";
 import Sidebar from "./StaffSidebar";
+import StaffNav from '../../components/Navbar/StaffNav';
 
 export default function AddSupplier() {
   const categories = ["Fertilizer", "Tools"];
@@ -8,6 +9,7 @@ export default function AddSupplier() {
 
   return (
     <div className="flex flex-col md:flex-row">
+      <StaffNav/>
       <div className="w-full md:w-1/5">
         <Sidebar />
       </div>

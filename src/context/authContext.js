@@ -1,8 +1,19 @@
-import axios from "axios";
-import { createContext, useEffect, useReducer } from "react";
+import { createContext, useReducer } from "react";
+
+const getUserFromStorage = () => {
+  try {
+    const user = localStorage.getItem("user");
+    if (user && user !== "undefined") {
+      return JSON.parse(user);
+    }
+    return null;
+  } catch (err) {
+    return null;
+  }
+};
 
 const INITIAL_STATE = {
-  user: JSON.parse(localStorage.getItem("user")) || null,
+  user: getUserFromStorage(),
   loading: false,
   error: null,
 };
@@ -18,6 +29,7 @@ const AuthReducer = (state, action) => {
         error: null,
       };
     case "LOGIN_SUCCESS":
+      localStorage.setItem("user", JSON.stringify(action.payload)); // ✅ Save correctly
       return {
         user: action.payload,
         loading: false,
@@ -30,6 +42,7 @@ const AuthReducer = (state, action) => {
         error: action.payload,
       };
     case "LOGOUT":
+      localStorage.removeItem("user");
       return {
         user: null,
         loading: false,
@@ -43,18 +56,6 @@ const AuthReducer = (state, action) => {
 export const AuthContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(AuthReducer, INITIAL_STATE);
 
-  useEffect(() => {
-    localStorage.setItem("user", JSON.stringify(state.user));
-  }, [state.user]);
-
-  const logout = () => {
-    localStorage.removeItem("user"); // remove the user from localStorage
-    axios.get("/api/logout").then(() => {
-      // make a request to your backend to clear cookies and session
-      dispatch({ type: "LOGOUT" }); // update the state to clear the user
-    });
-  };
-
   return (
     <AuthContext.Provider
       value={{
@@ -62,7 +63,6 @@ export const AuthContextProvider = ({ children }) => {
         loading: state.loading,
         error: state.error,
         dispatch,
-        logout, // add the logout function to the context
       }}
     >
       {children}

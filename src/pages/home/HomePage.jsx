@@ -32,27 +32,27 @@ const HomePage = () => {
   const closeModal = () => setSelectedProduct(null);
 // TODO make single paggggge
   return (
-    <div className="flex flex-col min-h-screen">
-      <section className="relative w-full h-[700px]">
+    <div className="flex flex-col min-h-screen ">
+      <section className="relative relative w-screen h-screen overflow-hidden">
         <img
           src={require("../../assets/images/hero_bgimg.jpg")}
           alt="Hero"
-          className="w-full  object-cover"
+          className="w-[]"
         />
         {/* <img
           src={require("../../assets/images/hero_img1.png")}
           alt="Hero Overlay"
           className="absolute top-16 right-0 h-full max-w-full object-contain z-10"
         /> */}
-        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white">
+        <div className="absolute inset-0 bg-opacity-50 flex items-center justify-center ">
           <div className="max-w-lg text-center">
-            <h1 className="text-5xl font-bold mb-4 shadow-lg">Welcome to THANGAM</h1>
-            <h2 className="text-xl mb-6 shadow-md">Buy & Rent for your garden from home!</h2>
+            <h1 className="text-5xl font-bold mb-4 ">We take care your beautiful garden</h1>
+            <h2 className="text-xl mb-6 ">Buy & Rent for your garden from home!</h2>
             <button
-              className="px-6 py-2 text-lg bg-green-800 outline outline-2 outline-transparent hover:outline-white rounded-md"
+              className="px-6 py-2 text-white text-lg bg-green-800 outline outline-2 outline-transparent hover:outline-white rounded-md"
               onClick={() => navigate("")}
             >
-              Book Now
+              Explore Our Products
             </button>
           </div>
         </div>

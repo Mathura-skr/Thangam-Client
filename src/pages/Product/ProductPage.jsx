@@ -1,21 +1,38 @@
-import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../context/authContext";
 import FilterPanel from "../../components/Filter/FilterPanel";
-import ProductCard from '../../components/ProductCard/ProductCard';
+import ProductCard from "../../components/ProductCard/ProductCard";
 
 const ProductPage = () => {
-  const getRandomPrice = () => Math.floor(Math.random() * (900 - 200 + 1)) + 200;
+  // const getRandomPrice = () =>
+  //   Math.floor(Math.random() * (900 - 200 + 1)) + 200;
 
-  const products = [
-    { id: 1, name: "Bosch Drill", category: "tools", subCategory: "Hand Tools", brand: "Bosch", rating: 4.8, price: getRandomPrice(), image: require("../../assets/images/tool_img1.png") },
-    { id: 2, name: "Makita Saw", category: "tools", subCategory: "Land Movers", brand: "Makita", rating: 4.8, price: getRandomPrice(), image: require("../../assets/images/tool_img2.png") },
-    { id: 3, name: "FarmRich Fertilizer", category: "fertilizers", brand: "FarmRich", size: "10kg", rating: 4.6, price: getRandomPrice(), image: require("../../assets/images/fer1.png") },
-    { id: 4, name: "AgriBoost Compost", category: "fertilizers", brand: "AgriBoost", size: "5kg", rating: 4.6, price: getRandomPrice(), image: require("../../assets/images/fer2.png") }
-  ];
+  const { user } = useContext(AuthContext); // access auth
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const [filteredProducts, setFilteredProducts] = useState(products);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await axios.get("/api/products");
+        setProducts(res.data);
+        console.log("data....", res.data)
+        setFilteredProducts(res.data);
+      } catch (err) {
+        setError("Failed to fetch products.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const applyFilter = (filter) => {
-    let filtered = products;
+    let filtered = [...products];
 
     if (filter.category) {
       filtered = filtered.filter((p) => p.category === filter.category);
@@ -33,31 +50,64 @@ const ProductPage = () => {
     setFilteredProducts(filtered);
   };
 
+  const handleAddToCart = async (productId) => {
+    try {
+      if (!user) {
+        alert("You need to login to add products to your cart.");
+        return;
+      }
+
+      await axios.post(
+        "/api/cart",
+        { productId, quantity: 1 },
+        { withCredentials: true }
+      );
+
+      alert("Product added to cart!");
+    } catch (err) {
+      console.error("Add to cart error:", err);
+      alert("Failed to add to cart.");
+    }
+  };
+
+  const handleBuyNow = (productId) => {
+    if (!user) {
+      alert("Please login first");
+      return;
+    }
+
+    // You might want to redirect with product ID as param or via context
+    window.location.href = `/checkout?productId=${productId}`;
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
-      <section className="relative w-full h-96">
-        <img src={require("../../assets/images/hero_bgimg.jpg")} alt="Hero" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold">Welcome to THANGAM</h1>
-            <h2 className="text-2xl mt-2">Buy & Rent for your garden from home!</h2>
-          </div>
-        </div>
-      </section>
+      
 
       <div className="container mx-auto p-4 flex flex-col md:flex-row gap-4">
         <div className="w-full md:w-1/4">
           <FilterPanel applyFilter={applyFilter} />
         </div>
         <div className="w-full md:w-3/4">
-          {filteredProducts.length > 0 ? (
+          {loading ? (
+            <p>Loading products...</p>
+          ) : error ? (
+            <p className="text-red-500">{error}</p>
+          ) : filteredProducts.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onAddToCart={() => handleAddToCart(product.id)}
+                  onBuyNow={() => handleBuyNow(product.id)}
+                />
               ))}
             </div>
           ) : (
-            <p className="text-center text-lg text-red-500">No products found.</p>
+            <p className="text-center text-lg text-red-500">
+              No products found.
+            </p>
           )}
         </div>
       </div>

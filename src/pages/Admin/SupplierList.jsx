@@ -13,11 +13,11 @@ const paginationModel = { page: 0, pageSize: 5 };
 
 export default function SuppliersList() {
     const [suppliers, setSuppliers] = useState([
-        { id: 1, pid: "F1001", category: "Fertilizer", products: "Organic Compost, Urea", date: "2024-02-15", mobile: "123-456-7890", address: "123 Greenway St, NY" },
-        { id: 2, pid: "T1002", category: "Tools", products: "Shovels, Rakes", date: "2024-01-20", mobile: "987-654-3210", address: "456 Farm Ln, CA" },
-        { id: 3, pid: "F1003", category: "Fertilizer", products: "Potash, NPK Mix", date: "2024-03-10", mobile: "456-789-1234", address: "789 Harvest Rd, TX" },
-        { id: 4, pid: "T1004", category: "Tools", products: "Pruners, Hoes", date: "2024-02-28", mobile: "321-654-9870", address: "321 Field Ave, FL" },
-        { id: 5, pid: "F1005", category: "Fertilizer", products: "Liquid Fertilizer, Bone Meal", date: "2024-01-05", mobile: "654-321-7890", address: "654 Growers St, WA" },
+        { id: 1, pid: "F1001", category: "Fertilizer", products: "Organic Compost, Urea", date: "2024-02-15", phone: "123-456-7890", address: "123 Greenway St, NY" },
+        { id: 2, pid: "T1002", category: "Tools", products: "Shovels, Rakes", date: "2024-01-20", phone: "987-654-3210", address: "456 Farm Ln, CA" },
+        { id: 3, pid: "F1003", category: "Fertilizer", products: "Potash, NPK Mix", date: "2024-03-10", phone: "456-789-1234", address: "789 Harvest Rd, TX" },
+        { id: 4, pid: "T1004", category: "Tools", products: "Pruners, Hoes", date: "2024-02-28", phone: "321-654-9870", address: "321 Field Ave, FL" },
+        { id: 5, pid: "F1005", category: "Fertilizer", products: "Liquid Fertilizer, Bone Meal", date: "2024-01-05", phone: "654-321-7890", address: "654 Growers St, WA" },
     ]);
 
     const deleteSupplier = (id) => {
@@ -31,7 +31,7 @@ export default function SuppliersList() {
         { field: "category", headerName: "Category", flex: 1, headerClassName: "super-app-theme--header" },
         { field: "products", headerName: "Products", flex: 1.5, headerClassName: "super-app-theme--header" },
         { field: "date", headerName: "Date", flex: 1, headerClassName: "super-app-theme--header" },
-        { field: "mobile", headerName: "Mobile", flex: 1.2, headerClassName: "super-app-theme--header" },
+        { field: "phone", headerName: "Mobile", flex: 1.2, headerClassName: "super-app-theme--header" },
         { field: "address", headerName: "Address", flex: 1.5, headerClassName: "super-app-theme--header" },
         {
             field: "actions",

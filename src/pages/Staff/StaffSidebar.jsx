@@ -52,7 +52,7 @@ export default function StaffSidebar() {
                                 <Link
                                     to={item.path}
                                     className="flex flex-col items-center md:flex-row md:items-center space-x-0 md:space-x-2 p-2 rounded hover:bg-gray-700"
-                                    onClick={() => setSidebarOpen(false)} // auto-close on mobile
+                                    onClick={() => setSidebarOpen(false)} // auto-close on phone
                                 >
                                     {item.icon}
                                     <span className="hidden md:inline">{item.label}</span>

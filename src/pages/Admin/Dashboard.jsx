@@ -1,7 +1,6 @@
 import Sidebar from "./Sidebar";
 import { Link } from "react-router-dom";
 
-// TODO: navBar, indicate admin, staff
 export default function Dashboard() {
     return (
         <div className="flex flex-col md:flex-row">

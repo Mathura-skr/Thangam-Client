@@ -13,11 +13,11 @@ const paginationModel = { page: 0, pageSize: 5 };
 
 export default function UserList() {
     const [users, setUsers] = useState([
-        { id: 1, name: "Alice Johnson", mobile: "123-456-7890", email: "alice@example.com", totalOrders: 5 },
-        { id: 2, name: "Bob Smith", mobile: "987-654-3210", email: "bob@example.com", totalOrders: 3 },
-        { id: 3, name: "Charlie Brown", mobile: "456-789-1234", email: "charlie@example.com", totalOrders: 7 },
-        { id: 4, name: "David Wilson", mobile: "321-654-9870", email: "david@example.com", totalOrders: 2 },
-        { id: 5, name: "Emma Davis", mobile: "654-321-7890", email: "emma@example.com", totalOrders: 4 },
+        { id: 1, name: "Alice Johnson", phone: "123-456-7890", email: "alice@example.com", totalOrders: 5 },
+        { id: 2, name: "Bob Smith", phone: "987-654-3210", email: "bob@example.com", totalOrders: 3 },
+        { id: 3, name: "Charlie Brown", phone: "456-789-1234", email: "charlie@example.com", totalOrders: 7 },
+        { id: 4, name: "David Wilson", phone: "321-654-9870", email: "david@example.com", totalOrders: 2 },
+        { id: 5, name: "Emma Davis", phone: "654-321-7890", email: "emma@example.com", totalOrders: 4 },
     ]);
 
     const deleteUser = (id) => {
@@ -28,7 +28,7 @@ export default function UserList() {
     const columns = [
         { field: "id", headerName: "ID", flex: 1, headerClassName: "super-app-theme--header" },
         { field: "name", headerName: "Name", flex: 1.2, headerClassName: "super-app-theme--header" },
-        { field: "mobile", headerName: "Mobile", flex: 1.2, headerClassName: "super-app-theme--header" },
+        { field: "phone", headerName: "Mobile", flex: 1.2, headerClassName: "super-app-theme--header" },
         { field: "email", headerName: "Email", flex: 1.5, headerClassName: "super-app-theme--header" },
         { field: "totalOrders", headerName: "Total Orders", type: "number", flex: 1, headerClassName: "super-app-theme--header" },
         {

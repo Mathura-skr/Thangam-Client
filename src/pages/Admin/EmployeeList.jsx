@@ -13,11 +13,11 @@ const paginationModel = { page: 0, pageSize: 5 };
 
 export default function EmployeeList() {
     const [employees, setEmployees] = useState([
-        { id: 1, name: "Alice Johnson", mobile: "123-456-7890", email: "alice@example.com", address: "123 Main St, NY", },
-        { id: 2, name: "Bob Smith", mobile: "987-654-3210", email: "bob@example.com", address: "456 Elm St, CA", },
-        { id: 3, name: "Charlie Brown", mobile: "456-789-1234", email: "charlie@example.com", address: "789 Pine St, TX", },
-        { id: 4, name: "David Wilson", mobile: "321-654-9870", email: "david@example.com", address: "321 Oak St, FL", },
-        { id: 5, name: "Emma Davis", mobile: "654-321-7890", email: "emma@example.com", address: "654 Cedar St, WA", },
+        { id: 1, name: "Alice Johnson", phone: "123-456-7890", email: "alice@example.com", address: "123 Main St, NY", },
+        { id: 2, name: "Bob Smith", phone: "987-654-3210", email: "bob@example.com", address: "456 Elm St, CA", },
+        { id: 3, name: "Charlie Brown", phone: "456-789-1234", email: "charlie@example.com", address: "789 Pine St, TX", },
+        { id: 4, name: "David Wilson", phone: "321-654-9870", email: "david@example.com", address: "321 Oak St, FL", },
+        { id: 5, name: "Emma Davis", phone: "654-321-7890", email: "emma@example.com", address: "654 Cedar St, WA", },
     ]);
 
     const deleteEmployee = (id) => {
@@ -28,7 +28,7 @@ export default function EmployeeList() {
     const columns = [
         { field: "id", headerName: "ID", flex: 0.8, headerClassName: "super-app-theme--header" },
         { field: "name", headerName: "Name", flex: 1.2, headerClassName: "super-app-theme--header" },
-        { field: "mobile", headerName: "Mobile", flex: 1.2, headerClassName: "super-app-theme--header" },
+        { field: "phone", headerName: "Mobile", flex: 1.2, headerClassName: "super-app-theme--header" },
         { field: "email", headerName: "Email", flex: 1.5, headerClassName: "super-app-theme--header" },
         { field: "address", headerName: "Address", flex: 1.5, headerClassName: "super-app-theme--header" },
         {
