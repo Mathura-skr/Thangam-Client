@@ -40,6 +40,10 @@ const Login = () => {
   
   
       dispatch({ type: "LOGIN_SUCCESS", payload: res.data.result });
+
+      const { token } = res.data;
+
+      localStorage.setItem("token", token);
   
       setLoading2(false);
   

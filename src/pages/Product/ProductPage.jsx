@@ -1,38 +1,24 @@
-import axios from "axios";
 import { useContext, useEffect, useState } from "react";
+import axios from "../../utils/axios";
 import { AuthContext } from "../../context/authContext";
 import FilterPanel from "../../components/Filter/FilterPanel";
 import ProductCard from "../../components/ProductCard/ProductCard";
+import useFetch from "../../hooks/useFetch";
 
 const ProductPage = () => {
-  // const getRandomPrice = () =>
-  //   Math.floor(Math.random() * (900 - 200 + 1)) + 200;
+  const { user } = useContext(AuthContext);
+  const { data, loading, error } = useFetch("/api/products");
 
-  const { user } = useContext(AuthContext); // access auth
-  const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await axios.get("/api/products");
-        setProducts(res.data);
-        console.log("data....", res.data)
-        setFilteredProducts(res.data);
-      } catch (err) {
-        setError("Failed to fetch products.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, []);
+    if (data.length > 0) {
+      setFilteredProducts(data);
+    }
+  }, [data]);
 
   const applyFilter = (filter) => {
-    let filtered = [...products];
+    let filtered = [...data];
 
     if (filter.category) {
       filtered = filtered.filter((p) => p.category === filter.category);
@@ -76,14 +62,11 @@ const ProductPage = () => {
       return;
     }
 
-    // You might want to redirect with product ID as param or via context
     window.location.href = `/checkout?productId=${productId}`;
   };
 
   return (
     <div className="min-h-screen bg-gray-100">
-      
-
       <div className="container mx-auto p-4 flex flex-col md:flex-row gap-4">
         <div className="w-full md:w-1/4">
           <FilterPanel applyFilter={applyFilter} />
@@ -92,7 +75,7 @@ const ProductPage = () => {
           {loading ? (
             <p>Loading products...</p>
           ) : error ? (
-            <p className="text-red-500">{error}</p>
+            <p className="text-red-500">Failed to load products.</p>
           ) : filteredProducts.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {filteredProducts.map((product) => (

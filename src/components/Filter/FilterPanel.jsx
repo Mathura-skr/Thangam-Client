@@ -18,7 +18,7 @@ const FilterPanel = ({ applyFilter }) => {
     fertilizers: ["GreenGrow", "FarmRich", "AgriBoost"]
   };
 
-  const sizes = ["5kg", "10kg", "20kg"];
+  const size = ["5kg", "10kg", "20kg"];
 
   const handleSelect = (id) => {
     setSelected(id);
@@ -64,7 +64,7 @@ const FilterPanel = ({ applyFilter }) => {
             <>
               <h3 className="mt-4">Size</h3>
               <ul>
-                {sizes.map((size) => (
+                {size.map((size) => (
                   <li key={size} className="cursor-pointer" onClick={() => applyFilter({ category: selected, size })}>
                     {size}
                   </li>

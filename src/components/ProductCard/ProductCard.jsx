@@ -8,12 +8,17 @@ const ProductCard = ({ product, onAddToCart, onBuyNow }) => {
         alt={product.name} 
         className="w-full h-32 object-cover rounded-md sm:h-40 md:h-48"
       />
+
       <h3 className="text-lg font-semibold mt-2 truncate">{product.name}</h3>
 
-      {product.brand && <p className="text-gray-500 text-sm">Brand: {product.brand}</p>}
+      {product.brand && (
+        <p className="text-gray-500 text-sm">Brand: {product.brand}</p>
+      )}
 
-      {product.category.includes("tools") && (
-        <p className="text-gray-500 text-sm">Category: {product.category.replace("-", " ")}</p>
+      {product.category?.includes("tools") && (
+        <p className="text-gray-500 text-sm">
+          Category: {product.category.replace("-", " ")}
+        </p>
       )}
 
       {product.size && (
@@ -24,12 +29,15 @@ const ProductCard = ({ product, onAddToCart, onBuyNow }) => {
       <p className="text-yellow-500 text-sm">Rating: {product.rating} ★</p>
 
       <div className="flex justify-between mt-auto">
-        <button onClick={onAddToCart} className="bg-orange-500 text-white rounded px-3 py-1 text-sm hover:bg-orange-600 w-1/2 mr-1">
+        <button
+          onClick={onAddToCart}
+          className="bg-orange-500 text-white rounded px-3 py-1 text-sm hover:bg-orange-600 w-1/2 mr-1"
+        >
           Add to Cart
         </button>
-        <button 
-          className="bg-black text-white rounded px-3 py-1 text-sm hover:outline hover:outline-2 hover:outline-black hover:rounded-md w-1/2 ml-1" 
+        <button
           onClick={onBuyNow}
+          className="bg-black text-white rounded px-3 py-1 text-sm hover:outline hover:outline-2 hover:outline-black hover:rounded-md w-1/2 ml-1"
         >
           Buy Now
         </button>
