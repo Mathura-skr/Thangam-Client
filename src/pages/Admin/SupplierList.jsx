@@ -7,6 +7,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import Sidebar from "./Sidebar";
+import AdminNav from "../../components/Navbar/AdminNav";
 import { toast } from "react-toastify";
 
 const paginationModel = { page: 0, pageSize: 5 };
@@ -63,11 +64,15 @@ export default function SuppliersList() {
     ];
 
     return (
-        <div className="flex flex-col md:flex-row">
-            <div className="w-full md:w-1/5">
-                <Sidebar />
-            </div>
-            <div className="flex flex-col md:w-4/5 p-6">
+        <div className="flex flex-col h-screen">
+        <AdminNav />
+        <div className="flex flex-1 overflow-hidden">
+          <div className="w-1/5 bg-gray-100 h-full border-r">
+            <Sidebar />
+          </div>
+  
+
+          <div className="w-4/5 p-6 overflow-auto">
                 {/* Header with Add Supplier Button */}
                 <div className="flex justify-between items-center mb-4">
                     <h1 className="text-2xl font-bold">Suppliers List</h1>
@@ -103,6 +108,7 @@ export default function SuppliersList() {
                         slots={{ toolbar: GridToolbar }}
                     />
                 </Box>
+            </div>
             </div>
         </div>
     );

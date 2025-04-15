@@ -24,7 +24,7 @@ import OrderList from '../pages/Admin/OrderList';
 import ProductList from '../pages/Admin/ProductList';
 import RentalList from '../pages/Admin/RentalList';
 import ReviewList from '../pages/Admin/ReviewList';
-import AdminSettings from '../pages/Admin/StaffSettings';
+import AdminSettings from '../pages/Admin/AdminSettings';
 import SupplierList from '../pages/Admin/SupplierList';
 import UpdateEmployee from '../pages/Admin/UpdateEmployee';
 import UpdateOrder from '../pages/Admin/UpdateOrder';

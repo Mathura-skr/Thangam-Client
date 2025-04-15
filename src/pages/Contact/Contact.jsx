@@ -1,9 +1,12 @@
 import React from "react";
-import contactImage from "../../assets/images/logo1.png"; // Replace with the actual contact image
+import contactImage from "../../assets/images/logo1.png";
+import Navigation from "../../components/Navbar/Navigation";
+
 
 const Contact = () => {
   return (
     <>
+     <Navigation/>
       <div className="bg-[#F5F5F5] lg:px-36 md:py-5 px-5">
         <div className="container mx-auto">
           <div className="mx-auto mb-12 max-w-[510px] text-center lg:mb-20 pt-20">

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
 import { Link, useNavigate } from "react-router-dom";
-import FilterPanel from "../../components/Filter/FilterPanel";
+import Navigation from "../../components/Navbar/Navigation";
+
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -32,7 +33,8 @@ const HomePage = () => {
   const closeModal = () => setSelectedProduct(null);
 // TODO make single paggggge
   return (
-    <div className="flex flex-col min-h-screen ">
+    <div className="flex flex-col h-screen ">
+      <Navigation/>
       <section className="relative relative w-screen h-screen overflow-hidden">
         <img
           src={require("../../assets/images/hero_bgimg.jpg")}

@@ -16,7 +16,7 @@ export default function NewProduct() {
   const [brand, setBrand] = useState("");
   const [quantity, setQuantity] = useState("");
   const [supplier, setSupplier] = useState("");
-  const [image_url, setImageURLs] = useState([]);
+  const [image_url, setImageURL] = useState("");
 
   const subCategories = {
     Fertilizer: ["Organic", "Chemical", "Compost"],
@@ -51,16 +51,14 @@ export default function NewProduct() {
     }
   };
 
-  const handleMultipleImageUpload = async (e) => {
-    const files = Array.from(e.target.files);
-    const urls = [];
+  const handleSingleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
 
-    for (const file of files) {
       const url = await handleImageUpload(file);
-      if (url) urls.push(url);
-    }
-
-    setImageURLs(urls);
+      if (url) {
+        setImageURL(url);
+      }
   };
 
   async function sendData(e) {
@@ -220,11 +218,10 @@ export default function NewProduct() {
                   </label>
               <input
                 type="file"
-                name="product_images"
+                name="product_image"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 id="customFile"
-                multiple
-                onChange={handleMultipleImageUpload}
+                onChange={handleSingleImageUpload}
               />
 
               <button

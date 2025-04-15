@@ -1,13 +1,18 @@
 import React from "react";
 import toolsImage from "../../assets/images/tool_img1.png";  
 import fertilizerImage from "../../assets/images/fer2.png";  
+import Navigation from "../../components/Navbar/Navigation";
+
 
 const Aboutus = () => {
   return (
     <>
+     <Navigation/>
       <div className="bg-[#F5F5F5] lg:px-36 md:py-5 px-5">
-        <div className="container mx-auto">
-          <div className="mx-auto mb-12 max-w-[510px] text-center lg:mb-20 pt-20">
+     
+        <section className="flex flex-col h-screen">
+        <div className="flex container mx-auto">
+          <div className="mx-auto max-w-[510px] text-center lg:mb-20 pt-20">
             <h2 className="mb-4 text-3xl font-bold sm:text-4xl md:text-[40px]">
               About Thangam Gardening Tools and Fertilizers
             </h2>
@@ -25,9 +30,11 @@ const Aboutus = () => {
             Our mission is to make gardening easier and more enjoyable for everyone.
           </p>
         </div>
+        </section>
 
         {/* Products Section */}
-        <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
+        <section className="flex flex-col h-screen">
+        <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-1 lg:grid-cols-2 xl:gap-x-8 align-center">
           {/* Gardening Tools */}
           <button type="button" className="group relative rounded-t-3xl shadow-2xl rounded-b-xl border-2">
             <div className="min-h-80 aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-3xl lg:aspect-none group-hover:opacity-40 lg:h-80">
@@ -65,6 +72,8 @@ const Aboutus = () => {
             Shop Now
           </a>
         </div>
+        </section>
+
       </div>
     </>
   );

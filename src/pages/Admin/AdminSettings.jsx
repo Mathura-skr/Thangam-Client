@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button, TextField, Avatar, Box, Typography } from "@mui/material";
 import Sidebar from "./Sidebar";
+import AdminNav from "../../components/Navbar/AdminNav";
 
 export default function AdminSettings() {
     const [username, setUsername] = useState("admin");
@@ -31,11 +32,16 @@ export default function AdminSettings() {
     };
 
     return (
-        <div className="flex flex-col md:flex-row">
-            <div className="w-full md:w-1/5">
-                <Sidebar />
-            </div>
-            <div className="flex flex-col md:w-4/5 p-6">
+
+        <div className="flex flex-col h-screen">
+        <AdminNav />
+        <div className="flex flex-1 overflow-hidden">
+          <div className="w-1/5 bg-gray-100 h-full border-r">
+            <Sidebar />
+          </div>
+  
+         
+          <div className="w-4/5 p-6 overflow-auto">
                 <Typography variant="h4" fontWeight="bold" mb={4}>
                     Admin Settings
                 </Typography>
@@ -82,6 +88,7 @@ export default function AdminSettings() {
                 >
                 Save Changes
             </Button>
+        </div>
         </div>
         </div >
     );
