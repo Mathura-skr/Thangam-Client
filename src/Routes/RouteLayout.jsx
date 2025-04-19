@@ -9,9 +9,11 @@ import Login from '../pages/Auth/Login';
 import Register from '../pages/Auth/Register';
 import ResetPassword from '../pages/Auth/ResetPassword';
 import Cart from '../pages/Cart/Cart';
+import Rent from '../pages/Rent/Rent';
 import Contact from '../pages/Contact/Contact';
 import HomePage from '../pages/home/HomePage';
 import ProductPage from '../pages/Product/ProductPage';
+import UserProfile from '../pages/Profile/UserProfile';
 
 // Admin pages
 import AddEmployee from '../pages/Admin/AddEmployee';
@@ -47,67 +49,81 @@ import StaffUpdateOrder from '../pages/Staff/UpdateOrder';
 import StaffUpdateProduct from '../pages/Staff/UpdateProduct';
 import StaffUpdateSupplier from '../pages/Staff/UpdateSupplier';
 
+import Forbidden403 from '../pages/ErrorPages/Forbidden403';
+
+
 export default function RouteLayout() {
   
-  const Protected = ({ children }) => {
-    const { user } = useContext(AuthContext);
-
+  const Protected = ({ children, role }) => {
+    const { user } = useContext(AuthContext); 
+  
     if (!user) {
       return <Navigate to="/login" />;
     }
+  
+    if (role && user.role !== role) {
+      return <Forbidden403 />;
+    }
+  
     return children;
   };
-
+  
+  
   return (
 
+//TODO: admin unprotected , add profile in website
+<div className="flex-1">
+<Routes>
 
-      <div className="flex-1">
-        <Routes>
-          {/* Public */}
-          <Route path='/' element={<HomePage />} />
-          <Route path='/product' element={<ProductPage />} />
-          <Route path='/cart' element={<Cart />} />
-          <Route path='/about' element={<Aboutus />} />
-          <Route path='/contact' element={<Contact />} />
-          <Route path='/login' element={<Login />} />
-          <Route path='/register' element={<Register />} />
-          <Route path='/resetPassword' element={<ResetPassword />} />
+  {/* Public */}
+  <Route path='/' element={<HomePage />} />
+  <Route path='/product' element={<ProductPage />} />
+  <Route path='/cart' element={<Cart />} />
+  <Route path='/rent' element={<Rent />} />
+  <Route path='/about' element={<Aboutus />} />
+  <Route path='/contact' element={<Contact />} />
+  <Route path='/login' element={<Login />} />
+  <Route path='/register' element={<Register />} />
+  <Route path='/resetPassword' element={<ResetPassword />} />
 
-          {/* Admin */}
-          <Route path='/admin/dashboard' element={<Protected> <Dashboard /> </Protected>} />
-          <Route path='/admin/products' element={<Protected> <ProductList /> </Protected>} />
-          <Route path='/admin/products/create' element={<Protected> <NewProduct /> </Protected>} />
-          <Route path='/admin/product/:id' element={<Protected> <UpdateProduct /> </Protected>} />
-          <Route path='/admin/orders' element={<Protected> <OrderList /> </Protected>} />
-          <Route path='/admin/order/:id' element={<Protected> <UpdateOrder /> </Protected>} />
-          <Route path='/admin/users' element={<Protected> <UserList /> </Protected>} />
-          <Route path='/admin/users/create' element={<Protected> <AddUser /> </Protected>} />
-          <Route path='/admin/user/:id' element={<Protected> <UpdateUser /> </Protected>} />
-          <Route path='/admin/employees' element={<Protected> <EmployeeList /> </Protected>} />
-          <Route path='/admin/employees/create' element={<Protected> <AddEmployee /> </Protected>} />
-          <Route path='/admin/employee/:id' element={<Protected> <UpdateEmployee /> </Protected>} />
-          <Route path='/admin/suppliers' element={<Protected> <SupplierList /> </Protected>} />
-          <Route path='/admin/suppliers/create' element={<Protected> <AddSupplier /> </Protected>} />
-          <Route path='/admin/supplier/:id' element={<Protected> <UpdateSupplier /> </Protected>} />
-          <Route path='/admin/reviews' element={<Protected> <ReviewList /> </Protected>} />
-          <Route path='/admin/rental' element={<Protected> <RentalList /> </Protected>} />
-          <Route path='/admin/settings' element={<Protected> <AdminSettings /> </Protected>} />
+  <Route path='/userProfile' element={<Protected role="user"><UserProfile /></Protected>} />
 
-          {/* Staff */}
-          <Route path='/staff/dashboard' element={<Protected> <StaffDashboard /> </Protected>} />
-          <Route path='/staff/products' element={<Protected> <StaffProductList /> </Protected>} />
-          <Route path='/staff/products/create' element={<Protected> <StaffNewProduct /> </Protected>} />
-          <Route path='/staff/product/:id' element={<Protected> <StaffUpdateProduct /> </Protected>} />
-          <Route path='/staff/orders' element={<Protected> <StaffOrderList /> </Protected>} />
-          <Route path='/staff/order/:id' element={<Protected> <StaffUpdateOrder /> </Protected>} />
-          <Route path='/staff/suppliers' element={<Protected> <StaffSupplierList /> </Protected>} />
-          <Route path='/staff/suppliers/create' element={<Protected> <StaffAddSupplier /> </Protected>} />
-          <Route path='/staff/supplier/:id' element={<Protected> <StaffUpdateSupplier /> </Protected>} />
-          <Route path='/staff/reviews' element={<Protected> <StaffReviewList /> </Protected>} />
-          <Route path='/staff/rental' element={<Protected> <StaffRentalList /> </Protected>} />
-          <Route path='/staff/settings' element={<Protected> <StaffSettings /> </Protected>} />
-        </Routes>
-      </div>
+  {/* Admin */}
+  <Route path='/admin/dashboard' element={<Protected role="admin"><Dashboard /></Protected>} />
+  <Route path='/admin/products' element={<Protected role="admin"><ProductList /></Protected>} />
+  <Route path='/admin/products/create' element={<Protected role="admin"><NewProduct /></Protected>} />
+  <Route path='/admin/product/:id' element={<Protected role="admin"><UpdateProduct /></Protected>} />
+  <Route path='/admin/orders' element={<Protected role="admin"><OrderList /></Protected>} />
+  <Route path='/admin/order/:id' element={<Protected role="admin"><UpdateOrder /></Protected>} />
+  <Route path='/admin/users' element={<Protected role="admin"><UserList /></Protected>} />
+  <Route path='/admin/users/create' element={<Protected role="admin"><AddUser /></Protected>} />
+  <Route path='/admin/user/:id' element={<Protected role="admin"><UpdateUser /></Protected>} />
+  <Route path='/admin/employees' element={<Protected role="admin"><EmployeeList /></Protected>} />
+  <Route path='/admin/employees/create' element={<Protected role="admin"><AddEmployee /></Protected>} />
+  <Route path='/admin/employee/:id' element={<Protected role="admin"><UpdateEmployee /></Protected>} />
+  <Route path='/admin/suppliers' element={<Protected role="admin"><SupplierList /></Protected>} />
+  <Route path='/admin/suppliers/create' element={<Protected role="admin"><AddSupplier /></Protected>} />
+  <Route path='/admin/supplier/:id' element={<Protected role="admin"><UpdateSupplier /></Protected>} />
+  <Route path='/admin/reviews' element={<Protected role="admin"><ReviewList /></Protected>} />
+  <Route path='/admin/rental' element={<Protected role="admin"><RentalList /></Protected>} />
+  <Route path='/admin/settings' element={<Protected role="admin"><AdminSettings /></Protected>} />
+
+  {/* Staff */}
+  <Route path='/staff/dashboard' element={<Protected role="staff"><StaffDashboard /></Protected>} />
+  <Route path='/staff/products' element={<Protected role="staff"><StaffProductList /></Protected>} />
+  <Route path='/staff/products/create' element={<Protected role="staff"><StaffNewProduct /></Protected>} />
+  <Route path='/staff/product/:id' element={<Protected role="staff"><StaffUpdateProduct /></Protected>} />
+  <Route path='/staff/orders' element={<Protected role="staff"><StaffOrderList /></Protected>} />
+  <Route path='/staff/order/:id' element={<Protected role="staff"><StaffUpdateOrder /></Protected>} />
+  <Route path='/staff/suppliers' element={<Protected role="staff"><StaffSupplierList /></Protected>} />
+  <Route path='/staff/suppliers/create' element={<Protected role="staff"><StaffAddSupplier /></Protected>} />
+  <Route path='/staff/supplier/:id' element={<Protected role="staff"><StaffUpdateSupplier /></Protected>} />
+  <Route path='/staff/reviews' element={<Protected role="staff"><StaffReviewList /></Protected>} />
+  <Route path='/staff/rental' element={<Protected role="staff"><StaffRentalList /></Protected>} />
+  <Route path='/staff/settings' element={<Protected role="staff"><StaffSettings /></Protected>} />
+
+</Routes>
+</div>
  
   );
 }

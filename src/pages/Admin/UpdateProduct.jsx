@@ -7,7 +7,7 @@ import axios from "../../utils/axios";
 export default function UpdateProduct() {
   const { id } = useParams();
   const navigate = useNavigate();
-
+// TODO: Want to show previous datas , image size
   const [productName, setProductName] = useState("");
   const [category, setCategory] = useState("");
   const [subCategory, setSubCategory] = useState("");

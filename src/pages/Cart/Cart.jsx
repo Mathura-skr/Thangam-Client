@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+//TODO: to be done
 const Cart = () => {
   const [selectedPayment, setSelectedPayment] = useState('cod');
 

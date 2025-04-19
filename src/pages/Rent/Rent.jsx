@@ -6,7 +6,7 @@ import ProductCard from "../../components/ProductCard/ProductCard";
 import Navigation from "../../components/Navbar/Navigation";
 import useFetch from "../../hooks/useFetch";
 
-const ProductPage = () => {
+const Rent = () => {
   const { user } = useContext(AuthContext);
   const { data, loading, error } = useFetch("/api/products");
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -114,4 +114,4 @@ const ProductPage = () => {
   );
 };
 
-export default ProductPage;
+export default Rent;

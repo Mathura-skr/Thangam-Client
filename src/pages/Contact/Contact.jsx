@@ -2,7 +2,7 @@ import React from "react";
 import contactImage from "../../assets/images/logo1.png";
 import Navigation from "../../components/Navbar/Navigation";
 
-
+//TODO: open gmail........  send message
 const Contact = () => {
   return (
     <>
