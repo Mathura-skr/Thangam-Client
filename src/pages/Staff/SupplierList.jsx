@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
@@ -7,24 +7,49 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import Sidebar from "./StaffSidebar";
+import AdminNav from "../../components/Navbar/StaffNav";
 import { toast } from "react-toastify";
+import axios from "../../utils/axios";
 
 const paginationModel = { page: 0, pageSize: 5 };
 
-export default function SuppliersList() {
-    const [suppliers, setSuppliers] = useState([
-        { id: 1, pid: "F1001", category: "Fertilizer", products: "Organic Compost, Urea", date: "2024-02-15", phone: "123-456-7890", address: "123 Greenway St, NY" },
-        { id: 2, pid: "T1002", category: "Tools", products: "Shovels, Rakes", date: "2024-01-20", phone: "987-654-3210", address: "456 Farm Ln, CA" },
-        { id: 3, pid: "F1003", category: "Fertilizer", products: "Potash, NPK Mix", date: "2024-03-10", phone: "456-789-1234", address: "789 Harvest Rd, TX" },
-        { id: 4, pid: "T1004", category: "Tools", products: "Pruners, Hoes", date: "2024-02-28", phone: "321-654-9870", address: "321 Field Ave, FL" },
-        { id: 5, pid: "F1005", category: "Fertilizer", products: "Liquid Fertilizer, Bone Meal", date: "2024-01-05", phone: "654-321-7890", address: "654 Growers St, WA" },
-    ]);
+export default function SuppliersListStaff() {
+    const [suppliers, setSuppliers] = useState([]);
 
-    const deleteSupplier = (id) => {
-        setSuppliers(suppliers.filter((supplier) => supplier.id !== id));
-        toast.success("Supplier deleted successfully!");
+    useEffect(() => {
+        fetchSuppliers();
+    }, []);
+
+    const fetchSuppliers = async () => {
+        try {
+            const res = await axios.get("/api/suppliers");
+            const formatted = res.data.map((supplier) => ({
+                id: supplier.id,
+                pid: `S${supplier.id.toString().padStart(4, "0")}`, // Generates something like S0001
+                category: supplier.category_name || "-",
+                products: supplier.product_name || "-",
+                date: new Date(supplier.created_at || Date.now()).toISOString().split("T")[0],
+                phone: supplier.phone,
+                address: supplier.address,
+            }));
+            setSuppliers(formatted);
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to fetch suppliers.");
+        }
     };
 
+    const deleteSupplier = async (id) => {
+        try {
+            await axios.delete(`/api/suppliers/${id}`);
+            setSuppliers((prev) => prev.filter((s) => s.id !== id));
+            toast.success("Supplier deleted successfully!");
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to delete supplier.");
+        }
+    };
+//TODO: brand
     const columns = [
         { field: "id", headerName: "ID", flex: 0.5, headerClassName: "super-app-theme--header" },
         { field: "pid", headerName: "PID", flex: 0.8, headerClassName: "super-app-theme--header" },
@@ -63,46 +88,47 @@ export default function SuppliersList() {
     ];
 
     return (
-        <div className="flex flex-col md:flex-row">
-            <div className="w-full md:w-1/5">
-                <Sidebar />
-            </div>
-            <div className="flex flex-col md:w-4/5 p-6">
-                {/* Header with Add Supplier Button */}
-                <div className="flex justify-between items-center mb-4">
-                    <h1 className="text-2xl font-bold">Suppliers List</h1>
-                    <Link to="/admin/suppliers/create">
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        startIcon={<AddIcon />}
-                    >
-                        Add Supplier
-                        {/* TODO: category subcat brand quant all upt */}
-                    </Button>
-                    </Link>
+        <div className="flex flex-col h-screen">
+            <AdminNav />
+            <div className="flex flex-1 overflow-hidden">
+                <div className="w-1/5 bg-gray-100 h-full border-r">
+                    <Sidebar />
                 </div>
 
-                {/* Data Grid */}
-                <Box
-                    sx={{
-                        height: '90%',
-                        width: "100%",
-                        "& .super-app-theme--header": {
-                            backgroundColor: "rgb(0, 0, 0)",
-                            color: "white",
-                        },
-                    }}
-                >
-                    <DataGrid
-                        rows={suppliers}
-                        columns={columns}
-                        initialState={{ pagination: { paginationModel } }}
-                        pageSizeOptions={[5, 10]}
-                        sx={{ border: 1 }}
-                        slots={{ toolbar: GridToolbar }}
-                    />
-                </Box>
+                <div className="w-4/5 p-6 overflow-auto">
+                    <div className="flex justify-between items-center mb-4">
+                        <h1 className="text-2xl font-bold">Suppliers List</h1>
+                        <Link to="/admin/suppliers/create">
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                startIcon={<AddIcon />}
+                            >
+                                Add Supplier
+                            </Button>
+                        </Link>
+                    </div>
+
+                    <Box
+                        sx={{
+                            height: '90%',
+                            width: "100%",
+                            "& .super-app-theme--header": {
+                                backgroundColor: "rgb(0, 0, 0)",
+                                color: "white",
+                            },
+                        }}
+                    >
+                        <DataGrid
+                            rows={suppliers}
+                            columns={columns}
+                            initialState={{ pagination: { paginationModel } }}
+                            pageSizeOptions={[5, 10]}
+                            sx={{ border: 1 }}
+                            slots={{ toolbar: GridToolbar }}
+                        />
+                    </Box>
+                </div>
             </div>
         </div>
     );

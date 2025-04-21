@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "../../utils/axios";
 import Sidebar from "./Sidebar";
 import AdminNav from "../../components/Navbar/AdminNav";
 import Swal from "sweetalert2";
-import useFetch from "../../hooks/useFetch"; // Import your custom hook
+import { AuthContext } from "../../context/authContext";
 
 export default function AdminSettings() {
-  const [adminId, setAdminId] = useState(null);
+  const { user, dispatch } = useContext(AuthContext);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -15,30 +15,31 @@ export default function AdminSettings() {
   const [image_url, setImageURL] = useState("");
   const [preview, setPreview] = useState("/default-avatar.png");
 
-  // Use your custom hook to fetch admin data
-  const { data: users, loading, error } = useFetch("/api/users/all");
-
   useEffect(() => {
-    if (users && users.length > 0) {
-      const adminUser = users.find((user) => user.role === "admin");
-      if (adminUser) {
-        setAdminId(adminUser.id);
-        setName(adminUser.name);
-        setEmail(adminUser.email);
-        setPhone(adminUser.phone);
-        
-        // Set profile picture
-        if (adminUser.image_url) {
-          // Check if it's already a full URL or needs prefix
-          const imageUrl = adminUser.image_url.startsWith('http') 
-            ? adminUser.image_url 
-            : `/uploads/${adminUser.image_url}`;
-          setImageURL(adminUser.image_url);
-          setPreview(imageUrl);
-        }
+    const fetchUserDetails = async () => {
+      if (!user?.userId) return;
+
+      try {
+        const { data } = await axios.get(`/api/users/${user.userId}`);
+        setName(data.name || "");
+        setEmail(data.email || "");
+        setPhone(data.phone || "");
+        setImageURL(data.image_url || "");
+
+        const imageUrl = data.image_url?.startsWith("http")
+          ? data.image_url
+          : data.image_url
+          ? `/uploads/${data.image_url}`
+          : "/default-avatar.png";
+
+        setPreview(imageUrl);
+      } catch (err) {
+        console.error("Failed to fetch user info:", err);
       }
-    }
-  }, [users]); // This effect runs when users data changes
+    };
+
+    fetchUserDetails();
+  }, [user?.userId]);
 
   const handleImageUpload = async (file) => {
     const formData = new FormData();
@@ -58,8 +59,7 @@ export default function AdminSettings() {
   const handleSingleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    
-    // Create instant preview
+
     const previewUrl = URL.createObjectURL(file);
     setPreview(previewUrl);
 
@@ -67,8 +67,6 @@ export default function AdminSettings() {
       const url = await handleImageUpload(file);
       if (url) {
         setImageURL(url);
-        // Optionally update preview to final URL
-        // setPreview(url);
       }
     } catch (err) {
       setPreview("/default-avatar.png");
@@ -79,7 +77,7 @@ export default function AdminSettings() {
   // Cleanup blob URLs
   useEffect(() => {
     return () => {
-      if (preview.startsWith('blob:')) {
+      if (preview.startsWith("blob:")) {
         URL.revokeObjectURL(preview);
       }
     };
@@ -110,7 +108,13 @@ export default function AdminSettings() {
     }
 
     try {
-      await axios.put(`/api/users/${adminId}`, updateData);
+      await axios.put(`/api/users/${user.userId}`, updateData);
+
+      // Refetch updated user
+      const { data: updatedUser } = await axios.get(`/api/users/${user.userId}`);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      dispatch({ type: "LOGIN_SUCCESS", payload: updatedUser });
+
       Swal.fire({
         icon: "success",
         title: "Admin updated successfully",
@@ -126,9 +130,6 @@ export default function AdminSettings() {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error loading admin data</div>;
-
   return (
     <div className="flex flex-col h-screen">
       <AdminNav />
@@ -143,7 +144,6 @@ export default function AdminSettings() {
                 Admin Settings
               </h1>
 
-              {/* Profile Picture Upload */}
               <div className="flex items-center gap-4">
                 <img
                   src={preview}

@@ -1,67 +1,43 @@
 import React, { useState } from "react";
 import axios from "../../utils/axios";
 import Swal from "sweetalert2";
-
-// import Spinner from "../components/spinner/LoadingSpinner";
 import { useLocation, useNavigate } from "react-router";
 
 const ResetPassword = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const token2 = searchParams.get("token");
-  console.log(token2);
 
   const [loading2, setLoading2] = useState(false);
-
-  const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [token, setToken] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
+
+  const navigate = useNavigate();
 
   const handleForgotPassword = async (event) => {
     event.preventDefault();
-
     if (!email || !email.includes("@")) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Please enter a valid email address",
-      });
+      Swal.fire("Invalid Email", "Please enter a valid email address", "error");
       return;
     }
 
     try {
       setLoading2(true);
-      const response = await axios.post("auth/forgot-password", {
-        email: email,
-      });
+      const response = await axios.post("auth/forgot-password", { email });
       setToken(response.data.token);
-      setLoading2(false);
-      Swal.fire({
-        icon: "success",
-        title: "Done",
-        text: "Password reset link sent to your email",
-      });
+      Swal.fire("Success", "Password reset link sent to your email", "success");
     } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: error.response.data.message,
-      });
+      Swal.fire("Error", error.response?.data?.message || "Something went wrong", "error");
+    } finally {
+      setLoading2(false);
     }
   };
 
   const handleResetPassword = async (event) => {
     event.preventDefault();
-
     if (!password || password.length < 6) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Password must be at least 6 characters long",
-      });
+      Swal.fire("Weak Password", "Password must be at least 6 characters long", "error");
       return;
     }
 
@@ -69,77 +45,84 @@ const ResetPassword = () => {
       setLoading2(true);
       const response = await axios.post("auth/reset-password", {
         token: token2,
-        password: password,
+        password,
       });
-      setLoading2(false);
-      Swal.fire({
-        icon: "success",
-        title: "Done",
-        text: response.data.message,
-      });
+      Swal.fire("Success", response.data.message, "success");
       navigate("/login");
     } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: error.response.data.message,
-      });
+      Swal.fire("Error", error.response?.data?.message || "Something went wrong", "error");
+    } finally {
+      setLoading2(false);
     }
   };
 
   return (
-    <div className="xl:px-96 xl:pt-36 xl:pb-52 p-16 bg-[#F5F5F5]">
-      <h2 className="text-center text-3xl font-bold pb-10">
-        Reset Password
-      </h2>
-      {/* {loading2 && <Spinner />} */}
-      <p className="text-center pb-8">
-        Enter your email and click the Get the Reset Link button to recive the
-        reset link via Email, then click on that reset link and it will redirect
-        you to the reset password page with access.
-      </p>
-      {token2 ? (
-        <form onSubmit={handleResetPassword} className="mb-6">
-          <label htmlFor="password" className="block mb-2 font-bold ">
-            New Password
-          </label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            className="w-full p-2 mb-4 border border-gray-500 rounded"
-          />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black px-4 py-12">
+      <div className="bg-[#111] shadow-xl rounded-2xl p-10 w-full max-w-lg text-white">
+        <h2 className="text-4xl font-bold text-center text-green-500 mb-6">
+          {token2 ? "Set New Password" : "Reset Password"}
+        </h2>
 
-          <button
-            type="submit"
-            className="bg-gray-700 hover:bg-opacity-90 text-white font-bold py-2 px-4 rounded"
-          >
-            Reset Password
-          </button>
-        </form>
-      ) : (
-        <form onSubmit={handleForgotPassword} className="mb-6">
-          <label htmlFor="email" className="block mb-2 font-bold">
-            Email
-          </label>
-          <input
-            type="text"
-            id="email"
-            name="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            className="w-full p-2 mb-4 border border-gray-500 rounded"
-          />
-          <button
-            type="submit"
-            className="bg-gray-800 hover:bg-opacity-90-100 text-white font-bold py-2 px-4 rounded"
-          >
-            Get the Reset Link
-          </button>
-        </form>
-      )}
+        {!token2 ? (
+          <form onSubmit={handleForgotPassword}>
+            <label htmlFor="email" className="block text-sm font-semibold mb-2">
+              Email Address
+            </label>
+            <input
+              id="email"
+              type="email"
+              className="w-full px-4 py-2 rounded-xl bg-gray-800 text-white border border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+            />
+
+            <button
+              type="submit"
+              disabled={loading2}
+              className={`mt-6 w-full py-3 rounded-xl font-bold transition-all ${
+                loading2
+                  ? "bg-green-800 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-500"
+              }`}
+            >
+              {loading2 ? "Sending..." : "Get the Reset Link"}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleResetPassword}>
+            <label htmlFor="password" className="block text-sm font-semibold mb-2">
+              New Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              className="w-full px-4 py-2 rounded-xl bg-gray-800 text-white border border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter new password"
+            />
+
+            <button
+              type="submit"
+              disabled={loading2}
+              className={`mt-6 w-full py-3 rounded-xl font-bold transition-all ${
+                loading2
+                  ? "bg-green-800 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-500"
+              }`}
+            >
+              {loading2 ? "Resetting..." : "Reset Password"}
+            </button>
+          </form>
+        )}
+
+        {!token2 && (
+          <p className="text-sm text-center mt-6 text-gray-400">
+            You'll receive a reset link in your email if the address is valid.
+          </p>
+        )}
+      </div>
     </div>
   );
 };
