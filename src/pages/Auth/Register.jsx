@@ -5,7 +5,6 @@ import { AuthContext } from "../../context/authContext";
 import axios from "../../utils/axios";
 
 const Register = () => {
-
   const [loading2, setLoading2] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -64,7 +63,6 @@ const Register = () => {
         email,
         phone,
         password,
-     
       });
 
       // contextLogin(response.data.user);
@@ -140,7 +138,9 @@ const Register = () => {
               type="submit"
               disabled={loading2}
               className={`w-full font-bold text-center rounded-3xl py-3 px-5 text-white transition hover:bg-opacity-90 ${
-                loading2 ? "bg-gray-500 cursor-not-allowed" : "bg-gray-800 hover:bg-gray-600"
+                loading2
+                  ? "bg-gray-500 cursor-not-allowed"
+                  : "bg-gray-800 hover:bg-gray-600"
               }`}
             >
               {loading2 ? "Signing Up..." : "Sign Up"}
@@ -151,7 +151,10 @@ const Register = () => {
         <div className="flex flex-col justify-center text-center pb-20">
           <p className="text-base text-[#000000]">
             Already have account?
-            <Link to="/login" className="text-grey-500 hover:underline ms-2 font-bold">
+            <Link
+              to="/login"
+              className="text-grey-500 hover:underline ms-2 font-bold"
+            >
               Sign In
             </Link>
           </p>

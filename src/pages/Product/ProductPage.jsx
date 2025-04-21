@@ -5,6 +5,7 @@ import FilterPanel from "../../components/Filter/FilterPanel";
 import ProductCard from "../../components/ProductCard/ProductCard";
 import Navigation from "../../components/Navbar/Navigation";
 import useFetch from "../../hooks/useFetch";
+import Swal from "sweetalert2";
 
 const ProductPage = () => {
   const { user } = useContext(AuthContext);
@@ -42,34 +43,69 @@ const ProductPage = () => {
   };
   
 
-  const handleAddToCart = async (productId) => {
+  const handleAddToCart = async (product) => {
     try {
       if (!user) {
-        alert("You need to login to add products to your cart.");
+        Swal.fire({
+          icon: 'warning',
+          title: 'Login Required',
+          text: 'You need to login to add products to your cart.',
+        });
         return;
       }
 
       await axios.post(
         "/api/cart",
-        { productId, quantity: 1 },
+        {
+          userId: user.userId,
+          product_id: product.id,
+          unit: 1,
+        },
         { withCredentials: true }
       );
-
-      alert("Product added to cart!");
+  
+      Swal.fire({
+        icon: 'success',
+        title: 'Added to Cart',
+        text: `${product.name} has been added to your cart.`,
+        showConfirmButton: false,
+        timer: 2000,
+      });
     } catch (err) {
       console.error("Add to cart error:", err);
-      alert("Failed to add to cart.");
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Failed to add the product to cart.',
+      });
     }
   };
-
-  const handleBuyNow = (productId) => {
+  
+  
+  const handleBuyNow = (product) => {
     if (!user) {
-      alert("Please login first");
+      Swal.fire({
+        icon: 'info',
+        title: 'Login Required',
+        text: 'Please login to proceed with purchase.',
+      });
       return;
     }
-
-    window.location.href = `/checkout?productId=${productId}`;
+  
+    // Redirect with confirmation
+    Swal.fire({
+      title: 'Proceed to Checkout?',
+      text: `You're about to buy: ${product.name}`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Buy Now!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = `/checkout?productId=${product.id}`;
+      }
+    });
   };
+  
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -98,8 +134,8 @@ const ProductPage = () => {
                 <ProductCard
                   key={product.id}
                   product={product}
-                  onAddToCart={() => handleAddToCart(product.id)}
-                  onBuyNow={() => handleBuyNow(product.id)}
+                  onAddToCart={() => handleAddToCart(product)}
+                  onBuyNow={() => handleBuyNow(product)}
                 />
               ))}
             </div>

@@ -1,104 +1,234 @@
-import React, { useState } from 'react';
+import React, { useEffect, useContext, useState } from "react";
+import { CartItem } from "../../components/CartItem/CartItem";
+import {
+  Button,
+  Chip,
+  CircularProgress,
+  Stack,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { motion } from "framer-motion";
+import { AuthContext } from "../../context/authContext";
+import axios from "../../utils/axios";
+import Navigation from "../../components/Navbar/Navigation";
+import Swal from "sweetalert2";
 
-//TODO: to be done
-const Cart = () => {
-  const [selectedPayment, setSelectedPayment] = useState('cod');
+const Cart = ({ checkout }) => {
+  const { user } = useContext(AuthContext);
+  const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const subtotal = cartItems.reduce(
+    (acc, item) => acc + (parseFloat(item.price) || 0) * (item.unit || 0),
+    0
+  );
+  const totalItems = cartItems.reduce((acc, item) => acc + (item.unit || 0), 0);
+  const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const SHIPPING = 5.55;
+  const TAXES = 5;
 
-  // Define cart as an array (replace this with actual cart data from state or props)
-  const cart = [
-    { label: "Product 1", price: 500, image: "https://via.placeholder.com/100", alt: "Product 1" },
-    { label: "Product 2", price: 750, image: "https://via.placeholder.com/100", alt: "Product 2" }
-  ];
+  const currencyFormat = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "LKR",
+  });
 
-  const calculateTotal = () => {
-    return cart.reduce((total, item) => total + (item.price || 0), 0);
-  };
-
-  const handleCheckout = () => {
-    if (window.confirm("Are you sure you want to make a purchase?")) {
-      if (selectedPayment === 'payHere') {
-        handlePayment();
-      } else {
-        console.log('Processing Cash on Delivery...');
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      window.scrollTo({ top: 0, behavior: "instant" });
+      try {
+        if (!user) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Login Required',
+            text: 'You need to login to view your cart.',
+          }).then(() => {
+            navigate("/login");
+          });
+          return;
+        }
+        const response = await axios.get(`/api/cart/user/${user.userId}`);
+        setCartItems(response.data);
+      } catch (err) {
+        console.error("Error fetching cart items:", err);
+        setError("Failed to fetch cart items.");
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to load your cart items.',
+        });
+      } finally {
+        setLoading(false);
       }
+    };
+
+    fetchCartItems();
+  }, [user, navigate]);
+
+  const handleRemoveCartItem = async (cartId) => {
+    try {
+      await axios.delete(`/api/cart/${cartId}`);
+      setCartItems((prevItems) =>
+        prevItems.filter((item) => item.cart_id !== cartId)
+      );
+      toast.success("Product removed from cart");
+    } catch (err) {
+      console.error("Error removing product from cart:", err);
+      toast.error("Error removing product from cart");
     }
   };
 
-  const handlePayment = () => {
-    console.log("Processing payHere Payment...");
+  const handleUpdateCartItem = async (cartId, updatedFields) => {
+    try {
+      const response = await axios.put(`/api/cart/${cartId}`, updatedFields);
+      setCartItems((prevItems) =>
+        prevItems.map((item) =>
+          item.cart_id === cartId ? { ...item, ...updatedFields } : item
+        )
+      );
+    } catch (err) {
+      console.error("Error updating cart item:", err);
+      toast.error("Error updating cart item");
+    }
   };
 
-  return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">Shopping Cart</h1>
-      {cart.length === 0 ? (
-        <div className="text-center p-6">
-          <p className="text-lg text-gray-600 mb-4">Your cart is empty</p>
-          <button
-            className="bg-green-600 text-white px-4 py-2 rounded-md"
-            onClick={() => window.location.href = '/products'}
-          >
-            Continue Shopping
-          </button>
+  if (loading)
+    return (
+      <div className="min-h-screen bg-gray-100">
+        <Navigation />
+        <div className="container mx-auto p-4 flex justify-center items-center h-64">
+          <CircularProgress />
         </div>
-      ) : (
-        <>
-          <div className="mb-6">
-            {cart.map((item, index) => (
-              <div key={index} className="flex flex-col md:flex-row items-center gap-4 p-4 border-b border-gray-200">
-                <img src={item.image} alt={item.alt} className="w-24 h-24 object-cover rounded-md" />
-                <div className="flex-1 text-center md:text-left">
-                  <h3 className="text-lg font-semibold text-gray-800">{item.label}</h3>
-                  <p className="text-gray-600">₨ {item.price.toFixed(2)}</p>
+      </div>
+    );
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <Navigation />
+
+      <div className="container flex flex-col mx-auto p-4">
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <Typography variant="h4" className="mb-6 font-bold pb-5">
+            {checkout ? "Order Summary" : "Your Shopping Cart"}
+          </Typography>
+
+          {error ? (
+            <Typography color="error" className="text-center py-8">
+              {error}
+            </Typography>
+          ) : Array.isArray(cartItems) && cartItems.length > 0 ? (
+            <div className="flex flex-col md:flex-row gap-6">
+              {/* Cart Items */}
+              <div className="flex flex-col gap-3 md:w-2/3 ">
+                {cartItems.map((item) => (
+                  <CartItem
+                    key={item.cart_id + item.id}
+                    id={item.cart_id}
+                    productId={item.id}
+                    image_url={item.image_url}
+                    title={item.name}
+                    category={item.category || "N/A"}
+                    brand={item.brand || "N/A"}
+                    description={item.description || ""}
+                    price={parseFloat(item.price)}
+                    unit={item.unit}
+                    stock={item.stock}
+                    onRemove={handleRemoveCartItem}
+                    onUpdate={handleUpdateCartItem}
+                  />
+                ))}
+              </div>
+
+              {/* Order Summary */}
+              <div className="md:w-1/3">
+                <div className="bg-gray-50 p-4 rounded-lg sticky top-4">
+                  <Typography variant="h6" className="font-semibold mb-4">
+                    Order Summary
+                  </Typography>
+
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <Typography>Subtotal</Typography>
+                      <Typography>{currencyFormat.format(subtotal)}</Typography>
+                    </div>
+
+                    {checkout && (
+                      <>
+                        <div className="flex justify-between">
+                          <Typography>Shipping</Typography>
+                          <Typography>{currencyFormat.format(SHIPPING)}</Typography>
+                        </div>
+                        <div className="flex justify-between">
+                          <Typography>Taxes</Typography>
+                          <Typography>{currencyFormat.format(TAXES)}</Typography>
+                        </div>
+                        <hr className="my-2" />
+                      </>
+                    )}
+
+                    <div className="flex justify-between font-semibold">
+                      <Typography>Total</Typography>
+                      <Typography>
+                        {currencyFormat.format(
+                          subtotal + (checkout ? SHIPPING + TAXES : 0)
+                        )}
+                      </Typography>
+                    </div>
+
+                    {!checkout && (
+                      <Typography variant="body2" className="text-gray-500">
+                        Shipping and taxes calculated at checkout
+                      </Typography>
+                    )}
+
+                    {!checkout && (
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        className="bg-black hover:bg-gray-800 mt-4 py-3"
+                        component={Link}
+                        to="/checkout"
+                      >
+                        Proceed to Checkout
+                      </Button>
+                    )}
+
+                    {!checkout && (
+                      <div className="text-center mt-2">
+                        <Link
+                          to="/"
+                          className="text-sm text-gray-600 hover:text-black"
+                        >
+                          or Continue Shopping
+                        </Link>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold mb-4 text-gray-800">Order Summary</h2>
-            <div className="flex justify-between text-gray-600 mb-2">
-              <span>Subtotal:</span>
-              <span>₨ {calculateTotal().toFixed(2)}</span>
             </div>
-            <div className="flex justify-between text-gray-600 mb-2">
-              <span>Shipping:</span>
-              <span>Free</span>
+          ) : (
+            <div className="text-center py-12">
+              <Typography variant="h6" className="mb-4">
+                Your cart is empty
+              </Typography>
+              <Button
+                variant="contained"
+                className="bg-black hover:bg-gray-800"
+                component={Link}
+                to="/"
+              >
+                Continue Shopping
+              </Button>
             </div>
-            <div className="flex justify-between text-gray-800 font-bold border-t border-gray-200 pt-3 mt-3">
-              <span>Total:</span>
-              <span>₨ {calculateTotal().toFixed(2)}</span>
-            </div>
-
-            <div className="mt-6 border-t border-gray-200 pt-6">
-              <h3 className="text-lg font-semibold mb-4 text-gray-800">Payment Method</h3>
-              <div className="flex flex-col md:flex-row gap-4">
-                <div
-                  className={`flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-all ${selectedPayment === 'payHere' ? 'border-green-500 bg-green-50' : 'border-gray-300'}`}
-                  onClick={() => setSelectedPayment('payHere')}
-                >
-                  <img src={require('../../assets/images/payHere_logo.png')} alt="payHere" className="w-10 h-10 object-contain" />
-                  <span className="text-gray-800">PayHere</span>
-                </div>
-                <div
-                  className={`flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-all ${selectedPayment === 'cod' ? 'border-green-500 bg-green-50' : 'border-gray-300'}`}
-                  onClick={() => setSelectedPayment('cod')}
-                >
-                  <img src={require('../../assets/images/COD.png')} alt="COD" className="w-10 h-10 object-contain" />
-                  <span className="text-gray-800">Cash on Delivery</span>
-                </div>
-              </div>
-            </div>
-
-            <button
-              className="w-full bg-white outline  text-white py-3 rounded-md mt-6 hover:bg-green-700 transition-all"
-              onClick={handleCheckout}
-            >
-              {selectedPayment === 'payHere' ? 'Pay with payHere' : 'Place Order (COD)'}
-            </button>
-          </div>
-        </>
-      )}
+          )}
+        </div>
+      </div>
     </div>
   );
 };

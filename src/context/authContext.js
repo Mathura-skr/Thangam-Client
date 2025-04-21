@@ -29,7 +29,7 @@ const AuthReducer = (state, action) => {
         error: null,
       };
     case "LOGIN_SUCCESS":
-      localStorage.setItem("user", JSON.stringify(action.payload)); // ✅ Save correctly
+      localStorage.setItem("user", JSON.stringify(action.payload)); 
       return {
         user: action.payload,
         loading: false,
