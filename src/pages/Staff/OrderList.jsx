@@ -86,7 +86,7 @@ export default function OrderList() {
     { field: "customerId", headerName: "Customer ID", flex: 0.7, headerClassName: "super-app-theme--header" },
     { field: "productId", headerName: "Product ID", flex: 0.7, headerClassName: "super-app-theme--header" },
     { field: "unit", headerName: "Qty", flex: 0.5, headerClassName: "super-app-theme--header" },
-    { field: "totalAmount", headerName: "Total ($)", flex: 0.8, headerClassName: "super-app-theme--header" },
+    { field: "totalAmount", headerName: "Total (Rs)", flex: 0.8, headerClassName: "super-app-theme--header" },
     { field: "paymentMode", headerName: "Payment", flex: 0.8, headerClassName: "super-app-theme--header" },
     { field: "address", headerName: "Address", flex: 1.8, headerClassName: "super-app-theme--header" },
     {

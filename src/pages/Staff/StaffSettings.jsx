@@ -134,7 +134,7 @@ export default function StaffSettings() {
     <div className="flex flex-col h-screen">
       <StaffNav />
       <div className="flex flex-1 overflow-hidden">
-        <div className="w-full md:w-1/5 bg-gray-800 text-white p-4">
+        <div className="w-full md:w-1/5 text-white">
           <Sidebar />
         </div>
         <div className="w-full md:w-4/5 flex justify-center items-center p-4">

@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import { Button } from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import Sidebar from "./Sidebar";
 import { toast } from "react-toastify";
@@ -19,7 +19,12 @@ export default function ProductList() {
   const fetchProducts = async () => {
     try {
       const response = await axios.get("/api/products");
-      setProducts(response.data); 
+      const productsWithDates = response.data.map((product) => ({
+        ...product,
+         expiry_date: product.category === "Fertilizer" ? product. expiry_date : "-",
+        manufactured_date: product.category === "Fertilizer" ? product.manufactured_date : "-",
+      }));
+      setProducts(productsWithDates);
     } catch (error) {
       toast.error("Failed to fetch products");
     }
@@ -53,6 +58,11 @@ export default function ProductList() {
     { field: "stock", headerName: "Stock", type: "number", flex: 1, headerClassName: "super-app-theme--header" },
     { field: "brand", headerName: "Brand", flex: 1, headerClassName: "super-app-theme--header" },
     { field: "supplier", headerName: "Supplier", flex: 1, headerClassName: "super-app-theme--header" },
+
+    // Conditionally show these columns for Fertilizer category
+    { field: "manufactured_date", headerName: "manufactured_date", flex: 1, headerClassName: "super-app-theme--header" },
+    { field: " expiry_date", headerName: " expiry_date", flex: 1, headerClassName: "super-app-theme--header" },
+
     {
       field: "actions",
       headerName: "Actions",
@@ -62,12 +72,7 @@ export default function ProductList() {
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 1 }}>
           <Link to={`/admin/product/${params.row.id}`}>
-            <Button
-              variant="outlined"
-              color="primary"
-              size="small"
-              sx={{ height: 36, minWidth: 36 }}
-            >
+            <Button variant="outlined" color="primary" size="small" sx={{ height: 36, minWidth: 36 }}>
               <EditIcon fontSize="small" />
             </Button>
           </Link>
@@ -82,9 +87,7 @@ export default function ProductList() {
           </Button>
         </Box>
       ),
-    }
-    
-    
+    },
   ];
 
   return (
@@ -95,7 +98,6 @@ export default function ProductList() {
           <Sidebar />
         </div>
 
-       
         <div className="w-4/5 p-6">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-2xl font-bold">Product List</h1>

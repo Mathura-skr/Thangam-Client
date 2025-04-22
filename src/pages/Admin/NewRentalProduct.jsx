@@ -5,36 +5,21 @@ import { useNavigate } from "react-router-dom";
 import axios from "../../utils/axios";
 import AdminNav from "../../components/Navbar/AdminNav";
 
-export default function NewProduct() {
+export default function NewRentalProduct() {
   const navigate = useNavigate();
 
   const [productName, setProductName] = useState("");
-  const [category, setCategory] = useState("");
-  const [subCategory, setSubCategory] = useState("");
-  const [price, setPrice] = useState("");
-  const [stock, setStock] = useState("");
-  const [description, setDescription] = useState("");
   const [brand, setBrand] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [supplier, setSupplier] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [subCategory, setSubCategory] = useState("");
   const [image_url, setImageURL] = useState("");
-  const [expiryDate, setExpiryDate] = useState("");
-  const [manufacturedDate, setManufacturedDate] = useState("");
 
-  const subCategories = {
-    Fertilizer: ["Organic", "Chemical", "Compost"],
-    Tools: [
-      "Hand Tools",
-      "Land Movers",
-      "Cleaning Tools",
-      "Protective Accessories",
-      "Watering Systems",
-    ],
-  };
-
-  const categories = [
-    { id: 1, name: "Fertilizer" },
-    { id: 2, name: "Tools" },
+  const subCategories = [
+    "Machinery",
+    "Vehicles",
+    "Power Tools",
+    "Irrigation Equipment",
   ];
 
   const handleImageUpload = async (file) => {
@@ -62,52 +47,27 @@ export default function NewProduct() {
   const sendData = async (e) => {
     e.preventDefault();
 
-    if (
-      isNaN(price) ||
-      price <= 0 ||
-      isNaN(stock) ||
-      stock <= 0 ||
-      productName.trim() === ""
-    ) {
+    if (productName.trim() === "" || isNaN(price) || price <= 0) {
       return Swal.fire({
         icon: "error",
         title: "Oops...",
-        text: "Please enter valid details.",
-      });
-    }
-
-    if (category === "Fertilizer" && (!quantity || !expiryDate || !manufacturedDate)) {
-      return Swal.fire({
-        icon: "error",
-        title: "Missing Info",
-        text: "Please enter quantity, expiry date and manufactured date for fertilizers",
+        text: "Please enter valid product details.",
       });
     }
 
     const payload = {
       name: productName,
-      category_name: category,
-      subcategory_name: subCategory,
-      price: parseFloat(price),
-      stock: parseInt(stock),
-      description,
       brand: brand,
-      supplier_name: supplier,
+      description,
+      price: parseFloat(price),
+      subcategory_name: subCategory,
       image_url,
-      manufactured_date: manufacturedDate,
-      expiry_date:expiryDate
     };
-
-    if (category === "Fertilizer") {
-      payload.quantity = parseFloat(quantity);
-      payload.expiry_date = expiryDate;
-      payload.manufactured_date = manufacturedDate;
-    }
 
     const token = localStorage.getItem("token");
 
     try {
-      await axios.post("/api/products/", payload, {
+      await axios.post("/api/rent/", payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -117,12 +77,12 @@ export default function NewProduct() {
       Swal.fire({
         position: "top-start",
         icon: "success",
-        title: "Product added successfully",
+        title: "Rental product added successfully",
         showConfirmButton: false,
         timer: 2000,
       });
 
-      navigate("/admin/products");
+      navigate("/admin/rental");
     } catch (err) {
       Swal.fire({
         icon: "error",
@@ -142,9 +102,9 @@ export default function NewProduct() {
         </div>
         <div className="w-full md:w-4/5 overflow-y-auto px-4 py-8">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-semibold">Add New Product</h1>
+            <h1 className="text-2xl font-semibold">Add Rental Product</h1>
             <button
-              onClick={() => navigate("/admin/products")}
+              onClick={() => navigate("/admin/rentals")}
               className="bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700"
             >
               Back to List
@@ -158,51 +118,23 @@ export default function NewProduct() {
           >
             <Input label="Name" onChange={setProductName} />
             <Input label="Brand" onChange={setBrand} />
-            <Input label="Supplier" onChange={setSupplier} />
             <Input label="Price" type="number" onChange={setPrice} />
             <Textarea label="Description" onChange={setDescription} />
 
             <div className="mb-4">
-              <label className="block text-gray-700 font-medium">Category</label>
+              <label className="block text-gray-700 font-medium">SubCategory</label>
               <select
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                onChange={(e) => setCategory(e.target.value)}
+                onChange={(e) => setSubCategory(e.target.value)}
               >
                 <option value="">Select</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.name}>
-                    {cat.name}
+                {subCategories.map((sub) => (
+                  <option key={sub} value={sub}>
+                    {sub}
                   </option>
                 ))}
               </select>
             </div>
-
-            {category === "Fertilizer" && (
-              <>
-                <Input label="Quantity (kg)" type="number" value={quantity} onChange={setQuantity} />
-                <Input label="Manufactured Date" type="date" value={manufacturedDate} onChange={setManufacturedDate} />
-                <Input label="Expiry Date" type="date" value={expiryDate} onChange={setExpiryDate} />
-              </>
-            )}
-
-            {category && (
-              <div className="mb-4">
-                <label className="block text-gray-700 font-medium">SubCategory</label>
-                <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  onChange={(e) => setSubCategory(e.target.value)}
-                >
-                  <option value="">Select</option>
-                  {subCategories[category]?.map((subCat) => (
-                    <option key={subCat} value={subCat}>
-                      {subCat}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            <Input label="Stock" type="number" onChange={setStock} />
 
             <div className="mb-4">
               <label className="block text-gray-700 font-medium">Upload Image</label>

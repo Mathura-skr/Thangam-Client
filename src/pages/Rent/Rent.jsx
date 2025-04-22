@@ -2,35 +2,44 @@ import { useContext, useEffect, useState } from "react";
 import axios from "../../utils/axios";
 import { AuthContext } from "../../context/authContext";
 import FilterPanel from "../../components/Filter/FilterPanel";
-import ProductCard from "../../components/ProductCard/ProductCard";
+import RentCard from "../../components/RentCard/RentCard";
 import Navigation from "../../components/Navbar/Navigation";
-import useFetch from "../../hooks/useFetch";
 import Swal from "sweetalert2";
 
 const Rent = () => {
   const { user } = useContext(AuthContext);
-  const { data, loading, error } = useFetch("/api/products");
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [activeFilter, setActiveFilter] = useState({});
 
-
   useEffect(() => {
-    if (data.length > 0) {
-      setFilteredProducts(data);
-    }
-  }, [data]);
+    const fetchRentalProducts = async () => {
+      try {
+        const response = await axios.get("/api/rent");
+        setData(response.data);
+        setFilteredProducts(response.data);
+      } catch (err) {
+        setError("Failed to load products.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRentalProducts();
+  }, []);
 
   const applyFilter = (newFilter) => {
     const updatedFilter = { ...activeFilter, ...newFilter };
     setActiveFilter(updatedFilter);
-  
+
     let filtered = [...data];
-  
+
     if (updatedFilter.category) {
       filtered = filtered.filter((p) => p.category === updatedFilter.category);
     }
     if (updatedFilter.subCategory) {
-      filtered = filtered.filter((p) => p.subCategory === updatedFilter.subCategory);
+      filtered = filtered.filter((p) => p.subcategory === updatedFilter.subCategory);
     }
     if (updatedFilter.brand) {
       filtered = filtered.filter((p) => p.brand === updatedFilter.brand);
@@ -38,10 +47,9 @@ const Rent = () => {
     if (updatedFilter.size) {
       filtered = filtered.filter((p) => p.size === updatedFilter.size);
     }
-  
+
     setFilteredProducts(filtered);
   };
-  
 
   const handleAddToCart = async (product) => {
     try {
@@ -63,7 +71,7 @@ const Rent = () => {
         },
         { withCredentials: true }
       );
-  
+
       Swal.fire({
         icon: 'success',
         title: 'Added to Cart',
@@ -80,8 +88,7 @@ const Rent = () => {
       });
     }
   };
-  
-  
+
   const handleBuyNow = (product) => {
     if (!user) {
       Swal.fire({
@@ -91,8 +98,7 @@ const Rent = () => {
       });
       return;
     }
-  
-    // Redirect with confirmation
+
     Swal.fire({
       title: 'Proceed to Checkout?',
       text: `You're about to buy: ${product.name}`,
@@ -105,33 +111,29 @@ const Rent = () => {
       }
     });
   };
-  
 
   return (
     <div className="min-h-screen bg-gray-100">
       <Navigation />
 
       <div className="container mx-auto p-4 flex gap-4">
-        {/* Sidebar Filter (Drawer on phone) */}
         <div className="hidden md:block w-1/4">
           <FilterPanel applyFilter={applyFilter} />
         </div>
 
-        {/* FilterPanel drawer on phone */}
         <div className="md:hidden fixed z-50">
           <FilterPanel applyFilter={applyFilter} />
         </div>
 
-        {/* Product Listing */}
         <div className="w-full md:w-3/4">
           {loading ? (
             <p>Loading products...</p>
           ) : error ? (
-            <p className="text-red-500">Failed to load products.</p>
+            <p className="text-red-500">{error}</p>
           ) : filteredProducts.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-6">
               {filteredProducts.map((product) => (
-                <ProductCard
+                <RentCard
                   key={product.id}
                   product={product}
                   onAddToCart={() => handleAddToCart(product)}

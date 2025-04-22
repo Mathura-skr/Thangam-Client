@@ -15,24 +15,28 @@ const FilterPanel = ({ applyFilter }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    axios.get("/api/filters/categories")
-      .then(res => setCategories(res.data))
-      .catch(err => console.error("Error fetching categories", err));
+    axios
+      .get("/api/filters/categories")
+      .then((res) => setCategories(res.data))
+      .catch((err) => console.error("Error fetching categories", err));
   }, []);
 
   useEffect(() => {
     if (selectedCategory) {
-      axios.get(`/api/filters/${selectedCategory}/subcategories`)
-        .then(res => setSubCategories(res.data))
-        .catch(err => console.error("Error fetching subcategories", err));
+      axios
+        .get(`/api/filters/${selectedCategory}/subcategories`)
+        .then((res) => setSubCategories(res.data))
+        .catch((err) => console.error("Error fetching subcategories", err));
 
-      axios.get(`/api/filters/${selectedCategory}/brands`)
-        .then(res => setBrands(res.data))
-        .catch(err => console.error("Error fetching brands", err));
+      axios
+        .get(`/api/filters/${selectedCategory}/brands`)
+        .then((res) => setBrands(res.data))
+        .catch((err) => console.error("Error fetching brands", err));
 
-      axios.get(`/api/filters/${selectedCategory}/sizes`)
-        .then(res => setSizes(res.data))
-        .catch(err => console.error("Error fetching sizes", err));
+      axios
+        .get(`/api/filters/${selectedCategory}/sizes`)
+        .then((res) => setSizes(res.data))
+        .catch((err) => console.error("Error fetching sizes", err));
     } else {
       setSubCategories([]);
       setBrands([]);
@@ -97,7 +101,7 @@ const FilterPanel = ({ applyFilter }) => {
                 <SelectedTag label="Category" value={selectedCategory} clear={() => setSelectedCategory(null)} />
               )}
               {selectedSubCategory && (
-                <SelectedTag label="Sub" value={selectedSubCategory} clear={() => setSelectedSubCategory(null)} />
+                <SelectedTag label="Subcategory" value={selectedSubCategory} clear={() => setSelectedSubCategory(null)} />
               )}
               {selectedBrand && (
                 <SelectedTag label="Brand" value={selectedBrand} clear={() => setSelectedBrand(null)} />
@@ -124,7 +128,6 @@ const FilterPanel = ({ applyFilter }) => {
                       setSelectedSubCategory(null);
                       setSelectedBrand(null);
                       setSelectedSize(null);
-                      applyFilter({ category: id });
                     }}
                   >
                     {name}
@@ -148,7 +151,6 @@ const FilterPanel = ({ applyFilter }) => {
                       }`}
                       onClick={() => {
                         setSelectedSubCategory(sub);
-                        applyAll();
                       }}
                     >
                       {sub}
@@ -173,7 +175,6 @@ const FilterPanel = ({ applyFilter }) => {
                       }`}
                       onClick={() => {
                         setSelectedBrand(brand);
-                        applyAll();
                       }}
                     >
                       {brand}
@@ -198,7 +199,6 @@ const FilterPanel = ({ applyFilter }) => {
                       }`}
                       onClick={() => {
                         setSelectedSize(size);
-                        applyAll();
                       }}
                     >
                       {size}

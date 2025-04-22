@@ -7,6 +7,7 @@ import MuiAlert from '@mui/material/Alert';
 import { Avatar, IconButton, Menu, MenuItem, Fade } from '@mui/material';
 import { AuthContext } from '../../context/authContext';
 import useFetch from '../../hooks/useFetch';
+import axios from '../../utils/axios';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -25,14 +26,31 @@ const Navbar = () => {
 
   const { data: userData } = useFetch(user ? `/api/users/${user.userId}` : null);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-  };
 
-  const handleSearchChange = (e) => {
+  const handleSearchChange = async (e) => {
     const query = e.target.value;
     setSearchQuery(query);
+  
+    if (query.length > 1) {
+      try {
+        const res = await axios.get(`/api/products/search?query=${encodeURIComponent(query)}`);
+        setSuggestions(res.data); // assuming response is an array of { id, name }
+      } catch (error) {
+        console.error("Failed to fetch suggestions:", error);
+      }
+    } else {
+      setSuggestions([]);
+    }
   };
+  
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
+      setSuggestions([]);
+    }
+  };
+  
 
   const handleAvatarClick = (event) => {
     if (user) {

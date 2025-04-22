@@ -25,6 +25,7 @@ import NewProduct from '../pages/Admin/NewProduct';
 import OrderList from '../pages/Admin/OrderList';
 import ProductList from '../pages/Admin/ProductList';
 import RentalList from '../pages/Admin/RentalList';
+import RentalProduct from '../pages/Admin/NewRentalProduct';
 import ReviewList from '../pages/Admin/ReviewList';
 import AdminSettings from '../pages/Admin/AdminSettings';
 import SupplierList from '../pages/Admin/SupplierList';
@@ -110,6 +111,7 @@ export default function RouteLayout() {
   <Route path='/admin/supplier/:id' element={<Protected role="admin"><UpdateSupplier /></Protected>} />
   <Route path='/admin/reviews' element={<Protected role="admin"><ReviewList /></Protected>} />
   <Route path='/admin/rental' element={<Protected role="admin"><RentalList /></Protected>} />
+  <Route path='/admin/rental/create' element={<Protected role="admin"><RentalProduct /></Protected>} />
   <Route path='/admin/settings' element={<Protected role="admin"><AdminSettings /></Protected>} />
 
   {/* Staff */}

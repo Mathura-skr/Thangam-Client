@@ -35,12 +35,12 @@ export default function Sidebar() {
     }).then((result) => {
       if (result.isConfirmed) {
         localStorage.clear(); // Clear token/user data
-        Swal.fire({
-          icon: "success",
-          title: "Logged out successfully",
-          timer: 1500,
-          showConfirmButton: false,
-        });
+        // Swal.fire({
+        //   icon: "success",
+        //   title: "Logged out successfully",
+        //   timer: 1500,
+        //   showConfirmButton: false,
+        // });
         navigate("/login"); // redirect to login page
       }
     });

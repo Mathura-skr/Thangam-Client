@@ -7,7 +7,7 @@ import axios from "../../utils/axios";
 export default function UpdateProduct() {
   const { id } = useParams();
   const navigate = useNavigate();
-// TODO: Want to show previous datas , image size
+
   const [productName, setProductName] = useState("");
   const [category, setCategory] = useState("");
   const [subCategory, setSubCategory] = useState("");
@@ -17,6 +17,9 @@ export default function UpdateProduct() {
   const [brand, setBrand] = useState("");
   const [quantity, setQuantity] = useState("");
   const [supplier, setSupplier] = useState("");
+  const [manufacturedDate, setManufacturedDate] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
+
   const [image_url, setImageURLs] = useState([]);
 
   const subCategories = {
@@ -36,7 +39,6 @@ export default function UpdateProduct() {
   ];
 
   useEffect(() => {
-    // Fetch product data when component mounts
     async function fetchProduct() {
       try {
         const { data } = await axios.get(`/api/products/${id}`);
@@ -47,8 +49,11 @@ export default function UpdateProduct() {
         setStock(data.stock);
         setDescription(data.description);
         setBrand(data.brand_name);
-        setQuantity(data.quantity || ""); 
+        setQuantity(data.quantity || "");
         setSupplier(data.supplier_name);
+        setManufacturedDate(data.manufactured_date || "");
+setExpiryDate(data.expiry_date || "");
+
         setImageURLs(data.image_url ? [data.image_url] : []);
       } catch (err) {
         console.error("Failed to load product", err);
@@ -89,7 +94,7 @@ export default function UpdateProduct() {
 
   async function sendData(e) {
     e.preventDefault();
-  
+
     if (isNaN(price) || price <= 0) {
       return Swal.fire({
         icon: "error",
@@ -97,7 +102,7 @@ export default function UpdateProduct() {
         text: "Enter valid price",
       });
     }
-  
+
     if (isNaN(stock) || stock <= 0) {
       return Swal.fire({
         icon: "error",
@@ -105,7 +110,7 @@ export default function UpdateProduct() {
         text: "Enter valid stock quantity",
       });
     }
-  
+
     if (productName.trim() === "") {
       return Swal.fire({
         icon: "error",
@@ -113,6 +118,7 @@ export default function UpdateProduct() {
         text: "Product name is required",
       });
     }
+
     const payload = {
       name: productName,
       category_name: category,
@@ -123,14 +129,16 @@ export default function UpdateProduct() {
       brand_name: brand,
       supplier_name: supplier,
       image_url: image_url,
+      manufactured_date: manufacturedDate,
+      expiry_date:expiryDate
     };
-    
-    if (category === "fertilizer") {
+
+    if (category === "Fertilizer") {
       payload.quantity = parseFloat(quantity);
     }
-    
+
     const token = localStorage.getItem("token");
-  
+
     try {
       await axios.put(`/api/products/${id}`, payload, {
         headers: {
@@ -146,7 +154,6 @@ export default function UpdateProduct() {
         showConfirmButton: false,
         timer: 2000,
       });
-
     } catch (err) {
       Swal.fire({
         icon: "error",
@@ -155,7 +162,6 @@ export default function UpdateProduct() {
       });
     }
   }
-  
 
   return (
     <div className="flex flex-col md:flex-row">
@@ -174,12 +180,24 @@ export default function UpdateProduct() {
                 Update Product
               </h1>
 
-              {/* Input fields */}
-              <Input label="Name" onChange={setProductName} />
-              <Input label="Brand" onChange={setBrand} />
-              <Input label="Supplier" onChange={setSupplier} />
-              <Input label="Price" type="number" onChange={setPrice} />
-              <Textarea label="Description" onChange={setDescription} />
+              <Input
+                label="Name"
+                value={productName}
+                onChange={setProductName}
+              />
+              <Input label="Brand" value={brand} onChange={setBrand} />
+              <Input label="Supplier" value={supplier} onChange={setSupplier} />
+              <Input
+                label="Price"
+                type="number"
+                value={price}
+                onChange={setPrice}
+              />
+              <Textarea
+                label="Description"
+                value={description}
+                onChange={setDescription}
+              />
 
               <div className="mb-4">
                 <label
@@ -191,6 +209,7 @@ export default function UpdateProduct() {
                 <select
                   id="category_field"
                   name="category"
+                  value={category}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                   onChange={(e) => setCategory(e.target.value)}
                 >
@@ -203,12 +222,30 @@ export default function UpdateProduct() {
                 </select>
               </div>
 
-             
               {category === "Fertilizer" && (
-                <Input label="Quantity (kg)" type="number" onChange={setQuantity} />
+                <>
+                <Input
+                  label="Quantity (kg)"
+                  type="number"
+                  value={quantity}
+                  onChange={setQuantity}
+                />
+                <Input
+                  label="Manufactured Date"
+                  type="date"
+                  value={manufacturedDate}
+                  onChange={setManufacturedDate}
+                />
+                <Input
+                  label="Expiry Date"
+                  type="date"
+                  value={expiryDate}
+                  onChange={setExpiryDate}
+                />
+              </>
+                
               )}
 
-             
               {category && (
                 <div className="mb-4">
                   <label
@@ -220,6 +257,7 @@ export default function UpdateProduct() {
                   <select
                     id="subCategory_field"
                     name="subCategory"
+                    value={subCategory}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                     onChange={(e) => setSubCategory(e.target.value)}
                   >
@@ -233,15 +271,19 @@ export default function UpdateProduct() {
                 </div>
               )}
 
-              <Input label="Stock" type="number" onChange={setStock} />
+              <Input
+                label="Stock"
+                type="number"
+                value={stock}
+                onChange={setStock}
+              />
 
-              {/* File upload */}
               <label
-                    htmlFor="subCategory_field"
-                    className="block text-gray-700 font-medium"
-                  >
-                    Upload image
-                  </label>
+                htmlFor="product_images"
+                className="block text-gray-700 font-medium"
+              >
+                Upload image
+              </label>
               <input
                 type="file"
                 name="product_images"
@@ -250,6 +292,19 @@ export default function UpdateProduct() {
                 multiple
                 onChange={handleMultipleImageUpload}
               />
+
+              {image_url.length > 0 && (
+                <div className="mt-4">
+                  <p className="text-gray-700 font-medium mb-2">
+                    Current Image:
+                  </p>
+                  <img
+                    src={image_url[0]}
+                    alt="Product"
+                    className="w-32 h-32 object-cover rounded"
+                  />
+                </div>
+              )}
 
               <button
                 id="login_button"
@@ -272,25 +327,29 @@ export default function UpdateProduct() {
   );
 }
 
-// Helper components
-const Input = ({ label, type = "text", onChange }) => (
+// Updated reusable components with value prop
+const Input = ({ label, type = "text", value, onChange }) => (
   <div className="mb-4">
     <label className="block text-gray-700 font-medium">{label}</label>
     <input
       type={type}
+      value={value}
       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
       onChange={(e) =>
-        onChange(type === "number" ? parseFloat(e.target.value) : e.target.value)
+        onChange(
+          type === "number" ? parseFloat(e.target.value) : e.target.value
+        )
       }
     />
   </div>
 );
 
-const Textarea = ({ label, onChange }) => (
+const Textarea = ({ label, value, onChange }) => (
   <div className="mb-4">
     <label className="block text-gray-700 font-medium">{label}</label>
     <textarea
       rows="4"
+      value={value}
       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
       onChange={(e) => onChange(e.target.value)}
     ></textarea>
