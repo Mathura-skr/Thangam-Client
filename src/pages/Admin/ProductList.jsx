@@ -21,7 +21,7 @@ export default function ProductList() {
       const response = await axios.get("/api/products");
       const productsWithDates = response.data.map((product) => ({
         ...product,
-         expiry_date: product.category === "Fertilizer" ? product. expiry_date : "-",
+         expiry_date: product.category === "Fertilizer" ? product.expiry_date : "-",
         manufactured_date: product.category === "Fertilizer" ? product.manufactured_date : "-",
       }));
       setProducts(productsWithDates);
@@ -61,8 +61,7 @@ export default function ProductList() {
 
     // Conditionally show these columns for Fertilizer category
     { field: "manufactured_date", headerName: "manufactured_date", flex: 1, headerClassName: "super-app-theme--header" },
-    { field: " expiry_date", headerName: " expiry_date", flex: 1, headerClassName: "super-app-theme--header" },
-
+    { field: "expiry_date", headerName: "Expiry Date", flex: 1, headerClassName: "super-app-theme--header" },
     {
       field: "actions",
       headerName: "Actions",
