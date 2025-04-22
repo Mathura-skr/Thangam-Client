@@ -58,7 +58,7 @@ export default function RentalList() {
       headerClassName: "super-app-theme--header",
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 1 }}>
-          <Link to={`/admin/rental/edit/${params.row.id}`}>
+          <Link to={`/admin/rental/${params.row.id}`}>
             <Button
               variant="outlined"
               color="primary"

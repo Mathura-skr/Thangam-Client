@@ -58,7 +58,7 @@ export default function RentalList() {
       headerClassName: "super-app-theme--header",
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 1 }}>
-          <Link to={`/admin/rental/edit/${params.row.id}`}>
+          <Link to={`/staff/rental/${params.row.id}`}>
             <Button
               variant="outlined"
               color="primary"
@@ -95,7 +95,7 @@ export default function RentalList() {
         <div className="w-4/5 p-6">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-2xl font-bold">Rental List</h1>
-            <Link to="/admin/rental/create">
+            <Link to="/staff/rental/create">
               <Button variant="contained" color="primary" startIcon={<AddIcon />}>
                 Add Product
               </Button>

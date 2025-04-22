@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import Sidebar from "./Sidebar";
+import Sidebar from "./StaffSidebar";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import axios from "../../utils/axios";
-import AdminNav from "../../components/Navbar/AdminNav";
+import AdminNav from "../../components/Navbar/StaffNav";
 
 export default function NewRentalProduct() {
   const navigate = useNavigate();
@@ -107,7 +107,7 @@ export default function NewRentalProduct() {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-semibold">Add Rental Product</h1>
             <button
-              onClick={() => navigate("/admin/rental")}
+              onClick={() => navigate("/staff/rental")}
               className="bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700"
             >
               Back to List

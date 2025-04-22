@@ -141,14 +141,14 @@ export default function OrderList() {
             </Button>
             )}
     
-            <Button
+            {/* <Button
               variant="contained"
               color="error"
               size="small"
               onClick={() => deleteOrder(id)}
             >
               <DeleteIcon />
-            </Button>
+            </Button> */}
           </Box>
         );
       },

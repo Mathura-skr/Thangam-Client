@@ -26,6 +26,7 @@ import OrderList from '../pages/Admin/OrderList';
 import ProductList from '../pages/Admin/ProductList';
 import RentalList from '../pages/Admin/RentalList';
 import RentalProduct from '../pages/Admin/NewRentalProduct';
+import UpdateRentalProduct from '../pages/Admin/UpdateRentalProduct';
 import ReviewList from '../pages/Admin/ReviewList';
 import AdminSettings from '../pages/Admin/AdminSettings';
 import SupplierList from '../pages/Admin/SupplierList';
@@ -42,6 +43,8 @@ import StaffNewProduct from '../pages/Staff/NewProduct';
 import StaffOrderList from '../pages/Staff/OrderList';
 import StaffProductList from '../pages/Staff/ProductList';
 import StaffRentalList from '../pages/Staff/RentalList';
+import StaffRentalProduct from '../pages/Staff/NewRentalProduct';
+import StaffUpdateRentalProduct from '../pages/Staff/UpdateRentalProduct';
 import StaffReviewList from '../pages/Staff/ReviewList';
 import StaffDashboard from '../pages/Staff/StaffDashboard';
 import StaffSettings from '../pages/Staff/StaffSettings';
@@ -73,7 +76,6 @@ export default function RouteLayout() {
   
   return (
 
-//TODO: cart unprotected ,
 <div className="flex-1">
 <Routes>
 
@@ -112,6 +114,7 @@ export default function RouteLayout() {
   <Route path='/admin/reviews' element={<Protected role="admin"><ReviewList /></Protected>} />
   <Route path='/admin/rental' element={<Protected role="admin"><RentalList /></Protected>} />
   <Route path='/admin/rental/create' element={<Protected role="admin"><RentalProduct /></Protected>} />
+  <Route path='/admin/rental/:id' element={<Protected role="admin"><UpdateRentalProduct /></Protected>} />
   <Route path='/admin/settings' element={<Protected role="admin"><AdminSettings /></Protected>} />
 
   {/* Staff */}
@@ -126,6 +129,9 @@ export default function RouteLayout() {
   <Route path='/staff/supplier/:id' element={<Protected role="staff"><StaffUpdateSupplier /></Protected>} />
   <Route path='/staff/reviews' element={<Protected role="staff"><StaffReviewList /></Protected>} />
   <Route path='/staff/rental' element={<Protected role="staff"><StaffRentalList /></Protected>} />
+  <Route path='/staff/rental' element={<Protected role="staff"><StaffRentalList /></Protected>} />
+  <Route path='/staff/rental/create' element={<Protected role="staff"><StaffRentalProduct /></Protected>} />
+  <Route path='/staff/rental/:id' element={<Protected role="staff"><StaffUpdateRentalProduct /></Protected>} />
   <Route path='/staff/settings' element={<Protected role="staff"><StaffSettings /></Protected>} />
 
 </Routes>

@@ -20,7 +20,7 @@ export default function UpdateProduct() {
   const [manufacturedDate, setManufacturedDate] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
 
-  const [image_url, setImageURLs] = useState([]);
+  const [image_url, setImageURL] = useState([]);
 
   const subCategories = {
     Fertilizer: ["Organic", "Chemical", "Compost"],
@@ -54,7 +54,7 @@ export default function UpdateProduct() {
         setManufacturedDate(data.manufactured_date || "");
 setExpiryDate(data.expiry_date || "");
 
-        setImageURLs(data.image_url ? [data.image_url] : []);
+        setImageURL(data.image_url ? [data.image_url] : []);
       } catch (err) {
         console.error("Failed to load product", err);
       }
@@ -63,15 +63,14 @@ setExpiryDate(data.expiry_date || "");
     fetchProduct();
   }, [id]);
 
+  
   const handleImageUpload = async (file) => {
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append("image_url", file);
 
     try {
       const { data } = await axios.post("/api/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+        headers: { "Content-Type": "multipart/form-data" },
       });
       return data.url;
     } catch (err) {
@@ -80,44 +79,38 @@ setExpiryDate(data.expiry_date || "");
     }
   };
 
-  const handleMultipleImageUpload = async (e) => {
-    const files = Array.from(e.target.files);
-    const urls = [];
-
-    for (const file of files) {
-      const url = await handleImageUpload(file);
-      if (url) urls.push(url);
-    }
-
-    setImageURLs(urls);
+  
+  const handleSingleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = await handleImageUpload(file);
+    if (url) setImageURL(url);
   };
 
   async function sendData(e) {
     e.preventDefault();
 
-    if (isNaN(price) || price <= 0) {
-      return Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Enter valid price",
-      });
-    }
-
-    if (isNaN(stock) || stock <= 0) {
-      return Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Enter valid stock quantity",
-      });
-    }
-
-    if (productName.trim() === "") {
-      return Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Product name is required",
-      });
-    }
+    if (
+          isNaN(price) ||
+          price <= 0 ||
+          isNaN(stock) ||
+          stock <= 0 ||
+          productName.trim() === ""
+        ) {
+          return Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Please enter valid details.",
+          });
+        }
+      
+        if (category === "Fertilizer" && (!quantity || !expiryDate || !manufacturedDate)) {
+          return Swal.fire({
+            icon: "error",
+            title: "Missing Info",
+            text: "Please enter quantity, expiry date and manufactured date for fertilizers",
+          });
+        }
 
     const payload = {
       name: productName,
@@ -128,14 +121,17 @@ setExpiryDate(data.expiry_date || "");
       description,
       brand_name: brand,
       supplier_name: supplier,
-      image_url: image_url,
-      manufactured_date: manufacturedDate,
-      expiry_date:expiryDate
+      image_url,
     };
 
+    // Only add dates for Fertilizer category
     if (category === "Fertilizer") {
       payload.quantity = parseFloat(quantity);
+      payload.expiry_date = expiryDate;
+      payload.manufactured_date = manufacturedDate;
     }
+
+    console.log("Payload to be sent:", payload);
 
     const token = localStorage.getItem("token");
 
@@ -290,7 +286,7 @@ setExpiryDate(data.expiry_date || "");
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 id="customFile"
                 multiple
-                onChange={handleMultipleImageUpload}
+                onChange={handleSingleImageUpload}
               />
 
               {image_url.length > 0 && (

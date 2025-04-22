@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "../../utils/axios";
 import AdminNav from "../../components/Navbar/StaffNav";
 
-export default function NewProductStaff() {
+export default function NewProduct() {
   const navigate = useNavigate();
 
   const [productName, setProductName] = useState("");
@@ -18,6 +18,8 @@ export default function NewProductStaff() {
   const [quantity, setQuantity] = useState("");
   const [supplier, setSupplier] = useState("");
   const [image_url, setImageURL] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
+  const [manufacturedDate, setManufacturedDate] = useState("");
 
   const subCategories = {
     Fertilizer: ["Organic", "Chemical", "Compost"],
@@ -59,7 +61,7 @@ export default function NewProductStaff() {
 
   const sendData = async (e) => {
     e.preventDefault();
-
+  
     if (
       isNaN(price) ||
       price <= 0 ||
@@ -73,17 +75,15 @@ export default function NewProductStaff() {
         text: "Please enter valid details.",
       });
     }
-
-    if (category === "Fertilizer" && !quantity) {
+  
+    if (category === "Fertilizer" && (!quantity || !expiryDate || !manufacturedDate)) {
       return Swal.fire({
         icon: "error",
-        title: "Quantity required",
-        text: "Please enter quantity for fertilizer products",
+        title: "Missing Info",
+        text: "Please enter quantity, expiry date and manufactured date for fertilizers",
       });
     }
-
-    const numericQuantity = category === "Fertilizer" ? Number(quantity) : null;
-    
+  
     const payload = {
       name: productName,
       category_name: category,
@@ -91,21 +91,22 @@ export default function NewProductStaff() {
       price: parseFloat(price),
       stock: parseInt(stock),
       description,
-      brand_name: brand,
-      supplier_name: supplier,
+      brand_name: brand,  
+      supplier_name: supplier,  
       image_url,
-      quantity: numericQuantity
     };
-
-    // Debug log
-  console.log("Final payload:", payload);
-
+  
+    // Only add dates for Fertilizer category
     if (category === "Fertilizer") {
       payload.quantity = parseFloat(quantity);
+      payload.expiry_date = expiryDate;
+      payload.manufactured_date = manufacturedDate;
     }
-
+  
+    console.log("Payload to be sent:", payload);
+  
     const token = localStorage.getItem("token");
-
+  
     try {
       await axios.post("/api/products/", payload, {
         headers: {
@@ -113,7 +114,7 @@ export default function NewProductStaff() {
           "Content-Type": "application/json",
         },
       });
-
+  
       Swal.fire({
         position: "top-start",
         icon: "success",
@@ -121,8 +122,8 @@ export default function NewProductStaff() {
         showConfirmButton: false,
         timer: 2000,
       });
-
-      navigate("/admin/products");
+  
+      navigate("/staff/products");
     } catch (err) {
       Swal.fire({
         icon: "error",
@@ -132,6 +133,7 @@ export default function NewProductStaff() {
       });
     }
   };
+  
 
   return (
     <div className="flex flex-col h-screen">
@@ -178,14 +180,16 @@ export default function NewProductStaff() {
             </div>
 
             {category === "Fertilizer" && (
-              <Input label="Quantity (kg)" type="number" value={quantity} onChange={setQuantity} />
+              <>
+                <Input label="Quantity (kg)" type="number" value={quantity} onChange={setQuantity} />
+                <Input label="Manufactured Date" type="date" value={manufacturedDate} onChange={setManufacturedDate} />
+                <Input label="Expiry Date" type="date" value={expiryDate} onChange={setExpiryDate} />
+              </>
             )}
 
             {category && (
               <div className="mb-4">
-                <label className="block text-gray-700 font-medium">
-                  SubCategory
-                </label>
+                <label className="block text-gray-700 font-medium">SubCategory</label>
                 <select
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                   onChange={(e) => setSubCategory(e.target.value)}
@@ -231,11 +235,12 @@ export default function NewProductStaff() {
 }
 
 // Reusable Components
-const Input = ({ label, type = "text", onChange }) => (
+const Input = ({ label, type = "text", onChange, value }) => (
   <div className="mb-4">
     <label className="block text-gray-700 font-medium">{label}</label>
     <input
       type={type}
+      value={value}
       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
       onChange={(e) =>
         onChange(type === "number" ? parseFloat(e.target.value) : e.target.value)

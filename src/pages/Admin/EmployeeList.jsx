@@ -98,7 +98,7 @@ export default function EmployeeList() {
       headerClassName: "super-app-theme--header",
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 1 }}>
-          <Link to={`/admin/user/${params.row.id}`}>
+          <Link to={`/admin/employee/${params.row.id}`}>
             <Button  variant="outlined"
               color="primary"
               size="small"

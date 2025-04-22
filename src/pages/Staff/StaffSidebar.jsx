@@ -51,7 +51,7 @@ export default function SidebarStaff() {
     { icon: <BuildIcon />, label: "Products", path: "/staff/products" },
     { icon: <LocalShippingIcon />, label: "Orders", path: "/staff/orders" },
     { icon: <RecyclingIcon />, label: "Rental", path: "/staff/rental" },
-    { icon: <DeliveryDiningIcon />, label: "Suppliers", path: "/staff/suppliers" },
+    // { icon: <DeliveryDiningIcon />, label: "Suppliers", path: "/staff/suppliers" },
     { icon: <MonetizationOnIcon />, label: "Sales", path: "/staff/sales" },
     { icon: <SettingsIcon />, label: "Settings", path: "/staff/settings" },
   ];

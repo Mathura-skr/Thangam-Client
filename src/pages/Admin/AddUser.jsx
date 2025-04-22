@@ -110,8 +110,8 @@ export default function AddUser() {
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
               >
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
+                <option value="user">Customer</option>
+                
               </select>
             </div>
 

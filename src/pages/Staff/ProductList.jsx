@@ -61,7 +61,7 @@ export default function ProductListStaff() {
       headerClassName: "super-app-theme--header",
       renderCell: (params) => (
         <Box sx={{ display: "flex", gap: 1 }}>
-          <Link to={`/admin/product/${params.row.id}`}>
+          <Link to={`/staff/product/${params.row.id}`}>
             <Button
               variant="outlined"
               color="primary"
@@ -99,7 +99,7 @@ export default function ProductListStaff() {
         <div className="w-4/5 p-6">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-2xl font-bold">Product List</h1>
-            <Link to="/admin/products/create">
+            <Link to="/staff/products/create">
               <Button variant="contained" color="primary" startIcon={<AddIcon />}>
                 Add Product
               </Button>
