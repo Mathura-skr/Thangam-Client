@@ -27,7 +27,7 @@ const ProductCard = ({ product, onAddToCart, onBuyNow }) => {
 
       <p className="text-green-600 font-medium">
         {" "}
-        Price: ₨ {Number(product.price).toFixed(2)}
+        Price: ₨ {Number(product.price).toFixed(2)} / Per Day
       </p>
       <p className="text-yellow-500 text-sm">Rating: {product.rating} ★</p>
 

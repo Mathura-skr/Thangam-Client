@@ -61,7 +61,7 @@ export default function NewProduct() {
 
   const sendData = async (e) => {
     e.preventDefault();
-
+  
     if (
       isNaN(price) ||
       price <= 0 ||
@@ -75,7 +75,7 @@ export default function NewProduct() {
         text: "Please enter valid details.",
       });
     }
-
+  
     if (category === "Fertilizer" && (!quantity || !expiryDate || !manufacturedDate)) {
       return Swal.fire({
         icon: "error",
@@ -83,7 +83,8 @@ export default function NewProduct() {
         text: "Please enter quantity, expiry date and manufactured date for fertilizers",
       });
     }
-
+  
+    // Construct the payload with correct field names
     const payload = {
       name: productName,
       category_name: category,
@@ -91,21 +92,22 @@ export default function NewProduct() {
       price: parseFloat(price),
       stock: parseInt(stock),
       description,
-      brand: brand,
-      supplier_name: supplier,
+      brand_name: brand,  // Changed from 'brand' to 'brand_name'
+      supplier_name: supplier,  // Changed from 'supplier' to 'supplier_name'
       image_url,
-      manufactured_date: manufacturedDate,
-      expiry_date:expiryDate
     };
-
+  
+    // Only add dates for Fertilizer category
     if (category === "Fertilizer") {
       payload.quantity = parseFloat(quantity);
       payload.expiry_date = expiryDate;
       payload.manufactured_date = manufacturedDate;
     }
-
+  
+    console.log("Payload to be sent:", payload);
+  
     const token = localStorage.getItem("token");
-
+  
     try {
       await axios.post("/api/products/", payload, {
         headers: {
@@ -113,7 +115,7 @@ export default function NewProduct() {
           "Content-Type": "application/json",
         },
       });
-
+  
       Swal.fire({
         position: "top-start",
         icon: "success",
@@ -121,7 +123,7 @@ export default function NewProduct() {
         showConfirmButton: false,
         timer: 2000,
       });
-
+  
       navigate("/admin/products");
     } catch (err) {
       Swal.fire({
@@ -132,6 +134,7 @@ export default function NewProduct() {
       });
     }
   };
+  
 
   return (
     <div className="flex flex-col h-screen">

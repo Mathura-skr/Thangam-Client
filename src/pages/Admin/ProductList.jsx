@@ -19,16 +19,21 @@ export default function ProductList() {
   const fetchProducts = async () => {
     try {
       const response = await axios.get("/api/products");
+  
+      // Ensure that we handle dates only for "Fertilizer" category
       const productsWithDates = response.data.map((product) => ({
         ...product,
-         expiry_date: product.category === "Fertilizer" ? product.expiry_date : "-",
-        manufactured_date: product.category === "Fertilizer" ? product.manufactured_date : "-",
+        // Set `manufactured_date` and `expiry_date` for Fertilizer products, otherwise leave them as null or undefined
+        manufactured_date: product.category.toLowerCase() === "fertilizer" ? product.manufactured_date : null,
+        expiry_date: product.category.toLowerCase() === "fertilizer" ? product.expiry_date : null,
       }));
+  
       setProducts(productsWithDates);
     } catch (error) {
       toast.error("Failed to fetch products");
     }
   };
+  
 
   useEffect(() => {
     fetchProducts();
@@ -60,7 +65,7 @@ export default function ProductList() {
     { field: "supplier", headerName: "Supplier", flex: 1, headerClassName: "super-app-theme--header" },
 
     // Conditionally show these columns for Fertilizer category
-    { field: "manufactured_date", headerName: "manufactured_date", flex: 1, headerClassName: "super-app-theme--header" },
+    { field: "manufactured_date", headerName: "Manufac Date", flex: 1, headerClassName: "super-app-theme--header" },
     { field: "expiry_date", headerName: "Expiry Date", flex: 1, headerClassName: "super-app-theme--header" },
     {
       field: "actions",
