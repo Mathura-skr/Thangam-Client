@@ -21,6 +21,10 @@ const ProductCard = ({ product, onAddToCart, onBuyNow }) => {
         </p>
       )}
 
+      {product.description && (
+        <p className="text-gray-500 text-sm"> {product.description}</p>
+      )}
+
       {product.size && (
         <p className="text-gray-500 text-sm">Size: {product.size}</p>
       )}
