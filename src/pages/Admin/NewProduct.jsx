@@ -163,7 +163,11 @@ export default function NewProduct() {
             <Input label="Brand" onChange={setBrand} />
             <Input label="Supplier" onChange={setSupplier} />
             <Input label="Price" type="number" onChange={setPrice} />
-            <Textarea label="Description" onChange={setDescription} />
+            <Textarea label="Description" onChange={setDescription} style={{ 
+            whiteSpace: 'pre',
+            fontFamily: 'monospace',
+            tabSize: 4
+          }} />
 
             <div className="mb-4">
               <label className="block text-gray-700 font-medium">Category</label>

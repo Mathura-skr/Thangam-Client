@@ -52,7 +52,7 @@ export default function UpdateProduct() {
         setQuantity(data.quantity || "");
         setSupplier(data.supplier_name);
         setManufacturedDate(data.manufactured_date || "");
-setExpiryDate(data.expiry_date || "");
+        setExpiryDate(data.expiry_date || "");
 
         setImageURL(data.image_url ? [data.image_url] : []);
       } catch (err) {
@@ -63,7 +63,6 @@ setExpiryDate(data.expiry_date || "");
     fetchProduct();
   }, [id]);
 
-  
   const handleImageUpload = async (file) => {
     const formData = new FormData();
     formData.append("image_url", file);
@@ -79,7 +78,6 @@ setExpiryDate(data.expiry_date || "");
     }
   };
 
-  
   const handleSingleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -91,26 +89,29 @@ setExpiryDate(data.expiry_date || "");
     e.preventDefault();
 
     if (
-          isNaN(price) ||
-          price <= 0 ||
-          isNaN(stock) ||
-          stock <= 0 ||
-          productName.trim() === ""
-        ) {
-          return Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Please enter valid details.",
-          });
-        }
-      
-        if (category === "Fertilizer" && (!quantity || !expiryDate || !manufacturedDate)) {
-          return Swal.fire({
-            icon: "error",
-            title: "Missing Info",
-            text: "Please enter quantity, expiry date and manufactured date for fertilizers",
-          });
-        }
+      isNaN(price) ||
+      price <= 0 ||
+      isNaN(stock) ||
+      stock <= 0 ||
+      productName.trim() === ""
+    ) {
+      return Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Please enter valid details.",
+      });
+    }
+
+    if (
+      category === "Fertilizer" &&
+      (!quantity || !expiryDate || !manufacturedDate)
+    ) {
+      return Swal.fire({
+        icon: "error",
+        title: "Missing Info",
+        text: "Please enter quantity, expiry date and manufactured date for fertilizers",
+      });
+    }
 
     const payload = {
       name: productName,
@@ -189,10 +190,18 @@ setExpiryDate(data.expiry_date || "");
                 value={price}
                 onChange={setPrice}
               />
-              <Textarea
-                label="Description"
+              <textarea
+                className="description-input"
                 value={description}
-                onChange={setDescription}
+                onChange={(e) => setDescription(e.target.value)}
+                style={{
+                  whiteSpace: "pre-wrap",
+                  minHeight: "100px",
+                  border: "1px solid #ccc",
+                  padding: "8px",
+                  width: "100%", // Add this for proper sizing
+                  fontFamily: "inherit", // Maintains consistent fonts
+                }}
               />
 
               <div className="mb-4">
@@ -220,26 +229,25 @@ setExpiryDate(data.expiry_date || "");
 
               {category === "Fertilizer" && (
                 <>
-                <Input
-                  label="Quantity (kg)"
-                  type="number"
-                  value={quantity}
-                  onChange={setQuantity}
-                />
-                <Input
-                  label="Manufactured Date"
-                  type="date"
-                  value={manufacturedDate}
-                  onChange={setManufacturedDate}
-                />
-                <Input
-                  label="Expiry Date"
-                  type="date"
-                  value={expiryDate}
-                  onChange={setExpiryDate}
-                />
-              </>
-                
+                  <Input
+                    label="Quantity (kg)"
+                    type="number"
+                    value={quantity}
+                    onChange={setQuantity}
+                  />
+                  <Input
+                    label="Manufactured Date"
+                    type="date"
+                    value={manufacturedDate}
+                    onChange={setManufacturedDate}
+                  />
+                  <Input
+                    label="Expiry Date"
+                    type="date"
+                    value={expiryDate}
+                    onChange={setExpiryDate}
+                  />
+                </>
               )}
 
               {category && (

@@ -55,6 +55,7 @@ import StaffUpdateSupplier from '../pages/Staff/UpdateSupplier';
 
 import Forbidden403 from '../pages/ErrorPages/Forbidden403';
 import Checkout from "../pages/Checkout/Checkout";
+import ProductDetail from "../pages/Product/ProductDetail";
 
 
 export default function RouteLayout() {
@@ -82,6 +83,7 @@ export default function RouteLayout() {
   {/* Public */}
   <Route path='/' element={<HomePage />} />
   <Route path='/product' element={<ProductPage />} />
+  <Route path='/product/:id' element={<ProductDetail />} />
   <Route path='/cart' element={<Protected role="user"> <Cart /></Protected>} />
   <Route path='/checkout' element={<Protected role="user"><Checkout /></Protected>} />
     {/* <Route path='/cart' element={ <Cart />} />

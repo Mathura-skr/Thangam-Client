@@ -1,49 +1,71 @@
 import React from "react";
 
-const ProductCard = ({ product, onAddToCart, onBuyNow }) => {
+const ProductCard = ({ product, onAddToCart, onBuyNow, onViewDetail }) => {
+  const handleCardClick = () => {
+    if (onViewDetail) onViewDetail(product.id);
+  };
+
+  const handleAddToCartClick = (e) => {
+    e.stopPropagation();
+    onAddToCart(product);
+  };
+
+  const handleBuyNowClick = (e) => {
+    e.stopPropagation();
+    onBuyNow(product);
+  };
+
+  const getImageUrl = () => {
+    if (Array.isArray(product.image_url)) {
+      return product.image_url[0] || "/images/placeholder-product.png";
+    }
+    return product.image_url || "/images/placeholder-product.png";
+  };
+
+  const renderStars = (rating) => {
+    const rounded = Math.round(rating || 0);
+    return (
+      <div className="flex justify-center mt-1 text-yellow-500 text-sm">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <span key={i}>{i < rounded ? "★" : "☆"}</span>
+        ))}
+      </div>
+    );
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 text-center transition-transform transform hover:-translate-y-1 w-48 h-72 flex flex-col justify-between sm:w-56 sm:h-80 md:w-64 md:h-96">
+    <div
+      className="bg-white rounded-lg shadow-md p-4 text-center transition-transform transform hover:-translate-y-1 w-48  flex flex-col justify-between sm:w-56  md:w-64  cursor-pointer"
+      onClick={handleCardClick}
+    >
       <img
-        src={product.image_url}
+        src={getImageUrl()}
         alt={product.name}
         className="w-full h-32 object-cover rounded-md sm:h-40 md:h-48"
+        onError={(e) => {
+          e.target.src = "/images/placeholder-product.png";
+        }}
       />
 
-      <h3 className="text-lg font-semibold mt-2 truncate">{product.name}</h3>
+      <div className="flex-grow">
+        <h3 className="text-lg font-semibold mt-2 truncate">{product.name}</h3>
 
-      {product.brand && (
-        <p className="text-gray-500 text-sm">Brand: {product.brand}</p>
-      )}
+        {product.brand_name && (
+          <p className="text-gray-500 text-sm">Brand: {product.brand_name}</p>
+        )}
 
-      {product.category?.includes("tools") && (
-        <p className="text-gray-500 text-sm">
-          Category: {product.category.replace("-", " ")}
+        {product.category_name && (
+          <p className="text-gray-500 text-sm">
+            Category: {product.category_name.replace("-", " ")}
+          </p>
+        )}
+
+        {/* Rating stars */}
+        {renderStars(product.average_rating)}
+
+        <p className="text-green-600 font-medium mt-1">
+          Price: ₨ {Number(product.price).toFixed(2)}
         </p>
-      )}
-
-      {product.size && (
-        <p className="text-gray-500 text-sm">Size: {product.size}</p>
-      )}
-
-      <p className="text-green-600 font-medium">
-        {" "}
-        Price: ₨ {Number(product.price).toFixed(2)}
-      </p>
-      <p className="text-yellow-500 text-sm">Rating: {product.rating} ★</p>
-
-      <div className="flex justify-between mt-auto">
-        <button
-          onClick={() => onAddToCart(product)}
-          className="bg-[#f2b400] text-white rounded px-3 py-1 text-sm hover:bg-orange-600 w-1/2 mr-1"
-        >
-          Add to Cart
-        </button>
-        <button
-          onClick={() => onBuyNow(product)}
-          className="bg-black text-white rounded px-3 py-1 text-sm hover:outline hover:outline-2 hover:outline-black hover:rounded-md w-1/2 ml-1"
-        >
-          Buy Now
-        </button>
       </div>
     </div>
   );

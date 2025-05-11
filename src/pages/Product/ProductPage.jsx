@@ -6,13 +6,14 @@ import ProductCard from "../../components/ProductCard/ProductCard";
 import Navigation from "../../components/Navbar/Navigation";
 import useFetch from "../../hooks/useFetch";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom"; // ✅ Add this
 
 const ProductPage = () => {
   const { user } = useContext(AuthContext);
   const { data, loading, error } = useFetch("/api/products");
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [activeFilter, setActiveFilter] = useState({});
-
+  const navigate = useNavigate(); // ✅ Hook for navigation
 
   useEffect(() => {
     if (data.length > 0) {
@@ -23,9 +24,9 @@ const ProductPage = () => {
   const applyFilter = (newFilter) => {
     const updatedFilter = { ...activeFilter, ...newFilter };
     setActiveFilter(updatedFilter);
-  
+
     let filtered = [...data];
-  
+
     if (updatedFilter.category) {
       filtered = filtered.filter((p) => p.category === updatedFilter.category);
     }
@@ -38,10 +39,9 @@ const ProductPage = () => {
     if (updatedFilter.size) {
       filtered = filtered.filter((p) => p.size === updatedFilter.size);
     }
-  
+
     setFilteredProducts(filtered);
   };
-  
 
   const handleAddToCart = async (product) => {
     try {
@@ -63,7 +63,7 @@ const ProductPage = () => {
         },
         { withCredentials: true }
       );
-  
+
       Swal.fire({
         icon: 'success',
         title: 'Added to Cart',
@@ -80,8 +80,7 @@ const ProductPage = () => {
       });
     }
   };
-  
-  
+
   const handleBuyNow = (product) => {
     if (!user) {
       Swal.fire({
@@ -91,8 +90,7 @@ const ProductPage = () => {
       });
       return;
     }
-  
-    // Redirect with confirmation
+
     Swal.fire({
       title: 'Proceed to Checkout?',
       text: `You're about to buy: ${product.name}`,
@@ -105,24 +103,24 @@ const ProductPage = () => {
       }
     });
   };
-  
+
+  const handleViewDetail = (id) => {
+    navigate(`/product/${id}`); // ✅ Navigate to product detail
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
       <Navigation />
 
       <div className="container mx-auto p-4 flex gap-4">
-        {/* Sidebar Filter (Drawer on phone) */}
         <div className="hidden md:block w-1/4">
           <FilterPanel applyFilter={applyFilter} />
         </div>
 
-        {/* FilterPanel drawer on phone */}
         <div className="md:hidden fixed z-50">
           <FilterPanel applyFilter={applyFilter} />
         </div>
 
-        {/* Product Listing */}
         <div className="w-full md:w-3/4">
           {loading ? (
             <p>Loading products...</p>
@@ -136,6 +134,7 @@ const ProductPage = () => {
                   product={product}
                   onAddToCart={() => handleAddToCart(product)}
                   onBuyNow={() => handleBuyNow(product)}
+                  onViewDetail={() => handleViewDetail(product.id)} // ✅ Added
                 />
               ))}
             </div>
