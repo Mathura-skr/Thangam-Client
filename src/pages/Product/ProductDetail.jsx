@@ -51,6 +51,10 @@ const ProductDetailPage = () => {
     ));
   };
 
+   const handleViewDetail = (id) => {
+    navigate(`/product/${id}`);
+  };
+
   const handleAddToCart = async () => {
     if (!user) {
       return Swal.fire("Login Required", "Please login to add to cart.", "warning");
@@ -147,6 +151,7 @@ const ProductDetailPage = () => {
             <ProductCard
               key={prod.id}
               product={prod}
+              onViewDetail={() => handleViewDetail(prod.id)} 
             />
           ))}
         </div>

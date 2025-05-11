@@ -56,6 +56,7 @@ import StaffUpdateSupplier from '../pages/Staff/UpdateSupplier';
 import Forbidden403 from '../pages/ErrorPages/Forbidden403';
 import Checkout from "../pages/Checkout/Checkout";
 import ProductDetail from "../pages/Product/ProductDetail";
+import SalesList from "../pages/Admin/SalesList";
 
 
 export default function RouteLayout() {
@@ -114,6 +115,7 @@ export default function RouteLayout() {
   <Route path='/admin/suppliers/create' element={<Protected role="admin"><AddSupplier /></Protected>} />
   <Route path='/admin/supplier/:id' element={<Protected role="admin"><UpdateSupplier /></Protected>} />
   <Route path='/admin/reviews' element={<Protected role="admin"><ReviewList /></Protected>} />
+  <Route path='/admin/sales' element={<Protected role="admin"><SalesList /></Protected>} />
   <Route path='/admin/rental' element={<Protected role="admin"><RentalList /></Protected>} />
   <Route path='/admin/rental/create' element={<Protected role="admin"><RentalProduct /></Protected>} />
   <Route path='/admin/rental/:id' element={<Protected role="admin"><UpdateRentalProduct /></Protected>} />

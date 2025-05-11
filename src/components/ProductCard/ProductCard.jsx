@@ -5,15 +5,7 @@ const ProductCard = ({ product, onAddToCart, onBuyNow, onViewDetail }) => {
     if (onViewDetail) onViewDetail(product.id);
   };
 
-  const handleAddToCartClick = (e) => {
-    e.stopPropagation();
-    onAddToCart(product);
-  };
 
-  const handleBuyNowClick = (e) => {
-    e.stopPropagation();
-    onBuyNow(product);
-  };
 
   const getImageUrl = () => {
     if (Array.isArray(product.image_url)) {

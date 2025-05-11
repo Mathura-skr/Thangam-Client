@@ -22,26 +22,27 @@ const ProductPage = () => {
   }, [data]);
 
   const applyFilter = (newFilter) => {
-    const updatedFilter = { ...activeFilter, ...newFilter };
-    setActiveFilter(updatedFilter);
+  const updatedFilter = { ...activeFilter, ...newFilter };
+  setActiveFilter(updatedFilter);
 
-    let filtered = [...data];
+  let filtered = [...data];
 
-    if (updatedFilter.category) {
-      filtered = filtered.filter((p) => p.category === updatedFilter.category);
-    }
-    if (updatedFilter.subCategory) {
-      filtered = filtered.filter((p) => p.subCategory === updatedFilter.subCategory);
-    }
-    if (updatedFilter.brand) {
-      filtered = filtered.filter((p) => p.brand === updatedFilter.brand);
-    }
-    if (updatedFilter.size) {
-      filtered = filtered.filter((p) => p.size === updatedFilter.size);
-    }
+  if (updatedFilter.category) {
+    filtered = filtered.filter((p) => p.category_id === updatedFilter.category);
+  }
+  if (updatedFilter.subCategory) {
+    filtered = filtered.filter((p) => p.subCategory === updatedFilter.subCategory);
+  }
+  if (updatedFilter.brand) {
+    filtered = filtered.filter((p) => p.brand === updatedFilter.brand);
+  }
+  if (updatedFilter.size) {
+    filtered = filtered.filter((p) => p.size === updatedFilter.size);
+  }
 
-    setFilteredProducts(filtered);
-  };
+  setFilteredProducts(filtered);
+};
+
 
   const handleAddToCart = async (product) => {
     try {
@@ -134,7 +135,7 @@ const ProductPage = () => {
                   product={product}
                   onAddToCart={() => handleAddToCart(product)}
                   onBuyNow={() => handleBuyNow(product)}
-                  onViewDetail={() => handleViewDetail(product.id)} // ✅ Added
+                  onViewDetail={() => handleViewDetail(product.id)} 
                 />
               ))}
             </div>
