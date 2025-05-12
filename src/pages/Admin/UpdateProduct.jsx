@@ -22,6 +22,10 @@ export default function UpdateProduct() {
 
   const [image_url, setImageURL] = useState([]);
 
+  const [suppliers, setSuppliers] = useState([]);
+  const [supplierNames, setSupplierNames] = useState([]);
+  const [brandNames, setBrandNames] = useState([]);
+
   const subCategories = {
     Fertilizer: ["Organic", "Chemical", "Compost"],
     Tools: [
@@ -60,7 +64,28 @@ export default function UpdateProduct() {
       }
     }
 
+    async function fetchSuppliers() {
+      try {
+        const { data } = await axios.get("/api/suppliers");
+
+        setSuppliers(data);
+
+        const uniqueSuppliers = [
+          ...new Set(data.map((s) => s.name).filter(Boolean)),
+        ];
+        const uniqueBrands = [
+          ...new Set(data.map((s) => s.brand).filter(Boolean)),
+        ];
+
+        setSupplierNames(uniqueSuppliers);
+        setBrandNames(uniqueBrands);
+      } catch (err) {
+        console.error("Failed to fetch suppliers:", err);
+      }
+    }
+
     fetchProduct();
+    fetchSuppliers();
   }, [id]);
 
   const handleImageUpload = async (file) => {
@@ -182,14 +207,35 @@ export default function UpdateProduct() {
                 value={productName}
                 onChange={setProductName}
               />
-              <Input label="Brand" value={brand} onChange={setBrand} />
-              <Input label="Supplier" value={supplier} onChange={setSupplier} />
-              <Input
-                label="Price"
-                type="number"
-                value={price}
-                onChange={setPrice}
-              />
+              <div className="mb-4">
+                <label className="block text-gray-700 font-medium">Brand</label>
+                <input
+                  list="brand-list"
+                  value={brand}
+                  onChange={(e) => setBrand(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+                <datalist id="brand-list">
+                  {brandNames.map((b, idx) => (
+                    <option key={idx} value={b} />
+                  ))}
+                </datalist>
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 font-medium">Supplier</label>
+                <input
+                  list="supplier-list"
+                  value={supplier}
+                  onChange={(e) => setSupplier(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+                <datalist id="supplier-list">
+                  {supplierNames.map((s, idx) => (
+                    <option key={idx} value={s} />
+                  ))}
+                </datalist>
+              </div>
+              <Input label="Price" type="number" value={price} onChange={setPrice} />
               <textarea
                 className="description-input"
                 value={description}
@@ -199,16 +245,13 @@ export default function UpdateProduct() {
                   minHeight: "100px",
                   border: "1px solid #ccc",
                   padding: "8px",
-                  width: "100%", // Add this for proper sizing
-                  fontFamily: "inherit", // Maintains consistent fonts
+                  width: "100%",
+                  fontFamily: "inherit",
                 }}
               />
 
               <div className="mb-4">
-                <label
-                  htmlFor="category_field"
-                  className="block text-gray-700 font-medium"
-                >
+                <label htmlFor="category_field" className="block text-gray-700 font-medium">
                   Category
                 </label>
                 <select
@@ -275,17 +318,9 @@ export default function UpdateProduct() {
                 </div>
               )}
 
-              <Input
-                label="Stock"
-                type="number"
-                value={stock}
-                onChange={setStock}
-              />
+              <Input label="Stock" type="number" value={stock} onChange={setStock} />
 
-              <label
-                htmlFor="product_images"
-                className="block text-gray-700 font-medium"
-              >
+              <label htmlFor="product_images" className="block text-gray-700 font-medium">
                 Upload image
               </label>
               <input
@@ -299,9 +334,7 @@ export default function UpdateProduct() {
 
               {image_url.length > 0 && (
                 <div className="mt-4">
-                  <p className="text-gray-700 font-medium mb-2">
-                    Current Image:
-                  </p>
+                  <p className="text-gray-700 font-medium mb-2">Current Image:</p>
                   <img
                     src={image_url[0]}
                     alt="Product"
@@ -319,9 +352,8 @@ export default function UpdateProduct() {
               </button>
 
               <input
-                className="w-full bg-red-500 text-white mt-2 py-2 rounded-lg hover:bg-gray-400 transition duration-200"
                 type="reset"
-                value="Reset"
+                className="w-full bg-gray-900 text-white py-2 rounded-lg hover:bg-gray-400 transition duration-200 mt-4"
               />
             </form>
           </div>
@@ -331,31 +363,14 @@ export default function UpdateProduct() {
   );
 }
 
-// Updated reusable components with value prop
 const Input = ({ label, type = "text", value, onChange }) => (
   <div className="mb-4">
     <label className="block text-gray-700 font-medium">{label}</label>
     <input
       type={type}
       value={value}
-      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-      onChange={(e) =>
-        onChange(
-          type === "number" ? parseFloat(e.target.value) : e.target.value
-        )
-      }
-    />
-  </div>
-);
-
-const Textarea = ({ label, value, onChange }) => (
-  <div className="mb-4">
-    <label className="block text-gray-700 font-medium">{label}</label>
-    <textarea
-      rows="4"
-      value={value}
-      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
       onChange={(e) => onChange(e.target.value)}
-    ></textarea>
+      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+    />
   </div>
 );

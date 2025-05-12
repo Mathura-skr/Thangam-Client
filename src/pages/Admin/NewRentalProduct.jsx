@@ -14,6 +14,8 @@ export default function NewRentalProduct() {
   const [price, setPrice] = useState("");
   const [subCategory, setSubCategory] = useState("");
   const [image_url, setImageURL] = useState("");
+  const [stock, setStock] = useState(0);
+  const [availability, setAvailability] = useState(true);
 
   const subCategories = [
     "Hand Tools",
@@ -22,8 +24,6 @@ export default function NewRentalProduct() {
     "Protective Accessories",
     "Watering Systems",
   ];
-
-
 
   const handleImageUpload = async (file) => {
     const formData = new FormData();
@@ -65,6 +65,8 @@ export default function NewRentalProduct() {
       price: parseFloat(price),
       subcategory_name: subCategory,
       image_url,
+      availability_status: availability ? "available" : "unavailable",
+  stock: parseInt(stock),
     };
 
     const token = localStorage.getItem("token");
@@ -125,7 +127,9 @@ export default function NewRentalProduct() {
             <Textarea label="Description" onChange={setDescription} />
 
             <div className="mb-4">
-              <label className="block text-gray-700 font-medium">SubCategory</label>
+              <label className="block text-gray-700 font-medium">
+                SubCategory
+              </label>
               <select
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 onChange={(e) => setSubCategory(e.target.value)}
@@ -138,15 +142,35 @@ export default function NewRentalProduct() {
                 ))}
               </select>
             </div>
+            <Input label="Stock" type="number" value={stock} onChange={setStock} />
+
 
             <div className="mb-4">
-              <label className="block text-gray-700 font-medium">Upload Image</label>
+              <label className="block text-gray-700 font-medium">
+                Upload Image
+              </label>
               <input
                 type="file"
                 name="product_image"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 onChange={handleSingleImageUpload}
               />
+            </div>
+
+            <div className="mb-4 flex items-center justify-between">
+              <label className="block text-gray-700 font-medium">
+                Available
+              </label>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={availability}
+                  onChange={(e) => setAvailability(e.target.checked)}
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:bg-green-600 transition-all duration-200"></div>
+                <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 transform peer-checked:translate-x-full"></div>
+              </label>
             </div>
 
             <button
@@ -176,7 +200,9 @@ const Input = ({ label, type = "text", onChange, value }) => (
       value={value}
       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
       onChange={(e) =>
-        onChange(type === "number" ? parseFloat(e.target.value) : e.target.value)
+        onChange(
+          type === "number" ? parseFloat(e.target.value) : e.target.value
+        )
       }
     />
   </div>

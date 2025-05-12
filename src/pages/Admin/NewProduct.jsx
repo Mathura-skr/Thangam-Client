@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +17,10 @@ export default function NewProduct() {
   const [brand, setBrand] = useState("");
   const [quantity, setQuantity] = useState("");
   const [supplier, setSupplier] = useState("");
+  const [suppliers, setSuppliers] = useState([]);
+  const [supplierNames, setSupplierNames] = useState([]);
+  const [brandNames, setBrandNames] = useState([]);
+
   const [image_url, setImageURL] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [manufacturedDate, setManufacturedDate] = useState("");
@@ -36,6 +40,29 @@ export default function NewProduct() {
     { id: 1, name: "Fertilizer" },
     { id: 2, name: "Tools" },
   ];
+
+  useEffect(() => {
+    const fetchSuppliers = async () => {
+      try {
+        const { data } = await axios.get("/api/suppliers");
+
+        setSuppliers(data);
+
+        const uniqueSuppliers = [
+          ...new Set(data.map((s) => s.name).filter(Boolean)),
+        ];
+        const uniqueBrands = [
+          ...new Set(data.map((s) => s.brand).filter(Boolean)),
+        ];
+
+        setSupplierNames(uniqueSuppliers);
+        setBrandNames(uniqueBrands);
+      } catch (err) {
+        console.error("Failed to fetch suppliers:", err);
+      }
+    };
+    fetchSuppliers();
+  }, []);
 
   const handleImageUpload = async (file) => {
     const formData = new FormData();
@@ -61,7 +88,7 @@ export default function NewProduct() {
 
   const sendData = async (e) => {
     e.preventDefault();
-  
+
     if (
       isNaN(price) ||
       price <= 0 ||
@@ -75,16 +102,18 @@ export default function NewProduct() {
         text: "Please enter valid details.",
       });
     }
-  
-    if (category === "Fertilizer" && (!quantity || !expiryDate || !manufacturedDate)) {
+
+    if (
+      category === "Fertilizer" &&
+      (!quantity || !expiryDate || !manufacturedDate)
+    ) {
       return Swal.fire({
         icon: "error",
         title: "Missing Info",
         text: "Please enter quantity, expiry date and manufactured date for fertilizers",
       });
     }
-  
-    // Construct the payload with correct field names
+
     const payload = {
       name: productName,
       category_name: category,
@@ -92,22 +121,19 @@ export default function NewProduct() {
       price: parseFloat(price),
       stock: parseInt(stock),
       description,
-      brand_name: brand,  // Changed from 'brand' to 'brand_name'
-      supplier_name: supplier,  // Changed from 'supplier' to 'supplier_name'
+      brand_name: brand,
+      supplier_name: supplier,
       image_url,
     };
-  
-    // Only add dates for Fertilizer category
+
     if (category === "Fertilizer") {
       payload.quantity = parseFloat(quantity);
       payload.expiry_date = expiryDate;
       payload.manufactured_date = manufacturedDate;
     }
-  
-    console.log("Payload to be sent:", payload);
-  
+
     const token = localStorage.getItem("token");
-  
+
     try {
       await axios.post("/api/products/", payload, {
         headers: {
@@ -115,7 +141,7 @@ export default function NewProduct() {
           "Content-Type": "application/json",
         },
       });
-  
+
       Swal.fire({
         position: "top-start",
         icon: "success",
@@ -123,7 +149,7 @@ export default function NewProduct() {
         showConfirmButton: false,
         timer: 2000,
       });
-  
+
       navigate("/admin/products");
     } catch (err) {
       Swal.fire({
@@ -134,7 +160,6 @@ export default function NewProduct() {
       });
     }
   };
-  
 
   return (
     <div className="flex flex-col h-screen">
@@ -160,17 +185,47 @@ export default function NewProduct() {
             encType="multipart/form-data"
           >
             <Input label="Name" onChange={setProductName} />
-            <Input label="Brand" onChange={setBrand} />
-            <Input label="Supplier" onChange={setSupplier} />
-            <Input label="Price" type="number" onChange={setPrice} />
-            <Textarea label="Description" onChange={setDescription} style={{ 
-            whiteSpace: 'pre',
-            fontFamily: 'monospace',
-            tabSize: 4
-          }} />
-
             <div className="mb-4">
-              <label className="block text-gray-700 font-medium">Category</label>
+              <label className="block text-gray-700 font-medium">Brand</label>
+              <input
+                list="brand-list"
+                value={brand}
+                onChange={(e) => setBrand(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+              <datalist id="brand-list">
+                {brandNames.map((b, idx) => (
+                  <option key={idx} value={b} />
+                ))}
+              </datalist>
+            </div>
+
+            {/* Supplier with datalist */}
+            <div className="mb-4">
+              <label className="block text-gray-700 font-medium">
+                Supplier
+              </label>
+              <input
+                list="supplier-list"
+                value={supplier}
+                onChange={(e) => setSupplier(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+              <datalist id="supplier-list">
+                {supplierNames.map((s, idx) => (
+                  <option key={idx} value={s} />
+                ))}
+              </datalist>
+            </div>
+
+            <Input label="Price" type="number" onChange={setPrice} />
+            <Textarea label="Description" onChange={setDescription} />
+
+            {/* Category selection */}
+            <div className="mb-4">
+              <label className="block text-gray-700 font-medium">
+                Category
+              </label>
               <select
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 onChange={(e) => setCategory(e.target.value)}
@@ -184,17 +239,36 @@ export default function NewProduct() {
               </select>
             </div>
 
+            {/* Fertilizer-specific fields */}
             {category === "Fertilizer" && (
               <>
-                <Input label="Quantity (kg)" type="number" value={quantity} onChange={setQuantity} />
-                <Input label="Manufactured Date" type="date" value={manufacturedDate} onChange={setManufacturedDate} />
-                <Input label="Expiry Date" type="date" value={expiryDate} onChange={setExpiryDate} />
+                <Input
+                  label="Quantity (kg)"
+                  type="number"
+                  value={quantity}
+                  onChange={setQuantity}
+                />
+                <Input
+                  label="Manufactured Date"
+                  type="date"
+                  value={manufacturedDate}
+                  onChange={setManufacturedDate}
+                />
+                <Input
+                  label="Expiry Date"
+                  type="date"
+                  value={expiryDate}
+                  onChange={setExpiryDate}
+                />
               </>
             )}
 
+            {/* Subcategory selection */}
             {category && (
               <div className="mb-4">
-                <label className="block text-gray-700 font-medium">SubCategory</label>
+                <label className="block text-gray-700 font-medium">
+                  SubCategory
+                </label>
                 <select
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                   onChange={(e) => setSubCategory(e.target.value)}
@@ -212,7 +286,9 @@ export default function NewProduct() {
             <Input label="Stock" type="number" onChange={setStock} />
 
             <div className="mb-4">
-              <label className="block text-gray-700 font-medium">Upload Image</label>
+              <label className="block text-gray-700 font-medium">
+                Upload Image
+              </label>
               <input
                 type="file"
                 name="product_image"
@@ -239,7 +315,7 @@ export default function NewProduct() {
   );
 }
 
-// Reusable Components
+// Reusable Input Component
 const Input = ({ label, type = "text", onChange, value }) => (
   <div className="mb-4">
     <label className="block text-gray-700 font-medium">{label}</label>
@@ -248,12 +324,15 @@ const Input = ({ label, type = "text", onChange, value }) => (
       value={value}
       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
       onChange={(e) =>
-        onChange(type === "number" ? parseFloat(e.target.value) : e.target.value)
+        onChange(
+          type === "number" ? parseFloat(e.target.value) : e.target.value
+        )
       }
     />
   </div>
 );
 
+// Reusable Textarea Component
 const Textarea = ({ label, onChange }) => (
   <div className="mb-4">
     <label className="block text-gray-700 font-medium">{label}</label>

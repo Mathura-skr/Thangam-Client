@@ -57,6 +57,8 @@ import Forbidden403 from '../pages/ErrorPages/Forbidden403';
 import Checkout from "../pages/Checkout/Checkout";
 import ProductDetail from "../pages/Product/ProductDetail";
 import SalesList from "../pages/Admin/SalesList";
+import PaymentSuccess from "../pages/Payment/payment-success";
+import PaymentCancel from "../pages/Payment/payment-cancel";
 
 
 export default function RouteLayout() {
@@ -87,6 +89,8 @@ export default function RouteLayout() {
   <Route path='/product/:id' element={<ProductDetail />} />
   <Route path='/cart' element={<Protected role="user"> <Cart /></Protected>} />
   <Route path='/checkout' element={<Protected role="user"><Checkout /></Protected>} />
+  <Route path='/payment-success' element={<Protected role="user"><PaymentSuccess /></Protected>} />
+  <Route path='/payment-cancel' element={<Protected role="user"><PaymentCancel /></Protected>} />
     {/* <Route path='/cart' element={ <Cart />} />
     <Route path='/checkout' element={<Checkout />} /> */}
   <Route path='/rent' element={<Rent />} />
@@ -94,7 +98,7 @@ export default function RouteLayout() {
   <Route path='/contact' element={<Contact />} />
   <Route path='/login' element={<Login />} />
   <Route path='/register' element={<Register />} />
-  <Route path='/resetPassword' element={<ResetPassword />} />
+  <Route path='/reset-Password' element={<ResetPassword />} />
 
   <Route path='/userProfile' element={<Protected role="user"><UserProfile /></Protected>} />
 
@@ -132,7 +136,6 @@ export default function RouteLayout() {
   <Route path='/staff/suppliers/create' element={<Protected role="staff"><StaffAddSupplier /></Protected>} />
   <Route path='/staff/supplier/:id' element={<Protected role="staff"><StaffUpdateSupplier /></Protected>} />
   <Route path='/staff/reviews' element={<Protected role="staff"><StaffReviewList /></Protected>} />
-  <Route path='/staff/rental' element={<Protected role="staff"><StaffRentalList /></Protected>} />
   <Route path='/staff/rental' element={<Protected role="staff"><StaffRentalList /></Protected>} />
   <Route path='/staff/rental/create' element={<Protected role="staff"><StaffRentalProduct /></Protected>} />
   <Route path='/staff/rental/:id' element={<Protected role="staff"><StaffUpdateRentalProduct /></Protected>} />

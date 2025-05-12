@@ -24,7 +24,7 @@ const ResetPassword = () => {
 
     try {
       setLoading2(true);
-      const response = await axios.post("auth/forgot-password", { email });
+      const response = await axios.post("/api/auth/forgot-password", { email });
       setToken(response.data.token);
       Swal.fire("Success", "Password reset link sent to your email", "success");
     } catch (error) {
@@ -43,7 +43,7 @@ const ResetPassword = () => {
 
     try {
       setLoading2(true);
-      const response = await axios.post("auth/reset-password", {
+      const response = await axios.post("/api/auth/reset-password", {
         token: token2,
         password,
       });

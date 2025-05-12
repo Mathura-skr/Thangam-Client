@@ -18,8 +18,12 @@ const Rent = () => {
     const fetchRentalProducts = async () => {
       try {
         const response = await axios.get("/api/rent");
-        setData(response.data);
-        setFilteredProducts(response.data);
+        const availableProducts = response.data.filter(
+  (p) => p.availability_status === 1 && p.stock > 0
+);
+
+        setData(availableProducts);
+        setFilteredProducts(availableProducts);
       } catch (err) {
         setError("Failed to load products.");
       } finally {
@@ -117,13 +121,13 @@ const Rent = () => {
       <Navigation />
 
       <div className="container mx-auto p-4 flex gap-4">
-        <div className="hidden md:block w-1/4">
+        {/* <div className="hidden md:block w-1/4">
           <FilterPanel applyFilter={applyFilter} />
         </div>
 
         <div className="md:hidden fixed z-50">
           <FilterPanel applyFilter={applyFilter} />
-        </div>
+        </div> */}
 
         <div className="w-full md:w-3/4">
           {loading ? (
@@ -143,7 +147,7 @@ const Rent = () => {
             </div>
           ) : (
             <p className="text-center text-lg text-red-500">
-              No products found.
+              No available rental products found.
             </p>
           )}
         </div>
