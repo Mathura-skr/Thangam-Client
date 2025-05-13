@@ -5,7 +5,7 @@ import Swal from "sweetalert2";
 import AdminNav from "../../components/Navbar/StaffNav";
 import { useNavigate } from "react-router-dom";
 
-export default function AddSupplierStaff() {
+export default function AddSupplier() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({

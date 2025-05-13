@@ -3,9 +3,8 @@ import { toast } from "react-toastify";
 import Sidebar from "./StaffSidebar";
 import axios from "../../utils/axios";
 import { useParams } from "react-router-dom";
-import AdminNav from "../../components/Navbar/StaffNav";
 
-export default function UpdateSupplierStaff() {
+export default function UpdateSupplier() {
     const { id } = useParams();
     const [supplier, setSupplier] = useState({
         name: "",

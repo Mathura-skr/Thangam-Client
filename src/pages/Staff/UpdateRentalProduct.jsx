@@ -14,13 +14,16 @@ export default function UpdateRentalProduct() {
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [image_url, setImageURLs] = useState([]);
+  const [stock, setStock] = useState(0); // New state for stock
+  const [availability, setAvailability] = useState(true); // New state for availability
+  const [brandSuggestions, setBrandSuggestions] = useState([]);
 
   const subCategories = [
     "Hand Tools",
-      "Land Movers",
-      "Cleaning Tools",
-      "Protective Accessories",
-      "Watering Systems",
+    "Land Movers",
+    "Cleaning Tools",
+    "Protective Accessories",
+    "Watering Systems",
   ];
 
   useEffect(() => {
@@ -32,6 +35,8 @@ export default function UpdateRentalProduct() {
         setSubcategory(data.subcategory);
         setPrice(data.price);
         setDescription(data.description);
+        setStock(data.stock); // Set initial stock value
+        setAvailability(data.availability); // Set initial availability value
         setImageURLs(data.image_url ? [data.image_url] : []);
       } catch (err) {
         console.error("Failed to load rental product", err);
@@ -40,6 +45,16 @@ export default function UpdateRentalProduct() {
 
     fetchRentalProduct();
   }, [id]);
+
+  const fetchBrandSuggestions = async (value) => {
+    if (!value.trim()) return;
+    try {
+      const { data } = await axios.get(`/api/rent/brands?query=${value}`);
+      setBrandSuggestions(data);
+    } catch (err) {
+      console.error("Failed to fetch brand suggestions", err);
+    }
+  };
 
   const handleImageUpload = async (file) => {
     const formData = new FormData();
@@ -73,11 +88,11 @@ export default function UpdateRentalProduct() {
   const sendData = async (e) => {
     e.preventDefault();
 
-    if (!productName.trim() || !brand.trim() || !subcategory || !price) {
+    if (!productName.trim() || !brand.trim() || !subcategory || !price || stock < 0) {
       return Swal.fire({
         icon: "error",
         title: "Missing Fields",
-        text: "All fields are required",
+        text: "All fields are required and stock must be greater than or equal to 0",
       });
     }
 
@@ -88,6 +103,8 @@ export default function UpdateRentalProduct() {
       price: parseFloat(price),
       description,
       image_url: image_url[0] || "",
+      stock: stock, // Include stock in the payload
+      availability: availability, // Include availability in the payload
     };
 
     try {
@@ -123,7 +140,13 @@ export default function UpdateRentalProduct() {
             </h1>
 
             <Input label="Name" value={productName} onChange={setProductName} />
-            <Input label="Brand" value={brand} onChange={setBrand} />
+            <AutoCompleteInput
+              label="Brand"
+              value={brand}
+              onChange={setBrand}
+              onInputChange={fetchBrandSuggestions}
+              suggestions={brandSuggestions}
+            />
             <Input
               label="Price (LKR/day)"
               type="number"
@@ -152,9 +175,32 @@ export default function UpdateRentalProduct() {
               </select>
             </div>
 
-            <label className="block text-gray-700 font-medium">
-              Upload Image
-            </label>
+            <Input
+              label="Stock"
+              type="number"
+              value={stock}
+              onChange={setStock}
+            />
+
+            <div className="mb-4">
+  <label className="block text-gray-700 font-medium mb-1">Available for Rent</label>
+  <button
+    type="button"
+    onClick={() => setAvailability(!availability)}
+    className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none ${
+      availability ? "bg-green-600" : "bg-gray-300"
+    }`}
+  >
+    <span
+      className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${
+        availability ? "translate-x-6" : "translate-x-1"
+      }`}
+    />
+  </button>
+</div>
+
+
+            <label className="block text-gray-700 font-medium">Upload Image</label>
             <input
               type="file"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -214,5 +260,34 @@ const Textarea = ({ label, value, onChange }) => (
       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
       onChange={(e) => onChange(e.target.value)}
     ></textarea>
+  </div>
+);
+
+const AutoCompleteInput = ({ label, value, onChange, onInputChange, suggestions }) => (
+  <div className="mb-4 relative">
+    <label className="block text-gray-700 font-medium">{label}</label>
+    <input
+      type="text"
+      value={value}
+      onChange={(e) => {
+        onChange(e.target.value);
+        onInputChange(e.target.value);
+      }}
+      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+      autoComplete="off"
+    />
+    {suggestions.length > 0 && (
+      <ul className="absolute z-10 bg-white w-full border border-gray-300 mt-1 rounded shadow-md max-h-40 overflow-y-auto">
+        {suggestions.map((s, index) => (
+          <li
+            key={index}
+            onClick={() => onChange(s)}
+            className="px-3 py-2 hover:bg-green-100 cursor-pointer"
+          >
+            {s}
+          </li>
+        ))}
+      </ul>
+    )}
   </div>
 );

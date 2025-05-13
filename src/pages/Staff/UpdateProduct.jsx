@@ -22,6 +22,10 @@ export default function UpdateProduct() {
 
   const [image_url, setImageURL] = useState([]);
 
+  const [suppliers, setSuppliers] = useState([]);
+  const [supplierNames, setSupplierNames] = useState([]);
+  const [brandNames, setBrandNames] = useState([]);
+
   const subCategories = {
     Fertilizer: ["Organic", "Chemical", "Compost"],
     Tools: [
@@ -52,7 +56,7 @@ export default function UpdateProduct() {
         setQuantity(data.quantity || "");
         setSupplier(data.supplier_name);
         setManufacturedDate(data.manufactured_date || "");
-setExpiryDate(data.expiry_date || "");
+        setExpiryDate(data.expiry_date || "");
 
         setImageURL(data.image_url ? [data.image_url] : []);
       } catch (err) {
@@ -60,10 +64,30 @@ setExpiryDate(data.expiry_date || "");
       }
     }
 
+    async function fetchSuppliers() {
+      try {
+        const { data } = await axios.get("/api/suppliers");
+
+        setSuppliers(data);
+
+        const uniqueSuppliers = [
+          ...new Set(data.map((s) => s.name).filter(Boolean)),
+        ];
+        const uniqueBrands = [
+          ...new Set(data.map((s) => s.brand).filter(Boolean)),
+        ];
+
+        setSupplierNames(uniqueSuppliers);
+        setBrandNames(uniqueBrands);
+      } catch (err) {
+        console.error("Failed to fetch suppliers:", err);
+      }
+    }
+
     fetchProduct();
+    fetchSuppliers();
   }, [id]);
 
-  
   const handleImageUpload = async (file) => {
     const formData = new FormData();
     formData.append("image_url", file);
@@ -79,7 +103,6 @@ setExpiryDate(data.expiry_date || "");
     }
   };
 
-  
   const handleSingleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -91,26 +114,29 @@ setExpiryDate(data.expiry_date || "");
     e.preventDefault();
 
     if (
-          isNaN(price) ||
-          price <= 0 ||
-          isNaN(stock) ||
-          stock <= 0 ||
-          productName.trim() === ""
-        ) {
-          return Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Please enter valid details.",
-          });
-        }
-      
-        if (category === "Fertilizer" && (!quantity || !expiryDate || !manufacturedDate)) {
-          return Swal.fire({
-            icon: "error",
-            title: "Missing Info",
-            text: "Please enter quantity, expiry date and manufactured date for fertilizers",
-          });
-        }
+      isNaN(price) ||
+      price <= 0 ||
+      isNaN(stock) ||
+      stock <= 0 ||
+      productName.trim() === ""
+    ) {
+      return Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Please enter valid details.",
+      });
+    }
+
+    if (
+      category === "Fertilizer" &&
+      (!quantity || !expiryDate || !manufacturedDate)
+    ) {
+      return Swal.fire({
+        icon: "error",
+        title: "Missing Info",
+        text: "Please enter quantity, expiry date and manufactured date for fertilizers",
+      });
+    }
 
     const payload = {
       name: productName,
@@ -181,25 +207,51 @@ setExpiryDate(data.expiry_date || "");
                 value={productName}
                 onChange={setProductName}
               />
-              <Input label="Brand" value={brand} onChange={setBrand} />
-              <Input label="Supplier" value={supplier} onChange={setSupplier} />
-              <Input
-                label="Price"
-                type="number"
-                value={price}
-                onChange={setPrice}
-              />
-              <Textarea
-                label="Description"
+              <div className="mb-4">
+                <label className="block text-gray-700 font-medium">Brand</label>
+                <input
+                  list="brand-list"
+                  value={brand}
+                  onChange={(e) => setBrand(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+                <datalist id="brand-list">
+                  {brandNames.map((b, idx) => (
+                    <option key={idx} value={b} />
+                  ))}
+                </datalist>
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 font-medium">Supplier</label>
+                <input
+                  list="supplier-list"
+                  value={supplier}
+                  onChange={(e) => setSupplier(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+                <datalist id="supplier-list">
+                  {supplierNames.map((s, idx) => (
+                    <option key={idx} value={s} />
+                  ))}
+                </datalist>
+              </div>
+              <Input label="Price" type="number" value={price} onChange={setPrice} />
+              <textarea
+                className="description-input"
                 value={description}
-                onChange={setDescription}
+                onChange={(e) => setDescription(e.target.value)}
+                style={{
+                  whiteSpace: "pre-wrap",
+                  minHeight: "100px",
+                  border: "1px solid #ccc",
+                  padding: "8px",
+                  width: "100%",
+                  fontFamily: "inherit",
+                }}
               />
 
               <div className="mb-4">
-                <label
-                  htmlFor="category_field"
-                  className="block text-gray-700 font-medium"
-                >
+                <label htmlFor="category_field" className="block text-gray-700 font-medium">
                   Category
                 </label>
                 <select
@@ -220,26 +272,25 @@ setExpiryDate(data.expiry_date || "");
 
               {category === "Fertilizer" && (
                 <>
-                <Input
-                  label="Quantity (kg)"
-                  type="number"
-                  value={quantity}
-                  onChange={setQuantity}
-                />
-                <Input
-                  label="Manufactured Date"
-                  type="date"
-                  value={manufacturedDate}
-                  onChange={setManufacturedDate}
-                />
-                <Input
-                  label="Expiry Date"
-                  type="date"
-                  value={expiryDate}
-                  onChange={setExpiryDate}
-                />
-              </>
-                
+                  <Input
+                    label="Quantity (kg)"
+                    type="number"
+                    value={quantity}
+                    onChange={setQuantity}
+                  />
+                  <Input
+                    label="Manufactured Date"
+                    type="date"
+                    value={manufacturedDate}
+                    onChange={setManufacturedDate}
+                  />
+                  <Input
+                    label="Expiry Date"
+                    type="date"
+                    value={expiryDate}
+                    onChange={setExpiryDate}
+                  />
+                </>
               )}
 
               {category && (
@@ -267,17 +318,9 @@ setExpiryDate(data.expiry_date || "");
                 </div>
               )}
 
-              <Input
-                label="Stock"
-                type="number"
-                value={stock}
-                onChange={setStock}
-              />
+              <Input label="Stock" type="number" value={stock} onChange={setStock} />
 
-              <label
-                htmlFor="product_images"
-                className="block text-gray-700 font-medium"
-              >
+              <label htmlFor="product_images" className="block text-gray-700 font-medium">
                 Upload image
               </label>
               <input
@@ -291,9 +334,7 @@ setExpiryDate(data.expiry_date || "");
 
               {image_url.length > 0 && (
                 <div className="mt-4">
-                  <p className="text-gray-700 font-medium mb-2">
-                    Current Image:
-                  </p>
+                  <p className="text-gray-700 font-medium mb-2">Current Image:</p>
                   <img
                     src={image_url[0]}
                     alt="Product"
@@ -311,9 +352,8 @@ setExpiryDate(data.expiry_date || "");
               </button>
 
               <input
-                className="w-full bg-red-500 text-white mt-2 py-2 rounded-lg hover:bg-gray-400 transition duration-200"
                 type="reset"
-                value="Reset"
+                className="w-full bg-gray-900 text-white py-2 rounded-lg hover:bg-gray-400 transition duration-200 mt-4"
               />
             </form>
           </div>
@@ -323,31 +363,14 @@ setExpiryDate(data.expiry_date || "");
   );
 }
 
-// Updated reusable components with value prop
 const Input = ({ label, type = "text", value, onChange }) => (
   <div className="mb-4">
     <label className="block text-gray-700 font-medium">{label}</label>
     <input
       type={type}
       value={value}
-      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-      onChange={(e) =>
-        onChange(
-          type === "number" ? parseFloat(e.target.value) : e.target.value
-        )
-      }
-    />
-  </div>
-);
-
-const Textarea = ({ label, value, onChange }) => (
-  <div className="mb-4">
-    <label className="block text-gray-700 font-medium">{label}</label>
-    <textarea
-      rows="4"
-      value={value}
-      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
       onChange={(e) => onChange(e.target.value)}
-    ></textarea>
+      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+    />
   </div>
 );

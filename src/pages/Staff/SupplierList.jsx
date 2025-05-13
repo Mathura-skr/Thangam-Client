@@ -13,7 +13,7 @@ import axios from "../../utils/axios";
 
 const paginationModel = { page: 0, pageSize: 5 };
 
-export default function SuppliersListStaff() {
+export default function SuppliersList() {
     const [suppliers, setSuppliers] = useState([]);
 
     useEffect(() => {
@@ -25,13 +25,15 @@ export default function SuppliersListStaff() {
             const res = await axios.get("/api/suppliers");
             const formatted = res.data.map((supplier) => ({
                 id: supplier.id,
-                pid: `S${supplier.id.toString().padStart(4, "0")}`, // Generates something like S0001
-                category: supplier.category_name || "-",
-                products: supplier.product_name || "-",
+                pid: `S${supplier.id.toString().padStart(4, "0")}`,
+                category: supplier.category || "-", // corrected key
+                products: supplier.product_name || "-", // make sure this is the correct field name
+                brand: supplier.brand || "-", // ← Add this if you want to show brand
                 date: new Date(supplier.created_at || Date.now()).toISOString().split("T")[0],
-                phone: supplier.phone,
-                address: supplier.address,
+                phone: supplier.phone || "-",
+                address: supplier.address || "-",
             }));
+            
             setSuppliers(formatted);
         } catch (err) {
             console.error(err);
@@ -54,6 +56,7 @@ export default function SuppliersListStaff() {
         { field: "id", headerName: "ID", flex: 0.5, headerClassName: "super-app-theme--header" },
         { field: "pid", headerName: "PID", flex: 0.8, headerClassName: "super-app-theme--header" },
         { field: "category", headerName: "Category", flex: 1, headerClassName: "super-app-theme--header" },
+        { field: "brand", headerName: "Brand", flex: 1, headerClassName: "super-app-theme--header" },
         { field: "products", headerName: "Products", flex: 1.5, headerClassName: "super-app-theme--header" },
         { field: "date", headerName: "Date", flex: 1, headerClassName: "super-app-theme--header" },
         { field: "phone", headerName: "Mobile", flex: 1.2, headerClassName: "super-app-theme--header" },
