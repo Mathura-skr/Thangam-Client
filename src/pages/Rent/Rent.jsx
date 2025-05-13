@@ -120,6 +120,22 @@ const Rent = () => {
     <div className="min-h-screen bg-gray-100">
       <Navigation />
 
+      <div className="fixed top-16 w-full z-40 bg-green-600 text-white py-2 overflow-hidden">
+        <div className="space-y-2">
+          <div className="animate-marquee whitespace-nowrap text-sm sm:text-lg font-semibold text-center">
+            🚚 RENT your tools at our THANGAM shop
+          </div>
+          <div className="animate-marquee whitespace-nowrap text-sm sm:text-lg font-semibold text-center">
+            🎉 Limited Stocks - Rent Now!
+          </div>
+          <div className="animate-marquee whitespace-nowrap text-sm sm:text-lg font-semibold text-center">
+            Contact us for more details....!
+          </div>
+        </div>
+      </div>
+
+    
+
       <div className="container mx-auto p-4 flex gap-4">
         {/* <div className="hidden md:block w-1/4">
           <FilterPanel applyFilter={applyFilter} />
@@ -129,7 +145,7 @@ const Rent = () => {
           <FilterPanel applyFilter={applyFilter} />
         </div> */}
 
-        <div className="w-full md:w-3/4">
+        <div className="w-full md:w-3/4 mt-24">
           {loading ? (
             <p>Loading products...</p>
           ) : error ? (

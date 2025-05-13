@@ -113,7 +113,22 @@ const ProductPage = () => {
     <div className="min-h-screen bg-gray-100">
       <Navigation />
 
-      <div className="container mx-auto p-4 flex gap-4">
+      <div className="fixed top-16 w-full z-40 bg-green-600 text-white py-2 overflow-hidden">
+  <div className="relative w-full h-6">
+    <div className="marquee line1 absolute w-full text-center font-semibold text-sm sm:text-lg">
+      🚚 FREE Island-wide Delivery on All Orders! 🎉 Limited Time Offer - Shop Now!
+    </div>
+    {/* <div className="marquee line2 absolute w-full text-center font-semibold text-sm sm:text-lg">
+      🛒 Shop our best deals today and save big on your favorite products!
+    </div>
+    <div className="marquee line3 absolute w-full text-center font-semibold text-sm sm:text-lg">
+      🎁 Get a surprise gift with every purchase over $50!
+    </div> */}
+  </div>
+</div>
+
+
+      <div className="container mx-auto p-4 flex gap-4  mt-24">
         <div className="hidden md:block w-1/4">
           <FilterPanel applyFilter={applyFilter} />
         </div>

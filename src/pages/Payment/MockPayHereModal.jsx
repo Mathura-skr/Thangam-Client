@@ -1,8 +1,20 @@
 import { useState } from "react";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../../context/authContext";
 
-export default function MockPayHereModal({ onClose, amount, cartItems, selectedAddressId, paymentMode, onSuccess }) {
+export default function MockPayHereModal({
+  onClose,
+  amount,
+  cartItems,
+  selectedAddressId,
+  billingAddressId, 
+  paymentMode,
+  invoiceEmail, 
+  onSuccess,
+}) {
+  const { user } = useContext(AuthContext);
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
@@ -15,7 +27,11 @@ export default function MockPayHereModal({ onClose, amount, cartItems, selectedA
 
     // Basic validation
     if (!trimmedCard || !trimmedExpiry || !trimmedCvv) {
-      Swal.fire("Missing Fields", "Please fill in all card details.", "warning");
+      Swal.fire(
+        "Missing Fields",
+        "Please fill in all card details.",
+        "warning"
+      );
       return;
     }
 
@@ -30,12 +46,20 @@ export default function MockPayHereModal({ onClose, amount, cartItems, selectedA
     }
 
     if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(trimmedExpiry)) {
-      Swal.fire("Invalid Expiry", "Expiry date must be in MM/YY format.", "warning");
+      Swal.fire(
+        "Invalid Expiry",
+        "Expiry date must be in MM/YY format.",
+        "warning"
+      );
       return;
     }
 
     // Simulated sandbox card behavior
-    const successCards = ["4916217501611292", "5307732125531191", "346781005510225"];
+    const successCards = [
+      "4916217501611292",
+      "5307732125531191",
+      "346781005510225",
+    ];
     const declineCards = {
       insufficient: ["4024007194349121", "5459051433777487", "370787711978928"],
       limit: ["4929119799365646", "5491182243178283", "340701811823469"],
@@ -45,23 +69,46 @@ export default function MockPayHereModal({ onClose, amount, cartItems, selectedA
 
     if (successCards.includes(trimmedCard)) {
       // Store order data in localStorage
-      localStorage.setItem("pendingOrder", JSON.stringify({
-        cartItems,
-        selectedAddressId,
-        paymentMode
-      }));
-
-      Swal.fire("Payment Successful!", `LKR ${amount} was paid successfully.`, "success").then(() => {
+      // Ensure complete data preservation
+      localStorage.setItem(
+        "pendingOrder",
+        JSON.stringify({
+          cartItems: cartItems.map((item) => ({
+            product_id: item.product_id,
+            unit: item.unit,
+            price: item.price, // Add original price
+            name: item.name, // Preserve for email
+          })),
+          selectedAddressId,
+          billingAddressId,
+          paymentMode,
+          invoiceEmail,
+          userId: user.userId, // Include user ID explicitly
+        })
+      );
+      Swal.fire(
+        "Payment Successful!",
+        `LKR ${amount} was paid successfully.`,
+        "success"
+      ).then(() => {
         onClose();
         onSuccess?.();
         navigate("/payment-success");
       });
     } else if (Object.values(declineCards).flat().includes(trimmedCard)) {
-      Swal.fire("Payment Failed", `Payment was declined due to card issue.`, "error").then(() => {
+      Swal.fire(
+        "Payment Failed",
+        `Payment was declined due to card issue.`,
+        "error"
+      ).then(() => {
         navigate("/payment-cancel");
       });
     } else {
-      Swal.fire("Invalid Card", `Use sandbox test card numbers for testing.`, "warning");
+      Swal.fire(
+        "Invalid Card",
+        `Use sandbox test card numbers for testing.`,
+        "warning"
+      );
     }
   };
 

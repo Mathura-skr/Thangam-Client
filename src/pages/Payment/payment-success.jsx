@@ -20,36 +20,75 @@ export default function PaymentSuccess() {
         return;
       }
 
-      const { cartItems, selectedAddressId, paymentMode } = orderData;
+      const { cartItems, selectedAddressId, paymentMode, invoiceEmail,  } = orderData;
+
+      const formattedItems = cartItems.map(item => ({
+        product_id: item.product_id,
+        unit: item.unit,
+        total_price: item.unit * parseFloat(item.price),
+      }));
+
+      const calculateTotal = () =>
+        cartItems.reduce((sum, item) => sum + item.unit * parseFloat(item.price), 0);
 
       try {
-        // Loop through each cart item and place an order
-        for (const item of cartItems) {
-          await axios.post("/api/orders", {
-            user_id: user.userId,
-            product_id: item.id,
-            address_id: selectedAddressId,
-            unit: item.unit,
-            total_price: item.unit * parseFloat(item.price),
-            status: "pending",
-            paymentMode,
-          });
-        }
+        // Place order
+        // Place order and get response
+const orderRes = await axios.post("/api/orders", {
+  user_id: user.userId,
+  address_id: selectedAddressId,
+  cartItems: formattedItems,
+  status: "pending",
+  paymentMode,
+});
 
-        // Clear cart after order
+// Get the first order ID
+const orderId = orderRes.data.orders?.[0]?.id;
+
+
+        // ✅ Send invoice email
+        await axios.post("/api/email/send-invoice", {
+          userId: user.userId,
+          cartItems,
+          billingAddressId: selectedAddressId,
+          totalPrice: calculateTotal(),
+          invoiceEmail,
+          orderId,
+        });
+
+        // Clear cart and local storage
         await axios.delete(`/api/cart/user/${user.userId}`);
         localStorage.removeItem("pendingOrder");
 
-        Swal.fire("Payment Successful!", "Your order has been placed.", "success").then(() =>
-          navigate("/")
-        );
+        Swal.fire({
+          icon: "success",
+          title: "🎉 Order Placed Successfully!",
+          html: `
+            <p>Thank you for your purchase. You’ll receive a detailed invoice at <strong>${invoiceEmail}</strong>.</p>
+            <br/>
+            <button id="continue-shopping" class="swal2-confirm swal2-styled" style="background-color: #3085d6;">
+              Continue Shopping
+            </button>
+          `,
+          showConfirmButton: false,
+          allowOutsideClick: false,
+          didOpen: () => {
+            const btn = document.getElementById("continue-shopping");
+            if (btn) {
+              btn.addEventListener("click", () => {
+                Swal.close();
+                navigate("/product");
+              });
+            }
+          },
+        });
       } catch (err) {
-        console.error("Order placement failed:", err);
+        console.error("Order placement failed or invoice error:", err);
         Swal.fire("Error", "Something went wrong placing your order.", "error").then(() =>
           navigate("/cart")
         );
       } finally {
-        setLoading(false); // Set loading to false after processing
+        setLoading(false);
       }
     };
 

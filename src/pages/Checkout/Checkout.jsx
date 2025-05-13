@@ -10,19 +10,21 @@ const Checkout = () => {
   const { user } = useContext(AuthContext);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [billingAddressId, setBillingAddressId] = useState(null);
   const [paymentMode, setPaymentMode] = useState("COD");
   const [cartItems, setCartItems] = useState([]);
-  const [showMockModal, setShowMockModal] = useState(false); // State for modal
+  const [invoiceEmail, setInvoiceEmail] = useState(user?.email || "");
+  const [showMockModal, setShowMockModal] = useState(false);
   const [loading, setLoading] = useState(false);
-
 
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
-        const res = await axios.get(`/api/addresses/user/${user.userId}`);
+        const res = await axios.get(`/api/addresses/user/${user?.userId}`);
         setAddresses(res.data);
         if (res.data.length > 0) {
           setSelectedAddressId(res.data[0].id);
+          setBillingAddressId(res.data[0].id);
         }
       } catch (error) {
         console.error("Failed to fetch addresses:", error);
@@ -31,7 +33,7 @@ const Checkout = () => {
 
     const fetchCartItems = async () => {
       try {
-        const res = await axios.get(`/api/cart/user/${user.userId}`);
+        const res = await axios.get(`/api/cart/user/${user?.userId}`);
         setCartItems(res.data);
       } catch (error) {
         console.error("Failed to fetch cart items:", error);
@@ -52,26 +54,16 @@ const Checkout = () => {
   };
 
   const handleCheckout = async () => {
-      console.log("Checkout triggered");
     if (paymentMode === "Card") {
       setShowMockModal(true);
-      
-      
-    setTimeout(() => {
-      setShowMockModal(true);
-      Swal.close(); // Close the loader
-      setLoading(false);
-    }, 1000); // Add slight delay for effect, or remove if unnecessary
-
       return;
     }
 
-
-    if (!selectedAddressId) {
+    if (!selectedAddressId || !billingAddressId || !invoiceEmail) {
       Swal.fire({
         icon: "warning",
-        title: "Address Required",
-        text: "Please select a shipping address.",
+        title: "Missing Info",
+        text: "Please fill out all required fields (shipping, billing, email).",
       });
       return;
     }
@@ -86,30 +78,39 @@ const Checkout = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          // Place each order
           for (const item of cartItems) {
             await axios.post("/api/orders", {
               user_id: user.userId,
-              product_id: item.id,
               address_id: selectedAddressId,
-              unit: item.unit,
-              total_price: item.unit * parseFloat(item.price),
+              billing_address_id: billingAddressId,
+              cartItems: cartItems.map((item) => ({
+                product_id: item.product_id, // Changed from item.id
+                unit: item.unit,
+                total_price: item.unit * parseFloat(item.price),
+              })),
               status: "pending",
               paymentMode,
             });
           }
-console.log("deleeeeee ", user.userId)
-          // ✅ Clear cart after successful order placement
+
           await axios.delete(`/api/cart/user/${user.userId}`);
+
+          await axios.post("/api/email/send-invoice", {
+            userId: user.userId,
+            cartItems,
+            billingAddressId,
+            totalPrice: calculateTotal(),
+            invoiceEmail,
+          });
 
           Swal.fire({
             icon: "success",
             title: "🎉 Order Placed Successfully!",
             html: `
-              <p>Thank you for your purchase. You’ll receive shipping updates soon.</p>
+              <p>Thank you for your purchase. You’ll receive a detailed invoice at <strong>${invoiceEmail}</strong>.</p>
               <br/>
               <button id="continue-shopping" class="swal2-confirm swal2-styled" style="background-color: #3085d6;">
-                  Continue Shopping
+                Continue Shopping
               </button>
             `,
             showConfirmButton: false,
@@ -137,10 +138,10 @@ console.log("deleeeeee ", user.userId)
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100">
       <Navigation />
       <div className="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Left Side */}
+        {/* Left Section */}
         <div className="space-y-6">
           <div className="bg-white rounded-xl shadow p-5">
             <Typography variant="h6" className="mb-2">
@@ -149,25 +150,58 @@ console.log("deleeeeee ", user.userId)
             <select
               className="w-full border rounded p-2"
               value={selectedAddressId || ""}
-              onChange={(e) => setSelectedAddressId(e.target.value)}
+              onChange={(e) => setSelectedAddressId(Number(e.target.value))}
             >
               {addresses.map((addr) => (
                 <option key={addr.id} value={addr.id}>
                   {addr.street}, {addr.city}, {addr.district}, {addr.province},{" "}
-                  {addr.zip_code}
+                  {addr.zip_code} ({addr.address_type})
                 </option>
               ))}
             </select>
           </div>
 
-          <div className="mb-6">
-            <label className="block mb-2 font-semibold text-white">
+          <div className="bg-white rounded-xl shadow p-5">
+            <Typography variant="h6" className="mb-2">
+              Billing Address
+            </Typography>
+            <select
+              className="w-full border rounded p-2"
+              value={billingAddressId || ""}
+              onChange={(e) => setBillingAddressId(Number(e.target.value))}
+            >
+              {addresses.map((addr) => (
+                <option key={addr.id} value={addr.id}>
+                  {addr.street}, {addr.city}, {addr.district}, {addr.province},{" "}
+                  {addr.zip_code} ({addr.address_type})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="bg-white rounded-xl shadow p-5">
+            <Typography variant="h6" className="mb-2">
+              Invoice Email
+            </Typography>
+            <input
+              type="email"
+              placeholder="example@email.com"
+              value={invoiceEmail}
+              onChange={(e) => setInvoiceEmail(e.target.value)}
+              className="w-full border rounded p-2"
+            />
+          </div>
+
+          <div className="bg-white rounded-xl shadow p-5">
+            <Typography variant="h6" className="mb-2">
               Payment Mode
-            </label>
+            </Typography>
             <div className="flex gap-4">
               <button
                 className={`px-4 py-2 rounded-lg ${
-                  paymentMode === "COD" ? "bg-green-600 text-white" : "bg-gray-200"
+                  paymentMode === "COD"
+                    ? "bg-green-600 text-white"
+                    : "bg-gray-200"
                 }`}
                 onClick={() => setPaymentMode("COD")}
               >
@@ -175,26 +209,30 @@ console.log("deleeeeee ", user.userId)
               </button>
               <button
                 className={`px-4 py-2 rounded-lg ${
-                  paymentMode === "Card" ? "bg-green-600 text-white" : "bg-gray-200"
+                  paymentMode === "Card"
+                    ? "bg-green-600 text-white"
+                    : "bg-gray-200"
                 }`}
                 onClick={() => setPaymentMode("Card")}
               >
-                Pay by Card (via PayHere)
+                Pay by Card
               </button>
             </div>
           </div>
         </div>
 
-        {/* Right Side */}
+        {/* Right Section */}
         <div className="space-y-4">
           <div className="bg-white rounded-xl shadow p-5">
             <Typography variant="h6" className="mb-4">
               Order Summary
             </Typography>
-
             {cartItems.map((item) => (
-              <Card key={item.id} className="mb-3 border border-gray-200 shadow-none">
-                <CardContent className="flex justify-between">
+              <Card
+                key={item.id}
+                className="mb-3 border border-gray-200 shadow-none"
+              >
+                <CardContent className="flex justify-between items-center">
                   <div>
                     <Typography variant="subtitle1">{item.name}</Typography>
                     <Typography variant="body2">Qty: {item.unit}</Typography>
@@ -205,7 +243,6 @@ console.log("deleeeeee ", user.userId)
                 </CardContent>
               </Card>
             ))}
-
             <div className="mt-4 flex justify-between font-semibold text-lg border-t pt-2">
               <span>Total:</span>
               <span>LKR.{calculateTotal().toFixed(2)}</span>
@@ -224,8 +261,17 @@ console.log("deleeeeee ", user.userId)
         </div>
       </div>
 
-      {/* Mock Payment Modal */}
-      {showMockModal && <MockPayHereModal amount={calculateTotal()} onClose={() => setShowMockModal(false)} />}
+      {showMockModal && (
+        <MockPayHereModal
+          amount={calculateTotal()}
+    onClose={() => setShowMockModal(false)}
+    cartItems={cartItems}
+    selectedAddressId={selectedAddressId}
+    billingAddressId={billingAddressId}
+    paymentMode={paymentMode}
+    invoiceEmail={invoiceEmail}
+        />
+      )}
     </div>
   );
 };

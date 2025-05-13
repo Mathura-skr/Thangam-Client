@@ -118,35 +118,35 @@ export default function UserList() {
       flex: 1,
       headerClassName: "super-app-theme--header",
     },
-    {
-      field: "actions",
-      headerName: "Actions",
-      flex: 1.5,
-      headerClassName: "super-app-theme--header",
-      renderCell: (params) => (
-        <Box sx={{ display: "flex", gap: 1 }}>
-          <Link to={`/admin/user/${params.row.id}`}>
-            <Button
-              variant="outlined"
-              color="primary"
-              size="small"
-              sx={{ height: 36, minWidth: 36 }}
-            >
-              <EditIcon />
-            </Button>
-          </Link>
-          <Button
-            variant="outlined"
-            color="error"
-            size="small"
-            onClick={() => deleteUser(params.row.id)}
-            sx={{ height: 36, minWidth: 36, mt: 1 }}
-          >
-            <DeleteIcon />
-          </Button>
-        </Box>
-      ),
-    },
+    // {
+    //   field: "actions",
+    //   headerName: "Actions",
+    //   flex: 1.5,
+    //   headerClassName: "super-app-theme--header",
+    //   renderCell: (params) => (
+    //     <Box sx={{ display: "flex", gap: 1 }}>
+    //       <Link to={`/admin/user/${params.row.id}`}>
+    //         <Button
+    //           variant="outlined"
+    //           color="primary"
+    //           size="small"
+    //           sx={{ height: 36, minWidth: 36 }}
+    //         >
+    //           <EditIcon />
+    //         </Button>
+    //       </Link>
+    //       <Button
+    //         variant="outlined"
+    //         color="error"
+    //         size="small"
+    //         onClick={() => deleteUser(params.row.id)}
+    //         sx={{ height: 36, minWidth: 36, mt: 1 }}
+    //       >
+    //         <DeleteIcon />
+    //       </Button>
+    //     </Box>
+    //   ),
+    // },
   ];
 
   return (
@@ -159,7 +159,7 @@ export default function UserList() {
         <div className="w-4/5 p-6 overflow-auto">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-2xl font-bold">Customer List</h1>
-            <Link to="/admin/users/create">
+            {/* <Link to="/admin/users/create">
               <Button
                 variant="contained"
                 color="primary"
@@ -167,7 +167,7 @@ export default function UserList() {
               >
                 Add user
               </Button>
-            </Link>
+            </Link> */}
           </div>
           <Box
             sx={{

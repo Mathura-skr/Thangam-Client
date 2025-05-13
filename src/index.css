@@ -15,3 +15,62 @@ code {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes marqueeFromCenter {
+  0% {
+    transform: translateX(50%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-100%);
+    opacity: 1;
+  }
+}
+
+@keyframes marqueeFromRight {
+  0% {
+    transform: translateX(100%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-100%);
+    opacity: 1;
+  }
+}
+
+@keyframes hideLine {
+  0%, 99% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+.marquee {
+  white-space: nowrap;
+  will-change: transform;
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  opacity: 0;
+}
+
+/* Total cycle duration = 36s (12 + 10 + 12 + 2s buffer) */
+.line1 {
+  animation: 
+    hideLine 36s linear infinite,
+    marqueeFromCenter 12s linear 0s infinite;
+}
+
+.line2 {
+  animation: 
+    hideLine 36s linear infinite,
+    marqueeFromRight 10s linear 12s infinite;
+}
+
+.line3 {
+  animation: 
+    hideLine 36s linear infinite,
+    marqueeFromRight 12s linear 22s infinite;
+}

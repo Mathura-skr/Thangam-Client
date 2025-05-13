@@ -16,7 +16,7 @@ const ProductCard = ({ product, onAddToCart, onBuyNow }) => {
         <h3 className="text-base sm:text-lg font-semibold truncate">{product.name}</h3>
 
         {product.brand && (
-          <p className="text-gray-500 text-xs sm:text-sm">Brand: {product.brand}</p>
+          <p className="text-gray-400 text-xs sm:text-sm">BRAND: {product.brand}</p>
         )}
 
         {product.category?.includes("tools") && (
@@ -26,7 +26,7 @@ const ProductCard = ({ product, onAddToCart, onBuyNow }) => {
         )}
 
         {product.description && (
-          <p className="text-gray-600 text-xs sm:text-sm line-clamp-5">
+          <p className="text-gray-700 text-xs sm:text-sm line-clamp-5">
             {product.description}
           </p>
         )}
@@ -35,7 +35,7 @@ const ProductCard = ({ product, onAddToCart, onBuyNow }) => {
           <p className="text-gray-500 text-xs sm:text-sm">Size: {product.size}</p>
         )}
 
-        <p className="text-gray-500 text-xs sm:text-sm">Stock: {product.stock}</p>
+        <p className="text-red-500 text-xs sm:text-sm"> {product.stock} in Stock</p>
 
         <div className="mt-2">
           <span
@@ -54,7 +54,7 @@ const ProductCard = ({ product, onAddToCart, onBuyNow }) => {
         <p className="text-green-600 font-medium text-sm sm:text-base">
           Price: ₨ {Number(product.price).toFixed(2)} / Per Day
         </p>
-        <p className="text-yellow-500 text-xs sm:text-sm">Rating: {product.rating} ★</p>
+        {/* <p className="text-yellow-500 text-xs sm:text-sm">Rating: {product.rating} ★</p> */}
       </div>
     </div>
   );

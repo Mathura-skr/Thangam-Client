@@ -19,10 +19,13 @@ export default function OrderList() {
     fetchOrders();
   }, []);
 
-  const fetchOrders = async () => {
-    try {
-      const res = await axios.get("/api/orders");
-      const formatted = res.data.orders.map((order) => ({
+ const fetchOrders = async () => {
+  try {
+    const res = await axios.get("/api/orders");
+    const formatted = res.data.orders.map((order) => {
+      
+
+      return {
         id: order.id,
         customerId: order.user_id,
         productId: order.product_id,
@@ -30,14 +33,15 @@ export default function OrderList() {
         totalAmount: order.total_price,
         status: order.status,
         paymentMode: order.paymentMode,
-        address: order.full_address || "N/A",
-      }));
-      setOrders(formatted);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to fetch orders.");
-    }
-  };
+        address: order.address || "No delivery address found"
+      };
+    });
+    setOrders(formatted);
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to fetch orders.");
+  }
+};
 
   const deleteOrder = async (id) => {
     try {
@@ -88,7 +92,7 @@ export default function OrderList() {
     { field: "unit", headerName: "Qty", flex: 0.5, headerClassName: "super-app-theme--header" },
     { field: "totalAmount", headerName: "Total (Rs)", flex: 0.8, headerClassName: "super-app-theme--header" },
     { field: "paymentMode", headerName: "Payment", flex: 0.8, headerClassName: "super-app-theme--header" },
-    { field: "address", headerName: "Address", flex: 1.8, headerClassName: "super-app-theme--header" },
+    { field: "address", headerName: "Delivery Address", flex: 1.8, headerClassName: "super-app-theme--header" },
     {
       field: "status",
       headerName: "Status",

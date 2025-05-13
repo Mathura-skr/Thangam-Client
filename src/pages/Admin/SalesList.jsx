@@ -1,260 +1,330 @@
-import React, { useEffect, useState } from 'react';
-import { Bar, Pie } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  BarElement,
-  ArcElement,
-  CategoryScale,
-  LinearScale,
-  Tooltip,
-  Legend
-} from 'chart.js';
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import AdminNav from "../../components/Navbar/AdminNav";
-import Sidebar from "./Sidebar";
+import React, { useEffect, useState } from "react";
 import axios from "../../utils/axios";
-import { Button, MenuItem, Select, TextField } from "@mui/material";
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+} from "recharts";
+import { Button } from "@mui/material";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import dayjs from 'dayjs';
-import logoImage from "../../assets/images/logo1.png"; 
-
-ChartJS.register(BarElement, ArcElement, CategoryScale, LinearScale, Tooltip, Legend);
+import jsPDF from "jspdf";
+import autoTable from 'jspdf-autotable';
+import AdminNav from "../../components/Navbar/AdminNav";
+import Sidebar from "../Admin/Sidebar";
+import dayjs from "dayjs";
+import { DataGrid } from "@mui/x-data-grid";
 
 const SalesReport = () => {
   const [salesData, setSalesData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [dateRange, setDateRange] = useState({ from: "", to: "" });
+  const [monthlyTotal, setMonthlyTotal] = useState(0);
+  const [quarterlyTotal, setQuarterlyTotal] = useState(0);
+  const [annualTotal, setAnnualTotal] = useState(0);
+  const [monthlySalesTrend, setMonthlySalesTrend] = useState([]);
+  const [categorySummary, setCategorySummary] = useState([]);
+  const [subcategorySummary, setSubcategorySummary] = useState([]);
+  const [topProducts, setTopProducts] = useState([]);
 
   useEffect(() => {
     const fetchSales = async () => {
       try {
-        const res = await axios.get('/api/orders/sales');
-        setSalesData(res.data);
-        setFilteredData(res.data);
-        const uniqueCats = [...new Set(res.data.map(item => item.category))];
-        setCategories(uniqueCats);
+        const res = await axios.get("/api/orders/sales");
+        const data = res.data;
+        setSalesData(data);
+        processSalesData(data);
       } catch (error) {
-        console.error('Error fetching sales summary:', error);
+        console.error("Error fetching sales data:", error);
       }
     };
     fetchSales();
   }, []);
 
-  const handleFilter = () => {
-    let data = [...salesData];
+  const processSalesData = (data) => {
+    const dataWithDates = data.map((item, i) => ({
+      ...item,
+      date: dayjs().subtract(i % 12, "month").format("YYYY-MM-DD"),
+    }));
 
-    if (selectedCategory !== "All") {
-      data = data.filter(item => item.category === selectedCategory);
-    }
-
-    if (dateRange.from && dateRange.to) {
-      data = data.filter(item => {
-        const orderDate = dayjs(item.date); // assuming `date` exists in item
-        return orderDate.isAfter(dayjs(dateRange.from).subtract(1, 'day')) &&
-               orderDate.isBefore(dayjs(dateRange.to).add(1, 'day'));
-      });
-    }
-
-    setFilteredData(data);
+    calculateSummaries(dataWithDates);
+    calculateMonthlyTrend(dataWithDates);
+    generateCategorySummary(dataWithDates);
+    generateSubcategorySummary(dataWithDates);
+    generateTopProducts(dataWithDates);
   };
 
- const exportPDF = () => {
-    const doc = new jsPDF();
+  const calculateSummaries = (data) => {
+    let monthly = 0, quarterly = 0, annual = 0;
+    const now = dayjs();
 
-    // Add logo (ensure logoImage is base64 or a valid public path)
-    const imgWidth = 30;
-    const imgHeight = 10;
-    doc.addImage(logoImage, 'PNG', 14, 10, imgWidth, imgHeight);
+    data.forEach((item) => {
+      const sales = Number(item.total_sales) || 0;
+      const date = dayjs(item.date);
 
-    // Add title next to logo
-    doc.setFontSize(18);
-    doc.setTextColor(40);
-    doc.text(`Sales Report - ${dayjs().format('MMMM D, YYYY')}`, 50, 25);
-
-    // Add contact details below the logo
-    doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0);
-    doc.text("thangamtools@gmail.com", 14, 40);
-    doc.text("+94 770 427 773", 14, 45);
-    doc.text("No:23, Dockyard Road, Trincomalee", 14, 50);
-
-    // Define columns and rows
-    const tableColumn = columns.map(col => col.headerName);
-    const tableRows = salesData.map(order =>
-        columns.map(col => order[col.field])
-    );
-
-    // Add table
-    autoTable(doc, {
-        head: [tableColumn],
-        body: tableRows,
-        startY: 55,
-        styles: { fontSize: 10 },
-        headStyles: { fillColor: [34, 197, 94] }, // green header
+      if (now.diff(date, "month") < 1) monthly += sales;
+      if (now.diff(date, "month") < 3) quarterly += sales;
+      if (now.diff(date, "year") < 1) annual += sales;
     });
 
-    doc.save("sales_report.pdf");
-};
+    setMonthlyTotal(monthly);
+    setQuarterlyTotal(quarterly);
+    setAnnualTotal(annual);
+  };
 
+  const calculateMonthlyTrend = (data) => {
+    const map = {};
 
+    data.forEach(item => {
+      const month = dayjs(item.date).format("MMMM");
+      if (!map[month]) map[month] = 0;
+      map[month] += Number(item.total_sales) || 0;
+    });
+
+    const trend = Object.entries(map).map(([month, total_sales]) => ({
+      month,
+      total_sales,
+    }));
+
+    setMonthlySalesTrend(trend);
+  };
+
+  const generateCategorySummary = (data) => {
+    const map = {};
+    data.forEach(item => {
+      const key = item.category;
+      if (!map[key]) map[key] = { category: key, total_sales: 0, total_units: 0 };
+      map[key].total_sales += Number(item.total_sales);
+      map[key].total_units += Number(item.total_units);
+    });
+    setCategorySummary(Object.values(map));
+  };
+
+  const generateSubcategorySummary = (data) => {
+    const map = {};
+    data.forEach(item => {
+      const key = item.subCategory;
+      if (!map[key]) map[key] = { subCategory: key, total_sales: 0, total_units: 0 };
+      map[key].total_sales += Number(item.total_sales);
+      map[key].total_units += Number(item.total_units);
+    });
+    setSubcategorySummary(Object.values(map));
+  };
+
+  const generateTopProducts = (data) => {
+    const sorted = [...data].sort((a, b) => b.total_units - a.total_units).slice(0, 5);
+    setTopProducts(sorted);
+  };
+
+  const exportPDF = () => {
+    const doc = new jsPDF();
+    const logo = new Image();
+    logo.src = `${window.location.origin}/logo1.png`;
+
+    logo.onload = () => {
+      const pageWidth = doc.internal.pageSize.getWidth();
+      doc.addImage(logo, "PNG", 10, 10, 30, 10);
+      doc.setFontSize(18);
+      doc.text("Sales Report", pageWidth / 2, 20, { align: "center" });
+      doc.setFontSize(10);
+      doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth - 50, 10);
+
+      const contact = [
+        "thangamtools@gmail.com",
+        "+94 770 427 773",
+        "No:23, Dockyard Road, Trincomalee"
+      ];
+      contact.forEach((line, i) => doc.text(line, pageWidth - 80, 15 + (i + 1) * 5));
+
+      let y = 50;
+
+      doc.setFontSize(14);
+      doc.text("Detailed Sales", 14, y);
+      autoTable(doc, {
+        startY: y + 5,
+        head: [["Product", "Category", "SubCategory", "Units", "Total Sales"]],
+        body: salesData.map(item => [
+          item.product_name,
+          item.category,
+          item.subCategory,
+          item.total_units,
+          `LKR ${Number(item.total_sales).toLocaleString()}`
+        ])
+      });
+
+      y = doc.lastAutoTable.finalY + 10;
+      doc.text("Sales by Category", 14, y);
+      autoTable(doc, {
+        startY: y + 5,
+        head: [["Category", "Units", "Total Sales"]],
+        body: categorySummary.map(item => [
+          item.category,
+          item.total_units,
+          `LKR ${Number(item.total_sales).toLocaleString()}`
+        ])
+      });
+
+      y = doc.lastAutoTable.finalY + 10;
+      doc.text("Sales by SubCategory", 14, y);
+      autoTable(doc, {
+        startY: y + 5,
+        head: [["SubCategory", "Units", "Total Sales"]],
+        body: subcategorySummary.map(item => [
+          item.subCategory,
+          item.total_units,
+          `LKR ${Number(item.total_sales).toLocaleString()}`
+        ])
+      });
+
+      y = doc.lastAutoTable.finalY + 10;
+      doc.text("Top Selling Products", 14, y);
+      autoTable(doc, {
+        startY: y + 5,
+        head: [["Product", "Category", "SubCategory", "Units", "Total Sales"]],
+        body: topProducts.map(item => [
+          item.product_name,
+          item.category,
+          item.subCategory,
+          item.total_units,
+          `LKR ${Number(item.total_sales).toLocaleString()}`
+        ])
+      });
+
+      doc.save("sales_report.pdf");
+    };
+  };
 
   const columns = [
-    { field: "product_id", headerName: "Product ID", flex: 1 },
-    { field: "product_name", headerName: "Product Name", flex: 2 },
+    { field: "product_name", headerName: "Product", flex: 1 },
     { field: "category", headerName: "Category", flex: 1 },
     { field: "subCategory", headerName: "SubCategory", flex: 1 },
-    { field: "total_units", headerName: "Quantity Sold", type: "number", flex: 1 },
-    { field: "total_sales", headerName: "Sales Amount (LKR.)", type: "number", flex: 1 },
+    { field: "total_units", headerName: "Units Sold", flex: 1 },
+    {
+      field: "total_sales",
+      headerName: "Total Sales (LKR)",
+      flex: 1,
+      valueFormatter: (params) => {
+  const value = Number(params.value);
+  return isNaN(value) ? "LKR 0.00" : `LKR ${value.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
+    },
   ];
-
-  const productNames = filteredData.map(item => item.product_name);
-  const productUnits = filteredData.map(item => Number(item.total_units));
-  const productSales = filteredData.map(item => Number(item.total_sales));
-
-  const categoryMap = {};
-  filteredData.forEach(item => {
-    if (!categoryMap[item.category]) categoryMap[item.category] = { sales: 0 };
-    categoryMap[item.category].sales += Number(item.total_sales);
-  });
-
-  const subCatMap = {};
-  filteredData.forEach(item => {
-    if (!subCatMap[item.subCategory]) subCatMap[item.subCategory] = { sales: 0 };
-    subCatMap[item.subCategory].sales += Number(item.total_sales);
-  });
-
-  const pieChartData = {
-    labels: Object.keys(categoryMap),
-    datasets: [
-      {
-        label: 'Sales by Category',
-        data: Object.values(categoryMap).map(c => c.sales),
-        backgroundColor: ['#16a34a', '#2563eb', '#f59e0b', '#dc2626', '#9333ea'],
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const barChartData = {
-    labels: productNames,
-    datasets: [
-      {
-        label: 'Units Sold',
-        data: productUnits,
-        backgroundColor: '#22c55e',
-      },
-      {
-        label: 'Total Sales (LKR.)',
-        data: productSales,
-        backgroundColor: '#3b82f6',
-      },
-    ],
-  };
 
   return (
     <div className="flex flex-col h-screen">
       <AdminNav />
       <div className="flex flex-1 overflow-hidden">
-        <div className="w-1/5 bg-gray-100 border-r">
+        <div className="w-1/5 border-r bg-gray-100">
           <Sidebar />
         </div>
-        <div className="w-4/5 p-6 space-y-6 overflow-auto">
+        <div className="w-4/5 p-6 overflow-auto space-y-6">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold">Sales Report</h1>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={exportPDF}
-              startIcon={<PictureAsPdfIcon />}
-            >
+            <Button variant="contained" color="secondary" onClick={exportPDF} startIcon={<PictureAsPdfIcon />}>
               Export to PDF
             </Button>
           </div>
 
-          {/* Filters */}
-          {/* <div className="flex flex-wrap gap-4 items-end">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Category</label>
-              <Select
-                size="small"
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                displayEmpty
-              >
-                <MenuItem value="All">All</MenuItem>
-                {categories.map(cat => (
-                  <MenuItem key={cat} value={cat}>{cat}</MenuItem>
-                ))}
-              </Select>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-green-100 p-4 rounded-lg text-center">
+              <h2 className="text-sm text-gray-600">This Month</h2>
+              <p className="text-xl font-bold text-green-700">LKR {monthlyTotal.toLocaleString()}</p>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">From</label>
-              <TextField
-                type="date"
-                size="small"
-                value={dateRange.from}
-                onChange={(e) => setDateRange({ ...dateRange, from: e.target.value })}
-              />
+            <div className="bg-blue-100 p-4 rounded-lg text-center">
+              <h2 className="text-sm text-gray-600">This Quarter</h2>
+              <p className="text-xl font-bold text-blue-700">LKR {quarterlyTotal.toLocaleString()}</p>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">To</label>
-              <TextField
-                type="date"
-                size="small"
-                value={dateRange.to}
-                onChange={(e) => setDateRange({ ...dateRange, to: e.target.value })}
-              />
-            </div>
-            <Button variant="contained" onClick={handleFilter}>Apply</Button>
-          </div> */}
-
-          {/* Charts */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white shadow rounded-xl p-3 h-[300px] flex flex-col justify-between">
-              <h2 className="text-base font-semibold text-center mb-2 text-green-700">Product Sales</h2>
-              <Bar data={barChartData} options={{ responsive: true, maintainAspectRatio: false }} />
-            </div>
-            <div className="bg-white shadow rounded-xl p-3 h-[300px] flex flex-col justify-between">
-              <h2 className="text-base font-semibold text-center mb-2 text-blue-700">Category-wise Sales</h2>
-              <Pie data={pieChartData} options={{ responsive: true, maintainAspectRatio: false }} />
-            </div>
-            <div className="bg-white shadow rounded-xl p-3 h-[300px] col-span-1 md:col-span-2 lg:col-span-1">
-              <h2 className="text-base font-semibold text-center mb-2 text-purple-700">SubCategory-wise Sales</h2>
-              <Bar
-                data={{
-                  labels: Object.keys(subCatMap),
-                  datasets: [{
-                    label: 'Sales (LKR.)',
-                    data: Object.values(subCatMap).map(c => c.sales),
-                    backgroundColor: '#8b5cf6',
-                  }]
-                }}
-                options={{ responsive: true, maintainAspectRatio: false }}
-              />
+            <div className="bg-purple-100 p-4 rounded-lg text-center">
+              <h2 className="text-sm text-gray-600">This Year</h2>
+              <p className="text-xl font-bold text-purple-700">LKR {annualTotal.toLocaleString()}</p>
             </div>
           </div>
 
-          {/* Table */}
-          <div className="bg-white rounded-lg shadow border p-4">
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h2 className="text-lg font-semibold mb-4">Monthly Sales Trend</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={monthlySalesTrend}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip formatter={(value) => `LKR ${Number(value).toLocaleString()}`} />
+                <Line type="monotone" dataKey="total_sales" stroke="#8884d8" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h2 className="text-lg font-semibold mb-4">Detailed Sales</h2>
             <DataGrid
-              rows={filteredData}
+              autoHeight
+              rows={salesData}
               columns={columns}
-              pageSizeOptions={[5, 10, 20]}
-              checkboxSelection={false}
-              disableRowSelectionOnClick
               getRowId={(row) => row.product_id}
-              slots={{ toolbar: GridToolbar }}
-              sx={{
-                "& .MuiDataGrid-columnHeaders": {
-                  backgroundColor: "#f3f4f6",
-                  color: "blue",
-                  fontWeight: "bold",
+              pageSize={5}
+            />
+          </div>
+
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h2 className="text-lg font-semibold mb-4">Sales by Category</h2>
+            <DataGrid
+              autoHeight
+              rows={categorySummary}
+              columns={[
+                { field: "category", headerName: "Category", flex: 1 },
+                { field: "total_units", headerName: "Units Sold", flex: 1 },
+                {
+                  field: "total_sales",
+                  headerName: "Total Sales (LKR)",
+                  flex: 1,
+                  valueFormatter: (params) => {
+  const value = Number(params.value);
+  return isNaN(value) ? "LKR 0.00" : `LKR ${value.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
                 },
-              }}
+              ]}
+              getRowId={(row) => row.category}
+              pageSize={5}
+            />
+          </div>
+
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h2 className="text-lg font-semibold mb-4">Sales by SubCategory</h2>
+            <DataGrid
+              autoHeight
+              rows={subcategorySummary}
+              columns={[
+                { field: "subCategory", headerName: "SubCategory", flex: 1 },
+                { field: "total_units", headerName: "Units Sold", flex: 1 },
+                {
+                  field: "total_sales",
+                  headerName: "Total Sales (LKR)",
+                  flex: 1,
+                  valueFormatter: (params) => {
+  const value = Number(params.value);
+  return isNaN(value) ? "LKR 0.00" : `LKR ${value.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
+                },
+              ]}
+              getRowId={(row) => row.subCategory}
+              pageSize={5}
+            />
+          </div>
+
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h2 className="text-lg font-semibold mb-4">Top Selling Products</h2>
+            <DataGrid
+              autoHeight
+              rows={topProducts}
+              columns={columns}
+              getRowId={(row) => row.product_id}
+              pageSize={5}
             />
           </div>
         </div>

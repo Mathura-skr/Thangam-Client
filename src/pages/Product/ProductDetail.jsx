@@ -15,6 +15,25 @@ const ProductDetailPage = () => {
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [description, setDescription] = useState('');
+
+   useEffect(() => {
+    if (product?.description) {
+      setDescription(
+        isExpanded 
+          ? product.description 
+          : truncateDescription(product.description)
+      );
+    }
+  }, [product, isExpanded]);
+
+   const truncateDescription = (text) => {
+    const maxLength = 300;
+    if (text.length <= maxLength) return text;
+    return text.substr(0, text.lastIndexOf(' ', maxLength)) + '... ';
+  };
+
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -106,11 +125,35 @@ const ProductDetailPage = () => {
             onError={(e) => (e.target.src = "/images/placeholder-product.png")}
           />
         </div>
-        <div>
+       
+        <div >
           <h1 className="text-2xl font-bold">{product.name}</h1>
-          <div className="text-gray-600 mt-2 whitespace-pre-line">
-            {formatDescription(product.description)}
-          </div>
+          <p className="text-gray-600 mt-2">
+              <span className="font-semibold">Brand:</span> {product.brand_name}
+            </p>
+
+          {product.category_name === 'Fertilizer' && (
+        <div className="my-2 space-y-1">
+          {product.quantity && (
+            <p className="text-gray-600">
+              <span className="font-semibold">Quantity:</span> {product.quantity}kg
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Shrinkable Description */}
+      <div className="text-gray-600 mt-2 whitespace-pre-line relative">
+        {formatDescription(description)}
+        {product.description.length > 300 && (
+          <button 
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="text-blue-600 hover:underline mt-2 text-sm"
+          >
+            {isExpanded ? 'Read Less' : 'Read More'}
+          </button>
+        )}
+      </div>
           <p className="text-lg mt-4 font-semibold text-green-600">₨ {product.price}</p>
 
           <div className="flex gap-4 mt-6">

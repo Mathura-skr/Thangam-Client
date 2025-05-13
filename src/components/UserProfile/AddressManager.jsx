@@ -21,29 +21,50 @@ export default function AddressManager() {
     district: "",
     province: "",
     zip_code: "",
+    address_type: "delivery",
   });
 
   const [editingId, setEditingId] = useState(null);
   const [editedAddress, setEditedAddress] = useState({});
 
-  const isNewAddressValid = Object.values(newAddress).every(
-    (val) => val.trim() !== ""
-  );
-  const isEditedAddressValid = Object.values(editedAddress).every(
-    (val) => val.trim() !== ""
-  );
+  const isNewAddressValid = Object.entries(newAddress)
+    .filter(([key]) => key !== "address_type")
+    .every(([, val]) => val.trim() !== "");
+
+  const isEditedAddressValid = Object.entries(editedAddress)
+    .filter(([key]) => key !== "address_type")
+    .every(([, val]) => val.trim() !== "");
+
+  const billingExists = addresses.some((a) => a.address_type === "billing");
 
   const handleAdd = async () => {
-    console.log("handleAdd triggered");
-    console.log("newAddress:", newAddress);
-    console.log("userId:", user.userId);
+    if (newAddress.address_type === "billing" && billingExists) {
+      // Convert the existing billing address to delivery before adding new billing address
+      const currentBilling = addresses.find((a) => a.address_type === "billing");
+      if (currentBilling) {
+        try {
+          await axios.put(`/api/addresses/${currentBilling.id}`, {
+            ...currentBilling,
+            address_type: "delivery",
+          });
+          setAddresses((prev) =>
+            prev.map((addr) =>
+              addr.id === currentBilling.id ? { ...currentBilling, address_type: "delivery" } : addr
+            )
+          );
+        } catch (err) {
+          console.error("Error updating previous billing address:", err);
+          Swal.fire("Error", "Failed to update previous billing address", "error");
+          return;
+        }
+      }
+    }
 
     try {
       const res = await axios.post("/api/addresses", {
         ...newAddress,
         user_id: user.userId,
       });
-      console.log("Address added:", res.data);
 
       setAddresses((prev) => [...prev, res.data]);
       setNewAddress({
@@ -52,6 +73,7 @@ export default function AddressManager() {
         district: "",
         province: "",
         zip_code: "",
+        address_type: "delivery",
       });
       Swal.fire("Success", "Address added successfully", "success");
     } catch (err) {
@@ -86,6 +108,15 @@ export default function AddressManager() {
   };
 
   const handleSaveEdit = async () => {
+    if (
+      editedAddress.address_type === "billing" &&
+      billingExists &&
+      addresses.find((a) => a.id !== editingId && a.address_type === "billing")
+    ) {
+      Swal.fire("Error", "Only one billing address is allowed.", "error");
+      return;
+    }
+
     try {
       const res = await axios.put(`/api/addresses/${editingId}`, editedAddress);
       setAddresses((prev) =>
@@ -95,7 +126,7 @@ export default function AddressManager() {
       setEditedAddress({});
       Swal.fire("Success", "Address updated successfully", "success");
     } catch (err) {
-      console.error("Add address error:", err);
+      console.error("Edit address error:", err);
       Swal.fire("Error", "Failed to update address", "error");
     }
   };
@@ -115,17 +146,33 @@ export default function AddressManager() {
 
         <div className="space-y-2">
           <h3 className="text-lg font-medium">Add New Address</h3>
-          {Object.entries(newAddress).map(([key, value]) => (
-            <input
-              key={key}
-              placeholder={key.replace("_", " ")}
-              className="input w-full border p-2 rounded-md"
-              value={value}
-              onChange={(e) =>
-                setNewAddress({ ...newAddress, [key]: e.target.value })
-              }
-            />
-          ))}
+          {Object.entries(newAddress).map(([key, value]) =>
+            key === "address_type" ? (
+              <select
+                key={key}
+                className="input w-full border p-2 rounded-md"
+                value={value}
+                onChange={(e) =>
+                  setNewAddress({ ...newAddress, address_type: e.target.value })
+                }
+              >
+                <option value="delivery">Delivery</option>
+                <option value="billing" disabled={billingExists}>
+                  Billing
+                </option>
+              </select>
+            ) : (
+              <input
+                key={key}
+                placeholder={key.replace("_", " ")}
+                className="input w-full border p-2 rounded-md"
+                value={value}
+                onChange={(e) =>
+                  setNewAddress({ ...newAddress, [key]: e.target.value })
+                }
+              />
+            )
+          )}
           <button
             className={`bg-black text-white px-4 py-2 rounded mt-2 ${
               !isNewAddressValid ? "opacity-50 cursor-not-allowed" : ""
@@ -154,31 +201,48 @@ export default function AddressManager() {
             <div key={addr.id} className="border rounded-lg p-4 space-y-2">
               {editingId === addr.id ? (
                 <>
-                  {Object.entries(editedAddress).map(
-                    ([key, value]) =>
-                      key !== "id" &&
-                      key !== "user_id" && (
-                        <input
-                          key={key}
-                          placeholder={key}
-                          className="input w-full border p-2 rounded-md"
-                          value={value}
-                          onChange={(e) =>
-                            setEditedAddress({
-                              ...editedAddress,
-                              [key]: e.target.value,
-                            })
-                          }
-                        />
-                      )
+                  {Object.entries(editedAddress).map(([key, value]) =>
+                    key === "id" || key === "user_id" ? null : key ===
+                      "address_type" ? (
+                      <select
+                        key={key}
+                        className="input w-full border p-2 rounded-md"
+                        value={value}
+                        onChange={(e) =>
+                          setEditedAddress({
+                            ...editedAddress,
+                            address_type: e.target.value,
+                          })
+                        }
+                      >
+                        <option value="delivery">Delivery</option>
+                        <option
+                          value="billing"
+                          disabled={billingExists && addresses.find((a) => a.id !== editingId && a.address_type === "billing")}
+                        >
+                          Billing
+                        </option>
+                      </select>
+                    ) : (
+                      <input
+                        key={key}
+                        placeholder={key.replace("_", " ")}
+                        className="input w-full border p-2 rounded-md"
+                        value={value}
+                        onChange={(e) =>
+                          setEditedAddress({
+                            ...editedAddress,
+                            [key]: e.target.value,
+                          })
+                        }
+                      />
+                    )
                   )}
                   <div className="flex gap-2">
                     <button
                       onClick={handleSaveEdit}
                       className={`bg-green-600 text-white px-3 py-1 rounded ${
-                        !isEditedAddressValid
-                          ? "opacity-50 cursor-not-allowed"
-                          : ""
+                        !isEditedAddressValid ? "opacity-50 cursor-not-allowed" : ""
                       }`}
                       disabled={!isEditedAddressValid}
                     >
@@ -200,17 +264,23 @@ export default function AddressManager() {
                   <p>
                     {addr.district}, {addr.province}, {addr.zip_code}
                   </p>
+                  <p className="text-sm italic text-gray-500">
+                    Type:{" "}
+                    {addr.address_type
+                      ? addr.address_type.charAt(0).toUpperCase() +
+                        addr.address_type.slice(1)
+                      : "N/A"}
+                  </p>
                   <div className="flex gap-2 mt-2">
-                    <button
+                    {/* <button
                       onClick={() => handleEdit(addr)}
-                      className="flex items-center outline outline-2 outline-blue-500 text-blue-500 px-3 py-1 rounded hover:bg-blue-500 focus:outline-none"
+                      className="flex items-center outline outline-2 outline-blue-500 text-blue-500 px-3 py-1 rounded hover:bg-blue-500"
                     >
                       <EditIcon className="mr-2" />
-                    </button>
-
+                    </button> */}
                     <button
                       onClick={() => handleDelete(addr.id)}
-                      className="flex items-center outline outline-2 outline-red-500 text-red-500 px-3 py-1 rounded hover:bg-red-500 focus:outline-none"
+                      className="flex items-center outline outline-2 outline-red-500 text-red-500 px-3 py-1 rounded hover:bg-opacity-50"
                     >
                       <DeleteIcon className="mr-2" />
                     </button>
@@ -224,17 +294,33 @@ export default function AddressManager() {
 
       <div className="space-y-2">
         <h3 className="text-lg font-medium">Add New Address</h3>
-        {Object.entries(newAddress).map(([key, value]) => (
-          <input
-            key={key}
-            placeholder={key.replace("_", " ")}
-            className="input w-full border p-2 rounded-md"
-            value={value}
-            onChange={(e) =>
-              setNewAddress({ ...newAddress, [key]: e.target.value })
-            }
-          />
-        ))}
+        {Object.entries(newAddress).map(([key, value]) =>
+          key === "address_type" ? (
+            <select
+              key={key}
+              className="input w-full border p-2 rounded-md"
+              value={value}
+              onChange={(e) =>
+                setNewAddress({ ...newAddress, address_type: e.target.value })
+              }
+            >
+              <option value="delivery">Delivery</option>
+              <option value="billing" disabled={billingExists}>
+                Billing
+              </option>
+            </select>
+          ) : (
+            <input
+              key={key}
+              placeholder={key.replace("_", " ")}
+              className="input w-full border p-2 rounded-md"
+              value={value}
+              onChange={(e) =>
+                setNewAddress({ ...newAddress, [key]: e.target.value })
+              }
+            />
+          )
+        )}
         <button
           className={`bg-black text-white px-4 py-2 rounded mt-2 ${
             !isNewAddressValid ? "opacity-50 cursor-not-allowed" : ""

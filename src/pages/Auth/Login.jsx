@@ -241,7 +241,7 @@ const Login = () => {
               transition={{ delay: 2 }}
             >
               <Link
-                to="/resetPassword"
+                to="/reset-Password"
                 className="text-sm text-green-400 hover:underline"
               >
                 Forgot Password?
