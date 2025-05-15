@@ -8,7 +8,7 @@ import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import jsPDF from "jspdf";
 import autoTable from 'jspdf-autotable';
 import AdminNav from "../../components/Navbar/StaffNav";
-import Sidebar from "../Admin/Sidebar";
+import Sidebar from "./StaffSidebar";
 import dayjs from "dayjs";
 import { DataGrid } from "@mui/x-data-grid";
 
@@ -125,9 +125,9 @@ const SalesReport = () => {
       doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth - 50, 10);
 
       const contact = [
-        "thangamtools@gmail.com",
-        "+94 770 427 773",
-        "No:23, Dockyard Road, Trincomalee"
+        "        thangamtools@gmail.com",
+        "        +94 770 427 773",
+        "        No:23, Dockyard Road, Trincomalee"
       ];
       contact.forEach((line, i) => doc.text(line, pageWidth - 80, 15 + (i + 1) * 5));
 

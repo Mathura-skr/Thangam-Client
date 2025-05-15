@@ -52,6 +52,8 @@ import StaffSupplierList from '../pages/Staff/SupplierList';
 import StaffUpdateOrder from '../pages/Staff/UpdateOrder';
 import StaffUpdateProduct from '../pages/Staff/UpdateProduct';
 import StaffUpdateSupplier from '../pages/Staff/UpdateSupplier';
+import StaffSalesList from '../pages/Staff/SalesList';
+
 
 import Forbidden403 from '../pages/ErrorPages/Forbidden403';
 import Checkout from "../pages/Checkout/Checkout";
@@ -139,6 +141,7 @@ export default function RouteLayout() {
   <Route path='/staff/rental' element={<Protected role="staff"><StaffRentalList /></Protected>} />
   <Route path='/staff/rental/create' element={<Protected role="staff"><StaffRentalProduct /></Protected>} />
   <Route path='/staff/rental/:id' element={<Protected role="staff"><StaffUpdateRentalProduct /></Protected>} />
+  <Route path='/staff/sales' element={<Protected role="staff"><StaffSalesList /></Protected>} />
   <Route path='/staff/settings' element={<Protected role="staff"><StaffSettings /></Protected>} />
 
 </Routes>
