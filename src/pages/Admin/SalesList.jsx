@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axios from "../../utils/axios";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
 } from "recharts";
 import { Button } from "@mui/material";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import jsPDF from "jspdf";
-import autoTable from 'jspdf-autotable';
+import autoTable from "jspdf-autotable";
 import AdminNav from "../../components/Navbar/AdminNav";
 import Sidebar from "../Admin/Sidebar";
 import dayjs from "dayjs";
@@ -36,21 +42,35 @@ const SalesReport = () => {
     fetchSales();
   }, []);
 
-  const processSalesData = (data) => {
-    const dataWithDates = data.map((item, i) => ({
-      ...item,
-      date: dayjs().subtract(i % 12, "month").format("YYYY-MM-DD"),
-    }));
+   // Add currency formatter utility at top
+const formatLKR = (value) => {
+  const numericValue = Number(value) || 0;
+  return `LKR ${numericValue.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+};
 
-    calculateSummaries(dataWithDates);
-    calculateMonthlyTrend(dataWithDates);
-    generateCategorySummary(dataWithDates);
-    generateSubcategorySummary(dataWithDates);
-    generateTopProducts(dataWithDates);
-  };
+// Modified processSalesData with data sanitization
+const processSalesData = (data) => {
+  const sanitizedData = data.map((item, i) => ({
+    ...item,
+    date: dayjs().subtract(i % 12, "month").format("YYYY-MM-DD"),
+    total_sales: Number(item.total_sales) || 0,  // Ensure numeric conversion
+    total_units: Number(item.total_units) || 0,
+  }));
+
+  calculateSummaries(sanitizedData);
+  calculateMonthlyTrend(sanitizedData);
+  generateCategorySummary(sanitizedData);
+  generateSubcategorySummary(sanitizedData);
+  generateTopProducts(sanitizedData);
+};
 
   const calculateSummaries = (data) => {
-    let monthly = 0, quarterly = 0, annual = 0;
+    let monthly = 0,
+      quarterly = 0,
+      annual = 0;
     const now = dayjs();
 
     data.forEach((item) => {
@@ -70,7 +90,7 @@ const SalesReport = () => {
   const calculateMonthlyTrend = (data) => {
     const map = {};
 
-    data.forEach(item => {
+    data.forEach((item) => {
       const month = dayjs(item.date).format("MMMM");
       if (!map[month]) map[month] = 0;
       map[month] += Number(item.total_sales) || 0;
@@ -86,9 +106,10 @@ const SalesReport = () => {
 
   const generateCategorySummary = (data) => {
     const map = {};
-    data.forEach(item => {
+    data.forEach((item) => {
       const key = item.category;
-      if (!map[key]) map[key] = { category: key, total_sales: 0, total_units: 0 };
+      if (!map[key])
+        map[key] = { category: key, total_sales: 0, total_units: 0 };
       map[key].total_sales += Number(item.total_sales);
       map[key].total_units += Number(item.total_units);
     });
@@ -97,9 +118,10 @@ const SalesReport = () => {
 
   const generateSubcategorySummary = (data) => {
     const map = {};
-    data.forEach(item => {
+    data.forEach((item) => {
       const key = item.subCategory;
-      if (!map[key]) map[key] = { subCategory: key, total_sales: 0, total_units: 0 };
+      if (!map[key])
+        map[key] = { subCategory: key, total_sales: 0, total_units: 0 };
       map[key].total_sales += Number(item.total_sales);
       map[key].total_units += Number(item.total_units);
     });
@@ -107,7 +129,9 @@ const SalesReport = () => {
   };
 
   const generateTopProducts = (data) => {
-    const sorted = [...data].sort((a, b) => b.total_units - a.total_units).slice(0, 5);
+    const sorted = [...data]
+      .sort((a, b) => b.total_units - a.total_units)
+      .slice(0, 5);
     setTopProducts(sorted);
   };
 
@@ -127,9 +151,11 @@ const SalesReport = () => {
       const contact = [
         "thangamtools@gmail.com",
         "+94 770 427 773",
-        "No:23, Dockyard Road, Trincomalee"
+        "No:23, Dockyard Road, Trincomalee",
       ];
-      contact.forEach((line, i) => doc.text(line, pageWidth - 80, 15 + (i + 1) * 5));
+      contact.forEach((line, i) =>
+        doc.text(line, pageWidth - 80, 15 + (i + 1) * 5)
+      );
 
       let y = 50;
 
@@ -138,13 +164,13 @@ const SalesReport = () => {
       autoTable(doc, {
         startY: y + 5,
         head: [["Product", "Category", "SubCategory", "Units", "Total Sales"]],
-        body: salesData.map(item => [
+        body: salesData.map((item) => [
           item.product_name,
           item.category,
           item.subCategory,
           item.total_units,
-          `LKR ${Number(item.total_sales).toLocaleString()}`
-        ])
+          `LKR ${Number(item.total_sales).toLocaleString()}`,
+        ]),
       });
 
       y = doc.lastAutoTable.finalY + 10;
@@ -152,11 +178,11 @@ const SalesReport = () => {
       autoTable(doc, {
         startY: y + 5,
         head: [["Category", "Units", "Total Sales"]],
-        body: categorySummary.map(item => [
+        body: categorySummary.map((item) => [
           item.category,
           item.total_units,
-          `LKR ${Number(item.total_sales).toLocaleString()}`
-        ])
+          `LKR ${Number(item.total_sales).toLocaleString()}`,
+        ]),
       });
 
       y = doc.lastAutoTable.finalY + 10;
@@ -164,11 +190,11 @@ const SalesReport = () => {
       autoTable(doc, {
         startY: y + 5,
         head: [["SubCategory", "Units", "Total Sales"]],
-        body: subcategorySummary.map(item => [
+        body: subcategorySummary.map((item) => [
           item.subCategory,
           item.total_units,
-          `LKR ${Number(item.total_sales).toLocaleString()}`
-        ])
+          `LKR ${Number(item.total_sales).toLocaleString()}`,
+        ]),
       });
 
       y = doc.lastAutoTable.finalY + 10;
@@ -176,38 +202,39 @@ const SalesReport = () => {
       autoTable(doc, {
         startY: y + 5,
         head: [["Product", "Category", "SubCategory", "Units", "Total Sales"]],
-        body: topProducts.map(item => [
+        body: topProducts.map((item) => [
           item.product_name,
           item.category,
           item.subCategory,
           item.total_units,
-          `LKR ${Number(item.total_sales).toLocaleString()}`
-        ])
+          `LKR ${Number(item.total_sales).toLocaleString()}`,
+        ]),
       });
 
       doc.save("sales_report.pdf");
     };
   };
 
-  const columns = [
-    { field: "product_name", headerName: "Product", flex: 1 },
-    { field: "category", headerName: "Category", flex: 1 },
-    { field: "subCategory", headerName: "SubCategory", flex: 1 },
-    { field: "total_units", headerName: "Units Sold", flex: 1 },
-    {
-      field: "total_sales",
-      headerName: "Total Sales (LKR)",
-      flex: 1,
-      valueFormatter: (params) => {
-  const value = Number(params.value);
-  return isNaN(value) ? "LKR 0.00" : `LKR ${value.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-}
 
-    },
-  ];
+
+// Updated columns configuration
+const columns = [
+  { field: "product_name", headerName: "Product", flex: 1 },
+  { field: "category", headerName: "Category", flex: 1 },
+  { field: "subCategory", headerName: "SubCategory", flex: 1 },
+  { 
+    field: "total_units", 
+    headerName: "Units Sold", 
+    flex: 1,
+    valueGetter: (value) => value?.toLocaleString() || '0'
+  },
+  {
+    field: "total_sales",
+    headerName: "Total Sales (LKR)",
+    flex: 1,
+    valueGetter: (value) => formatLKR(value)
+  }
+];
 
   return (
     <div className="flex flex-col h-screen">
@@ -219,7 +246,12 @@ const SalesReport = () => {
         <div className="w-4/5 p-6 overflow-auto space-y-6">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold">Sales Report</h1>
-            <Button variant="contained" color="secondary" onClick={exportPDF} startIcon={<PictureAsPdfIcon />}>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={exportPDF}
+              startIcon={<PictureAsPdfIcon />}
+            >
               Export to PDF
             </Button>
           </div>
@@ -227,15 +259,21 @@ const SalesReport = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-green-100 p-4 rounded-lg text-center">
               <h2 className="text-sm text-gray-600">This Month</h2>
-              <p className="text-xl font-bold text-green-700">LKR {monthlyTotal.toLocaleString()}</p>
+              <p className="text-xl font-bold text-green-700">
+                LKR {monthlyTotal.toLocaleString()}
+              </p>
             </div>
             <div className="bg-blue-100 p-4 rounded-lg text-center">
               <h2 className="text-sm text-gray-600">This Quarter</h2>
-              <p className="text-xl font-bold text-blue-700">LKR {quarterlyTotal.toLocaleString()}</p>
+              <p className="text-xl font-bold text-blue-700">
+                LKR {quarterlyTotal.toLocaleString()}
+              </p>
             </div>
             <div className="bg-purple-100 p-4 rounded-lg text-center">
               <h2 className="text-sm text-gray-600">This Year</h2>
-              <p className="text-xl font-bold text-purple-700">LKR {annualTotal.toLocaleString()}</p>
+              <p className="text-xl font-bold text-purple-700">
+                LKR {annualTotal.toLocaleString()}
+              </p>
             </div>
           </div>
 
@@ -246,7 +284,9 @@ const SalesReport = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
                 <YAxis />
-                <Tooltip formatter={(value) => `LKR ${Number(value).toLocaleString()}`} />
+                <Tooltip
+                  formatter={(value) => `LKR ${Number(value).toLocaleString()}`}
+                />
                 <Line type="monotone" dataKey="total_sales" stroke="#8884d8" />
               </LineChart>
             </ResponsiveContainer>
@@ -275,14 +315,15 @@ const SalesReport = () => {
                   field: "total_sales",
                   headerName: "Total Sales (LKR)",
                   flex: 1,
-                  valueFormatter: (params) => {
-  const value = Number(params.value);
-  return isNaN(value) ? "LKR 0.00" : `LKR ${value.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-}
-
+                  valueGetter: (value) => {
+                    
+                    return isNaN(value)
+                      ? "LKR 0.00"
+                      : `LKR ${value.toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}`;
+                  },
                 },
               ]}
               getRowId={(row) => row.category}
@@ -302,14 +343,15 @@ const SalesReport = () => {
                   field: "total_sales",
                   headerName: "Total Sales (LKR)",
                   flex: 1,
-                  valueFormatter: (params) => {
-  const value = Number(params.value);
-  return isNaN(value) ? "LKR 0.00" : `LKR ${value.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-}
-
+                  valueGetter: (value) => {
+                    
+                    return isNaN(value)
+                      ? "LKR 0.00"
+                      : `LKR ${value.toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}`;
+                  },
                 },
               ]}
               getRowId={(row) => row.subCategory}
