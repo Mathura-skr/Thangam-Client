@@ -17,6 +17,7 @@ export default function NewProduct() {
   const [brand, setBrand] = useState("");
   const [quantity, setQuantity] = useState("");
   const [supplier, setSupplier] = useState("");
+  const [discount, setDiscount] = useState("");
   const [suppliers, setSuppliers] = useState([]);
   const [supplierNames, setSupplierNames] = useState([]);
   const [brandNames, setBrandNames] = useState([]);
@@ -123,6 +124,7 @@ export default function NewProduct() {
       description,
       brand_name: brand,
       supplier_name: supplier,
+      discount: discount ? parseFloat(discount) : 0,
       image_url,
     };
 
@@ -185,6 +187,7 @@ export default function NewProduct() {
             encType="multipart/form-data"
           >
             <Input label="Name" onChange={setProductName} />
+
             <div className="mb-4">
               <label className="block text-gray-700 font-medium">Brand</label>
               <input
@@ -200,11 +203,8 @@ export default function NewProduct() {
               </datalist>
             </div>
 
-            {/* Supplier with datalist */}
             <div className="mb-4">
-              <label className="block text-gray-700 font-medium">
-                Supplier
-              </label>
+              <label className="block text-gray-700 font-medium">Supplier</label>
               <input
                 list="supplier-list"
                 value={supplier}
@@ -219,13 +219,11 @@ export default function NewProduct() {
             </div>
 
             <Input label="Price" type="number" onChange={setPrice} />
+            <Input label="Discount (%)" type="number" onChange={setDiscount} />
             <Textarea label="Description" onChange={setDescription} />
 
-            {/* Category selection */}
             <div className="mb-4">
-              <label className="block text-gray-700 font-medium">
-                Category
-              </label>
+              <label className="block text-gray-700 font-medium">Category</label>
               <select
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 onChange={(e) => setCategory(e.target.value)}
@@ -239,7 +237,6 @@ export default function NewProduct() {
               </select>
             </div>
 
-            {/* Fertilizer-specific fields */}
             {category === "Fertilizer" && (
               <>
                 <Input
@@ -263,7 +260,6 @@ export default function NewProduct() {
               </>
             )}
 
-            {/* Subcategory selection */}
             {category && (
               <div className="mb-4">
                 <label className="block text-gray-700 font-medium">

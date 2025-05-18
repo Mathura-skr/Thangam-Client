@@ -53,46 +53,51 @@ export default function ProductList() {
     }
   };
 
-  const columns = [
-    { field: "id", headerName: "ID", flex: 1, headerClassName: "super-app-theme--header" },
-    { field: "name", headerName: "Product Name", flex: 1, headerClassName: "super-app-theme--header" },
-    { field: "category", headerName: "Category", flex: 1, headerClassName: "super-app-theme--header" },
-    { field: "subCategory", headerName: "SubCategory", flex: 1, headerClassName: "super-app-theme--header" },
-    { field: "price", headerName: "Price", type: "number", flex: 1, headerClassName: "super-app-theme--header" },
-    { field: "quantity", headerName: "Quantity(Kg)", type: "number", flex: 1, headerClassName: "super-app-theme--header" },
-    { field: "stock", headerName: "Stock", type: "number", flex: 1, headerClassName: "super-app-theme--header" },
-    { field: "brand", headerName: "Brand", flex: 1, headerClassName: "super-app-theme--header" },
-    { field: "supplier", headerName: "Supplier", flex: 1, headerClassName: "super-app-theme--header" },
 
-    // Conditionally show these columns for Fertilizer category
-    { field: "manufactured_date", headerName: "Manufac Date", flex: 1, headerClassName: "super-app-theme--header" },
-    { field: "expiry_date", headerName: "Expiry Date", flex: 1, headerClassName: "super-app-theme--header" },
-    {
-      field: "actions",
-      headerName: "Actions",
-      flex: 1,
-      minWidth: 160,
-      headerClassName: "super-app-theme--header",
-      renderCell: (params) => (
-        <Box sx={{ display: "flex", gap: 1 }}>
-          <Link to={`/admin/product/${params.row.id}`}>
-            <Button variant="outlined" color="primary" size="small" sx={{ height: 36, minWidth: 36 }}>
-              <EditIcon fontSize="small" />
-            </Button>
-          </Link>
-          <Button
-            variant="outlined"
-            color="error"
-            size="small"
-            onClick={() => deleteProduct(params.row.id)}
-            sx={{ height: 36, minWidth: 36, mt: 1 }}
-          >
-            <DeleteIcon fontSize="small" />
+const columns = [
+  { field: "id", headerName: "ID", flex: 1, headerClassName: "super-app-theme--header" },
+  { field: "name", headerName: "Product Name", flex: 1, headerClassName: "super-app-theme--header" },
+  { field: "category", headerName: "Category", flex: 1, headerClassName: "super-app-theme--header" },
+  { field: "subCategory", headerName: "SubCategory", flex: 1, headerClassName: "super-app-theme--header" },
+  { field: "price", headerName: "Price", type: "number", flex: 1, headerClassName: "super-app-theme--header" },
+  { field: "discount", headerName: "Discount (%)", type: "number", flex: 1, headerClassName: "super-app-theme--header" },
+  { field: "discount_price", headerName: "Discounted Price", type: "number", flex: 1, headerClassName: "super-app-theme--header" },
+  { field: "quantity", headerName: "Quantity(Kg)", type: "number", flex: 1, headerClassName: "super-app-theme--header" },
+  { field: "stock", headerName: "Stock", type: "number", flex: 1, headerClassName: "super-app-theme--header" },
+  { field: "brand", headerName: "Brand", flex: 1, headerClassName: "super-app-theme--header" },
+  { field: "supplier", headerName: "Supplier", flex: 1, headerClassName: "super-app-theme--header" },
+
+  // Conditionally show these columns for Fertilizer category
+  { field: "manufactured_date", headerName: "Manufac Date", flex: 1, headerClassName: "super-app-theme--header" },
+  { field: "expiry_date", headerName: "Expiry Date", flex: 1, headerClassName: "super-app-theme--header" },
+
+  {
+    field: "actions",
+    headerName: "Actions",
+    flex: 1,
+    minWidth: 160,
+    headerClassName: "super-app-theme--header",
+    renderCell: (params) => (
+      <Box sx={{ display: "flex", gap: 1 }}>
+        <Link to={`/admin/product/${params.row.id}`}>
+          <Button variant="outlined" color="primary" size="small" sx={{ height: 36, minWidth: 36 }}>
+            <EditIcon fontSize="small" />
           </Button>
-        </Box>
-      ),
-    },
-  ];
+        </Link>
+        <Button
+          variant="outlined"
+          color="error"
+          size="small"
+          onClick={() => deleteProduct(params.row.id)}
+          sx={{ height: 36, minWidth: 36, mt: 1 }}
+        >
+          <DeleteIcon fontSize="small" />
+        </Button>
+      </Box>
+    ),
+  },
+];
+
 
   return (
     <div className="flex flex-col h-screen">

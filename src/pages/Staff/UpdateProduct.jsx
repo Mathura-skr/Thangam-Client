@@ -19,6 +19,8 @@ export default function UpdateProduct() {
   const [supplier, setSupplier] = useState("");
   const [manufacturedDate, setManufacturedDate] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
+  const [discount, setDiscount] = useState("");
+  const [discountPrice, setDiscountPrice] = useState("");
 
   const [image_url, setImageURL] = useState([]);
 
@@ -57,6 +59,8 @@ export default function UpdateProduct() {
         setSupplier(data.supplier_name);
         setManufacturedDate(data.manufactured_date || "");
         setExpiryDate(data.expiry_date || "");
+        setDiscount(data.discount || "");
+        setDiscountPrice(data.discount_price || "");
 
         setImageURL(data.image_url ? [data.image_url] : []);
       } catch (err) {
@@ -148,6 +152,8 @@ export default function UpdateProduct() {
       brand_name: brand,
       supplier_name: supplier,
       image_url,
+      discount: discount ? parseFloat(discount) : 0,
+      //discount_price: discountPrice ? parseFloat(discountPrice) : 0,
     };
 
     // Only add dates for Fertilizer category
@@ -222,7 +228,9 @@ export default function UpdateProduct() {
                 </datalist>
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700 font-medium">Supplier</label>
+                <label className="block text-gray-700 font-medium">
+                  Supplier
+                </label>
                 <input
                   list="supplier-list"
                   value={supplier}
@@ -235,7 +243,12 @@ export default function UpdateProduct() {
                   ))}
                 </datalist>
               </div>
-              <Input label="Price" type="number" value={price} onChange={setPrice} />
+              <Input
+                label="Price"
+                type="number"
+                value={price}
+                onChange={setPrice}
+              />
               <textarea
                 className="description-input"
                 value={description}
@@ -250,8 +263,18 @@ export default function UpdateProduct() {
                 }}
               />
 
+              <Input
+                label="Discount (%)"
+                type="number"
+                value={discount}
+                onChange={setDiscount}
+              />
+
               <div className="mb-4">
-                <label htmlFor="category_field" className="block text-gray-700 font-medium">
+                <label
+                  htmlFor="category_field"
+                  className="block text-gray-700 font-medium"
+                >
                   Category
                 </label>
                 <select
@@ -318,9 +341,17 @@ export default function UpdateProduct() {
                 </div>
               )}
 
-              <Input label="Stock" type="number" value={stock} onChange={setStock} />
+              <Input
+                label="Stock"
+                type="number"
+                value={stock}
+                onChange={setStock}
+              />
 
-              <label htmlFor="product_images" className="block text-gray-700 font-medium">
+              <label
+                htmlFor="product_images"
+                className="block text-gray-700 font-medium"
+              >
                 Upload image
               </label>
               <input
@@ -334,7 +365,9 @@ export default function UpdateProduct() {
 
               {image_url.length > 0 && (
                 <div className="mt-4">
-                  <p className="text-gray-700 font-medium mb-2">Current Image:</p>
+                  <p className="text-gray-700 font-medium mb-2">
+                    Current Image:
+                  </p>
                   <img
                     src={image_url[0]}
                     alt="Product"

@@ -5,8 +5,6 @@ const ProductCard = ({ product, onAddToCart, onBuyNow, onViewDetail }) => {
     if (onViewDetail) onViewDetail(product.id);
   };
 
-
-
   const getImageUrl = () => {
     if (Array.isArray(product.image_url)) {
       return product.image_url[0] || "/images/placeholder-product.png";
@@ -25,15 +23,25 @@ const ProductCard = ({ product, onAddToCart, onBuyNow, onViewDetail }) => {
     );
   };
 
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
+    if (onAddToCart) onAddToCart(product);
+  };
+
+  const handleBuyNow = (e) => {
+    e.stopPropagation();
+    if (onBuyNow) onBuyNow(product);
+  };
+
   return (
     <div
-      className="bg-white rounded-lg shadow-md p-4 text-center transition-transform transform hover:-translate-y-1 w-48  flex flex-col justify-between sm:w-56  md:w-64  cursor-pointer"
+      className="bg-white rounded-lg shadow-md p-4 text-center transition-transform transform hover:-translate-y-1 w-48 sm:w-56 md:w-64 flex flex-col justify-between cursor-pointer"
       onClick={handleCardClick}
     >
       <img
         src={getImageUrl()}
-        alt={product.name}
-        className="w-full h-32 object-cover rounded-md sm:h-40 md:h-48"
+        alt={product.name || "Product"}
+        className="w-full h-32 sm:h-40 md:h-48 object-cover rounded-md"
         onError={(e) => {
           e.target.src = "/images/placeholder-product.png";
         }}
@@ -52,12 +60,44 @@ const ProductCard = ({ product, onAddToCart, onBuyNow, onViewDetail }) => {
           </p>
         )}
 
-        {/* Rating stars */}
         {renderStars(product.average_rating)}
 
-        <p className="text-green-600 font-medium mt-1">
-          Price: ₨ {Number(product.price).toFixed(2)}
-        </p>
+        <div className="mt-1">
+          {product.discount && product.discount_price ? (
+            <div className="flex flex-col items-center">
+              <div className="flex items-center space-x-2">
+                <span className="text-red-600 font-semibold text-base">
+                  ₨ {Number(product.discount_price).toFixed(2)}
+                </span>
+                <span className="bg-red-100 text-red-600 text-xs font-semibold px-2 py-0.5 rounded">
+                  -{product.discount}%
+                </span>
+              </div>
+              <span className="text-gray-500 line-through text-sm">
+                ₨ {Number(product.price).toFixed(2)}
+              </span>
+            </div>
+          ) : (
+            <p className="text-green-600 font-medium">
+              ₨ {Number(product.price).toFixed(2)}
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-3 space-x-2">
+        <button
+          onClick={handleAddToCart}
+          className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm"
+        >
+          Add to Cart
+        </button>
+        <button
+          onClick={handleBuyNow}
+          className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-sm"
+        >
+          Buy Now
+        </button>
       </div>
     </div>
   );

@@ -16,24 +16,21 @@ const ProductDetailPage = () => {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState("");
 
-   useEffect(() => {
+  useEffect(() => {
     if (product?.description) {
       setDescription(
-        isExpanded 
-          ? product.description 
-          : truncateDescription(product.description)
+        isExpanded ? product.description : truncateDescription(product.description)
       );
     }
   }, [product, isExpanded]);
 
-   const truncateDescription = (text) => {
+  const truncateDescription = (text) => {
     const maxLength = 300;
     if (text.length <= maxLength) return text;
-    return text.substr(0, text.lastIndexOf(' ', maxLength)) + '... ';
+    return text.substr(0, text.lastIndexOf(" ", maxLength)) + "... ";
   };
-
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -41,18 +38,15 @@ const ProductDetailPage = () => {
         const res = await axios.get(`/api/products/${id}`);
         setProduct(res.data);
 
-        // Fetch related products
-        const category = res.data.category_name;
-
-        if (category) {
+        if (res.data.category_name) {
           const relatedRes = await axios.get(
-            `/api/products/related?category=${encodeURIComponent(category)}&excludeId=${res.data.id}`
+            `/api/products/related?category=${encodeURIComponent(
+              res.data.category_name
+            )}&excludeId=${res.data.id}`
           );
           setRelatedProducts(relatedRes.data);
         }
-        
 
-        // Fetch reviews
         const reviewRes = await axios.get(`/api/reviews/product/${id}`);
         setReviews(reviewRes.data);
       } catch (err) {
@@ -61,18 +55,18 @@ const ProductDetailPage = () => {
     };
 
     fetchProductDetails();
-  }, [id, navigate]);
+  }, [id]);
 
   const formatDescription = (text) => {
-    if (!text) return '';
-    return text.split('\n').map((paragraph, i) => (
-      <p key={i} className="mb-2">{paragraph}</p>
+    if (!text) return "";
+    return text.split("\n").map((paragraph, i) => (
+      <p key={i} className="mb-2">
+        {paragraph}
+      </p>
     ));
   };
 
-   const handleViewDetail = (id) => {
-    navigate(`/product/${id}`);
-  };
+  const handleViewDetail = (id) => navigate(`/product/${id}`);
 
   const handleAddToCart = async () => {
     if (!user) {
@@ -85,7 +79,6 @@ const ProductDetailPage = () => {
         product_id: product.id,
         unit: 1,
       });
-
       Swal.fire("Added to Cart", `${product.name} added to your cart.`, "success");
     } catch (err) {
       console.error("Add to cart error:", err);
@@ -112,49 +105,68 @@ const ProductDetailPage = () => {
 
   if (!product) return <div className="p-8">Loading...</div>;
 
+  const hasDiscount = product.discount > 0 && product.discount_price < product.price;
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Navigation />
+
       <div className="container mx-auto p-6 grid md:grid-cols-2 gap-8">
-        {/* Product Image + Info */}
         <div>
           <img
-            src={Array.isArray(product.image_url) ? product.image_url[0] : product.image_url}
+            src={
+              Array.isArray(product.image_url)
+                ? product.image_url[0]
+                : product.image_url || "/images/placeholder-product.png"
+            }
             alt={product.name}
             className="w-full h-auto rounded-lg shadow"
             onError={(e) => (e.target.src = "/images/placeholder-product.png")}
           />
         </div>
-       
-        <div >
+
+        <div>
           <h1 className="text-2xl font-bold">{product.name}</h1>
-          <p className="text-gray-600 mt-2">
+          {product.brand_name && (
+            <p className="text-gray-600 mt-2">
               <span className="font-semibold">Brand:</span> {product.brand_name}
             </p>
+          )}
 
-          {product.category_name === 'Fertilizer' && (
-        <div className="my-2 space-y-1">
-          {product.quantity && (
-            <p className="text-gray-600">
-              <span className="font-semibold">Quantity:</span> {product.quantity}kg
+          {product.category_name === "Fertilizer" && product.quantity && (
+            <p className="text-gray-600 mt-2">
+              <span className="font-semibold">Quantity:</span> {product.quantity} kg
             </p>
           )}
-        </div>
-      )}
 
-      {/* Shrinkable Description */}
-      <div className="text-gray-600 mt-2 whitespace-pre-line relative">
-        {formatDescription(description)}
-        {product.description.length > 300 && (
-          <button 
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="text-blue-600 hover:underline mt-2 text-sm"
-          >
-            {isExpanded ? 'Read Less' : 'Read More'}
-          </button>
-        )}
-      </div>
-          <p className="text-lg mt-4 font-semibold text-green-600">₨ {product.price}</p>
+          <div className="text-gray-600 mt-4 whitespace-pre-line">
+            {formatDescription(description)}
+            {product.description.length > 300 && (
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="text-blue-600 hover:underline mt-2 text-sm"
+              >
+                {isExpanded ? "Read Less" : "Read More"}
+              </button>
+            )}
+          </div>
+
+          <div className="mt-4">
+            {hasDiscount ? (
+              <div>
+                <p className="text-lg font-semibold text-red-600">
+                  Discounted Price: ₨ {Number(product.discount_price).toFixed(2)}
+                </p>
+                <p className="line-through text-gray-500 text-sm">
+                  Original: ₨ {Number(product.price).toFixed(2)}
+                </p>
+              </div>
+            ) : (
+              <p className="text-lg font-semibold text-green-600">
+                ₨ {Number(product.price).toFixed(2)}
+              </p>
+            )}
+          </div>
 
           <div className="flex gap-4 mt-6">
             <button
@@ -176,14 +188,8 @@ const ProductDetailPage = () => {
       {/* Reviews */}
       <div className="container mx-auto mt-10 px-6">
         <h2 className="text-xl font-semibold mb-4">Customer Reviews</h2>
-        {reviews.length === 0 ? (
-          <p className="text-gray-500">No reviews yet.</p>
-        ) : (
-          <div className="space-y-4">
-            <ProductReviewSection productId={product.id} user={user} />
-
-          </div>
-        )}
+        <ProductReviewSection productId={product.id} user={user} />
+        {reviews.length === 0 && <p className="text-gray-500">No reviews yet.</p>}
       </div>
 
       {/* Related Products */}
@@ -194,7 +200,7 @@ const ProductDetailPage = () => {
             <ProductCard
               key={prod.id}
               product={prod}
-              onViewDetail={() => handleViewDetail(prod.id)} 
+              onViewDetail={() => handleViewDetail(prod.id)}
             />
           ))}
         </div>
