@@ -30,13 +30,23 @@ export default function UpdateUser() {
         setRole(user.role || "staff");
         setImage(user.image || "");
 
-        const { data: address } = await axios.get(`/api/addresses/user/${id}`);
-        if (address) {
-          setStreet(address.street);
-          setCity(address.city);
-          setDistrict(address.district);
-          setProvince(address.province);
-          setZipCode(address.zip_code);
+        // Fetch addresses as an array
+        const { data: addresses } = await axios.get(`/api/addresses/user/${id}`);
+
+        if (Array.isArray(addresses) && addresses.length > 0) {
+          const address = addresses[0]; // use the first address
+          setStreet(address.street || "");
+          setCity(address.city || "");
+          setDistrict(address.district || "");
+          setProvince(address.province || "");
+          setZipCode(address.zip_code || "");
+        } else {
+          // No address found — clear fields
+          setStreet("");
+          setCity("");
+          setDistrict("");
+          setProvince("");
+          setZipCode("");
         }
       } catch (err) {
         console.error(err);
@@ -108,7 +118,7 @@ export default function UpdateUser() {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-semibold">Update Staff</h1>
             <button
-               onClick={() => navigate("/admin/employees")}
+              onClick={() => navigate("/admin/employees")}
               className="bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700"
             >
               Back to List
