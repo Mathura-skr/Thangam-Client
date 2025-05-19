@@ -50,8 +50,9 @@ const ProductCard = ({ product, onAddToCart, onBuyNow, onViewDetail }) => {
       <div className="flex-grow">
         <h3 className="text-lg font-semibold mt-2 truncate">{product.name}</h3>
 
-        {product.brand_name && (
-          <p className="text-gray-500 text-sm">Brand: {product.brand_name}</p>
+        
+        {product.brand && (
+          <p className="text-gray-500 text-sm">Brand: {product.brand}</p>
         )}
 
         {product.category_name && (
@@ -88,13 +89,14 @@ const ProductCard = ({ product, onAddToCart, onBuyNow, onViewDetail }) => {
       <div className="mt-3 space-x-2">
         <button
           onClick={handleAddToCart}
-          className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm"
+          className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
         >
           Add to Cart
         </button>
         <button
           onClick={handleBuyNow}
-          className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-sm"
+          className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+        
         >
           Buy Now
         </button>

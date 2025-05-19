@@ -85,10 +85,10 @@ const Register = () => {
       Swal.fire("Please enter a valid email address", "", "error");
       return;
     }
-    if (phone.length !== 10) {
-      Swal.fire("Enter a valid 10-digit phone number", "", "error");
-      return;
-    }
+    if (!/^\d{10}$/.test(phone)) {
+  Swal.fire("Enter a valid 10-digit phone number", "Only digits allowed", "error");
+  return;
+}
     if (password.length <= 6) {
       Swal.fire("Password must be at least 6 characters", "", "error");
       return;
