@@ -86,7 +86,7 @@ const ProductCard = ({ product, onAddToCart, onBuyNow, onViewDetail }) => {
         </div>
       </div>
 
-      <div className="mt-3 space-x-2">
+      {/* <div className="mt-3 space-x-2">
         <button
           onClick={handleAddToCart}
           className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
@@ -100,7 +100,7 @@ const ProductCard = ({ product, onAddToCart, onBuyNow, onViewDetail }) => {
         >
           Buy Now
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };
