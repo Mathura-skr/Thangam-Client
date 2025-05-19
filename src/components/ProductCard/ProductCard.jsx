@@ -50,7 +50,6 @@ const ProductCard = ({ product, onAddToCart, onBuyNow, onViewDetail }) => {
       <div className="flex-grow">
         <h3 className="text-lg font-semibold mt-2 truncate">{product.name}</h3>
 
-        
         {product.brand && (
           <p className="text-gray-500 text-sm">Brand: {product.brand}</p>
         )}
@@ -64,7 +63,7 @@ const ProductCard = ({ product, onAddToCart, onBuyNow, onViewDetail }) => {
         {renderStars(product.average_rating)}
 
         <div className="mt-1">
-          {product.discount && product.discount_price ? (
+          {Number(product.discount) > 0 && Number(product.discount_price) > 0 ? (
             <div className="flex flex-col items-center">
               <div className="flex items-center space-x-2">
                 <span className="text-red-600 font-semibold text-base">
@@ -86,6 +85,7 @@ const ProductCard = ({ product, onAddToCart, onBuyNow, onViewDetail }) => {
         </div>
       </div>
 
+      {/* Uncomment these if you want the buttons back */}
       {/* <div className="mt-3 space-x-2">
         <button
           onClick={handleAddToCart}
@@ -96,7 +96,6 @@ const ProductCard = ({ product, onAddToCart, onBuyNow, onViewDetail }) => {
         <button
           onClick={handleBuyNow}
           className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
-        
         >
           Buy Now
         </button>

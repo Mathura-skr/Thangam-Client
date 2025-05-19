@@ -38,14 +38,14 @@ const Login = () => {
 
   const buttonVariants = {
     initial: { scale: 1 },
-    hover: { 
+    hover: {
       scale: 1.02,
-      backgroundColor: "#facc15", // yellow-400
-      color: "#000000", // black
-      transition: { 
-        type: "spring", 
-        stiffness: 300 
-      } 
+      backgroundColor: "#facc15",
+      color: "#000000",
+      transition: {
+        type: "spring",
+        stiffness: 300
+      }
     },
     tap: { scale: 0.98 },
     loading: {
@@ -89,8 +89,13 @@ const Login = () => {
     if (!credentials.email || !credentials.password) {
       return Swal.fire("Please enter your email and password", "", "error");
     }
+
     if (!/\S+@\S+\.\S+/.test(credentials.email)) {
       return Swal.fire("Please enter a valid email address", "", "error");
+    }
+
+    if (credentials.password.length < 6) {
+      return Swal.fire("Password must be at least 6 characters long", "", "error");
     }
 
     try {
@@ -120,13 +125,16 @@ const Login = () => {
     }
   };
 
+  const isEmailValid = /\S+@\S+\.\S+/.test(credentials.email);
+  const isPasswordValid = credentials.password.length >= 6;
+
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-black overflow-hidden">
       {/* Left Column - Brand & Animation */}
       <motion.div
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
-        transition={{ 
+        transition={{
           type: "spring",
           stiffness: 60,
           damping: 12,
@@ -134,28 +142,28 @@ const Login = () => {
         }}
         className="lg:w-1/2 w-full flex items-center justify-center bg-green-900 text-white p-6 relative"
       >
-        <motion.div 
+        <motion.div
           className="absolute inset-0 bg-green-800/20"
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 1.5 }}
         />
-        
-        <motion.div 
+
+        <motion.div
           className="w-full max-w-md flex flex-col items-center"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
-          <motion.img 
+          <motion.img
             className="z-50 max-w-full h-auto"
-            src={logo1} 
+            src={logo1}
             alt="Company Logo"
             variants={logoVariants}
             whileHover="hover"
           />
-          
-          <motion.div 
+
+          <motion.div
             className="w-full h-1 bg-green-400 mt-8"
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
@@ -168,7 +176,7 @@ const Login = () => {
       <motion.div
         initial={{ x: 100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
-        transition={{ 
+        transition={{
           type: "spring",
           stiffness: 60,
           damping: 12,
@@ -179,13 +187,13 @@ const Login = () => {
           backgroundImage: "url('https://www.transparenttextures.com/patterns/black-paper.png')",
         }}
       >
-        <motion.div 
+        <motion.div
           className="w-full max-w-md backdrop-blur-xl bg-gradient-to-br from-black/50 via-green-900/40 to-black/50 rounded-2xl shadow-2xl p-8 border border-green-700 border-opacity-40"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.6, type: "spring" }}
         >
-          <motion.h2 
+          <motion.h2
             className="text-3xl font-bold text-center mb-8 text-green-400"
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -219,7 +227,7 @@ const Login = () => {
             </motion.div>
             <motion.div className="mb-6" variants={itemVariants}>
               <motion.button
-                disabled={loading2}
+                disabled={loading2 || !isEmailValid || !isPasswordValid}
                 onClick={handleClick}
                 className="w-full bg-black text-green-300 font-semibold py-3 rounded-xl"
                 variants={buttonVariants}
@@ -234,7 +242,7 @@ const Login = () => {
           </motion.form>
 
           <AnimatePresence>
-            <motion.div 
+            <motion.div
               className="text-center mb-2"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -247,7 +255,7 @@ const Login = () => {
                 Forgot Password?
               </Link>
             </motion.div>
-            <motion.p 
+            <motion.p
               className="text-center text-sm text-green-300"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
