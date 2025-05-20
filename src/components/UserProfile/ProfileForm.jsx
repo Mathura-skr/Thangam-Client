@@ -74,9 +74,9 @@ export default function ProfileForm() {
   };
 
   const validatePassword = (password) => {
-    // At least 8 chars, 1 uppercase, 1 lowercase, 1 number
-    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password);
-  };
+  // Only require at least 8 characters
+  return /^.{8,}$/.test(password);
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();

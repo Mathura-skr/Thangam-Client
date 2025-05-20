@@ -87,9 +87,10 @@ export default function AdminSettings() {
   const validateEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
-  const validatePassword = (password) => {
-    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password);
-  };
+   const validatePassword = (password) => {
+  // Only require at least 8 characters
+  return /^.{8,}$/.test(password);
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();

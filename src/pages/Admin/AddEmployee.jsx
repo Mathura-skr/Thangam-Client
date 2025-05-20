@@ -47,9 +47,9 @@ export default function AddEmployee() {
   const validateEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
-  const validatePassword = (password) => {
-    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password);
-  };
+   const validatePassword = (password) => {
+  return /^.{8,}$/.test(password);
+};
 
   const sendData = async (e) => {
     e.preventDefault();
