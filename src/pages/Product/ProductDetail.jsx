@@ -87,21 +87,17 @@ const ProductDetailPage = () => {
   };
 
   const handleBuyNow = () => {
-    if (!user) {
-      return Swal.fire("Login Required", "Please login to proceed.", "info");
-    }
-
-    Swal.fire({
-      title: "Proceed to Checkout?",
-      text: `Buy ${product.name}?`,
-      showCancelButton: true,
-      confirmButtonText: "Yes, Buy Now!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        window.location.href = `/checkout?productId=${product.id}`;
-      }
-    });
-  };
+  navigate("/checkout", {
+    state: {
+      buyNowItem: {
+        product_id: product.id,
+        name: product.name,
+        price: product.discount_price || product.price,
+        unit: 1,
+      },
+    },
+  });
+};
 
   if (!product) return <div className="p-8">Loading...</div>;
 
@@ -153,18 +149,24 @@ const ProductDetailPage = () => {
 
           <div className="mt-4">
             {hasDiscount ? (
-              <div>
-                <p className="text-lg font-semibold text-red-600">
-                  Discounted Price: ₨ {Number(product.discount_price).toFixed(2)}
-                </p>
-                <p className="line-through text-gray-500 text-sm">
-                  Original: ₨ {Number(product.price).toFixed(2)}
-                </p>
+              // Show discounted price and original price
+            <div >
+              <div className="flex items-center space-x-2">
+                <span className="text-red-600 font-semibold text-base">
+                  ₨ {Number(product.discount_price).toFixed(2)}
+                </span>
+                <span className="bg-red-100 text-red-600 text-xs font-semibold px-2 py-0.5 rounded">
+                  -{product.discount}%
+                </span>
               </div>
-            ) : (
-              <p className="text-lg font-semibold text-green-600">
+              <span className="text-gray-500 line-through text-sm">
                 ₨ {Number(product.price).toFixed(2)}
-              </p>
+              </span>
+            </div>
+            ) : (
+              <p className="text-green-600 font-medium">
+              ₨ {Number(product.price).toFixed(2)}
+            </p>
             )}
           </div>
 

@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import Sidebar from "./Sidebar";
 import axios from "../../utils/axios";
 import { useParams } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export default function UpdateSupplier() {
   const { id } = useParams();
@@ -56,14 +57,27 @@ export default function UpdateSupplier() {
   };
 
   const submitHandler = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.put(`/api/suppliers/${id}`, supplier);
-      toast.success("Supplier updated successfully!");
-    } catch (error) {
-      toast.error("Error updating supplier");
-    }
-  };
+  e.preventDefault();
+  try {
+    await axios.put(`/api/suppliers/${id}`, supplier);
+
+    Swal.fire({
+      icon: "success",
+      title: "Updated!",
+      text: "Supplier updated successfully.",
+      timer: 2000,
+      showConfirmButton: false,
+    });
+
+  } catch (error) {
+    console.error(error);
+    Swal.fire({
+      icon: "error",
+      title: "Update Failed",
+      text: "There was an error updating the supplier.",
+    });
+  }
+};
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen">
@@ -110,6 +124,11 @@ export default function UpdateSupplier() {
               >
                 UPDATE
               </button>
+
+               <input
+                type="reset"
+                className="w-full bg-gray-900 text-white py-2 rounded-lg hover:bg-gray-400 transition duration-200 mt-4"
+              />
             </form>
           </div>
         </Fragment>

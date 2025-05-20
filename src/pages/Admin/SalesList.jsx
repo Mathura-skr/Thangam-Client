@@ -27,81 +27,71 @@ const SalesReport = () => {
   const [categorySummary, setCategorySummary] = useState([]);
   const [subcategorySummary, setSubcategorySummary] = useState([]);
   const [topProducts, setTopProducts] = useState([]);
+  const [monthlySummary, setMonthlySummary] = useState([]);
+  const [quarterlySummary, setQuarterlySummary] = useState([]);
+  const [annualSummary, setAnnualSummary] = useState([]);
 
   useEffect(() => {
-    const fetchSales = async () => {
+    const fetchAll = async () => {
       try {
-        const res = await axios.get("/api/orders/sales");
-        const data = res.data;
-        setSalesData(data);
-        processSalesData(data);
+        // Product summary (for tables)
+        const salesRes = await axios.get("/api/orders/sales");
+        setSalesData(salesRes.data);
+        processSalesData(salesRes.data);
+
+        // Monthly summary (for chart and monthly total)
+        const monthlyRes = await axios.get("/api/orders/summary/monthly");
+        setMonthlySummary(monthlyRes.data);
+
+        // Quarterly summary (for quarterly total)
+        const quarterlyRes = await axios.get("/api/orders/summary/quarterly");
+        setQuarterlySummary(quarterlyRes.data);
+
+        // Annual summary (for annual total)
+        const annualRes = await axios.get("/api/orders/summary/annual");
+        setAnnualSummary(annualRes.data);
+
+        // Set totals
+        setMonthlyTotal(monthlyRes.data[0]?.total_sales || 0);
+        setQuarterlyTotal(quarterlyRes.data[0]?.total_sales || 0);
+        setAnnualTotal(annualRes.data[0]?.total_sales || 0);
+
+        // Set monthly trend for chart (reverse for chronological order)
+        setMonthlySalesTrend(
+          monthlyRes.data
+            .slice()
+            .reverse()
+            .map((row) => ({
+              month: row.month,
+              total_sales: Number(row.total_sales) || 0,
+            }))
+        );
       } catch (error) {
         console.error("Error fetching sales data:", error);
       }
     };
-    fetchSales();
+    fetchAll();
   }, []);
 
-   // Add currency formatter utility at top
-const formatLKR = (value) => {
-  const numericValue = Number(value) || 0;
-  return `LKR ${numericValue.toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-};
-
-// Modified processSalesData with data sanitization
-const processSalesData = (data) => {
-  const sanitizedData = data.map((item, i) => ({
-    ...item,
-    date: dayjs().subtract(i % 12, "month").format("YYYY-MM-DD"),
-    total_sales: Number(item.total_sales) || 0,  // Ensure numeric conversion
-    total_units: Number(item.total_units) || 0,
-  }));
-
-  calculateSummaries(sanitizedData);
-  calculateMonthlyTrend(sanitizedData);
-  generateCategorySummary(sanitizedData);
-  generateSubcategorySummary(sanitizedData);
-  generateTopProducts(sanitizedData);
-};
-
-  const calculateSummaries = (data) => {
-    let monthly = 0,
-      quarterly = 0,
-      annual = 0;
-    const now = dayjs();
-
-    data.forEach((item) => {
-      const sales = Number(item.total_sales) || 0;
-      const date = dayjs(item.date);
-
-      if (now.diff(date, "month") < 1) monthly += sales;
-      if (now.diff(date, "month") < 3) quarterly += sales;
-      if (now.diff(date, "year") < 1) annual += sales;
-    });
-
-    setMonthlyTotal(monthly);
-    setQuarterlyTotal(quarterly);
-    setAnnualTotal(annual);
+  // Add currency formatter utility at top
+  const formatLKR = (value) => {
+    const numericValue = Number(value) || 0;
+    return `LKR ${numericValue.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
   };
 
-  const calculateMonthlyTrend = (data) => {
-    const map = {};
-
-    data.forEach((item) => {
-      const month = dayjs(item.date).format("MMMM");
-      if (!map[month]) map[month] = 0;
-      map[month] += Number(item.total_sales) || 0;
-    });
-
-    const trend = Object.entries(map).map(([month, total_sales]) => ({
-      month,
-      total_sales,
+  // Remove fake date logic and time-based calculations from processSalesData
+  const processSalesData = (data) => {
+    const sanitizedData = data.map((item) => ({
+      ...item,
+      total_sales: Number(item.total_sales) || 0,
+      total_units: Number(item.total_units) || 0,
     }));
-
-    setMonthlySalesTrend(trend);
+    generateCategorySummary(sanitizedData);
+    generateSubcategorySummary(sanitizedData);
+    generateTopProducts(sanitizedData);
   };
 
   const generateCategorySummary = (data) => {
@@ -143,22 +133,28 @@ const processSalesData = (data) => {
     logo.onload = () => {
       const pageWidth = doc.internal.pageSize.getWidth();
       doc.addImage(logo, "PNG", 10, 10, 30, 10);
+      // Set contact info below logo, left-aligned, with spacing
+      const contact = [
+        "thangamtools@gmail.com",
+        "+94 770 427 773",
+        "No:23, Dockyard Road",
+        "Trincomalee",
+      ];
+      let contactY = 25; // Start just below the logo
+      doc.setFontSize(10);
+      contact.forEach((line, i) => {
+        doc.text(line, 10, contactY + i * 6); // 6pt vertical spacing
+      });
+      // Move y below contact info for the rest of the content
+      let y = contactY + contact.length * 6 + 10;
       doc.setFontSize(18);
       doc.text("Sales Report", pageWidth / 2, 20, { align: "center" });
       doc.setFontSize(10);
       doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth - 50, 10);
 
-      const contact = [
-        "thangamtools@gmail.com",
-        "+94 770 427 773",
-        "No:23, Dockyard Road, Trincomalee",
-      ];
-      contact.forEach((line, i) =>
-        doc.text(line, pageWidth - 80, 15 + (i + 1) * 5)
-      );
+      
 
-      let y = 50;
-
+      // Use 'y' for the first table header
       doc.setFontSize(14);
       doc.text("Detailed Sales", 14, y);
       autoTable(doc, {
@@ -215,26 +211,32 @@ const processSalesData = (data) => {
     };
   };
 
+  // Updated columns configuration
+  const columns = [
+    { field: "product_name", headerName: "Product", flex: 1 },
+    { field: "category", headerName: "Category", flex: 1 },
+    { field: "subCategory", headerName: "SubCategory", flex: 1 },
+    {
+      field: "total_units",
+      headerName: "Units Sold",
+      flex: 1,
+      valueGetter: (value) => value?.toLocaleString() || "0",
+    },
+    {
+      field: "total_sales",
+      headerName: "Total Sales (LKR)",
+      flex: 1,
+      valueGetter: (value) => formatLKR(value),
+    },
+  ];
 
-
-// Updated columns configuration
-const columns = [
-  { field: "product_name", headerName: "Product", flex: 1 },
-  { field: "category", headerName: "Category", flex: 1 },
-  { field: "subCategory", headerName: "SubCategory", flex: 1 },
-  { 
-    field: "total_units", 
-    headerName: "Units Sold", 
-    flex: 1,
-    valueGetter: (value) => value?.toLocaleString() || '0'
-  },
-  {
-    field: "total_sales",
-    headerName: "Total Sales (LKR)",
-    flex: 1,
-    valueGetter: (value) => formatLKR(value)
-  }
-];
+  // Utility to format month labels (e.g., '2025-01' to 'Jan 2025')
+  const formatMonthLabel = (monthStr) => {
+    if (!monthStr) return "";
+    const [year, month] = monthStr.split("-");
+    const date = new Date(year, month - 1);
+    return date.toLocaleString("default", { month: "short", year: "numeric" });
+  };
 
   return (
     <div className="flex flex-col h-screen">
@@ -280,14 +282,33 @@ const columns = [
           <div className="bg-white p-4 rounded-lg shadow">
             <h2 className="text-lg font-semibold mb-4">Monthly Sales Trend</h2>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={monthlySalesTrend}>
+              <LineChart
+                data={Array.isArray(monthlySalesTrend) && monthlySalesTrend.length > 0 ? monthlySalesTrend.slice().sort((a, b) => {
+                  if (a.month && b.month && a.month.length === 7 && b.month.length === 7) {
+                    return a.month.localeCompare(b.month);
+                  }
+                  return 0;
+                }) : [{ month: '', total_sales: 0 }]}
+                margin={{ top: 20, right: 30, left: 0, bottom: 40 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
+                <XAxis
+                  dataKey="month"
+                  tickFormatter={formatMonthLabel}
+                  interval={0}
+                  angle={-30}
+                  textAnchor="end"
+                  height={60}
+                  minTickGap={10}
+                />
+                <YAxis
+                  tickFormatter={(value) => `LKR ${Number(value).toLocaleString()}`}
+                />
                 <Tooltip
                   formatter={(value) => `LKR ${Number(value).toLocaleString()}`}
+                  labelFormatter={formatMonthLabel}
                 />
-                <Line type="monotone" dataKey="total_sales" stroke="#8884d8" />
+                <Line type="monotone" dataKey="total_sales" stroke="#82ca9d" strokeWidth={3} dot={{ r: 5 }} activeDot={{ r: 8 }} isAnimationActive={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -316,7 +337,6 @@ const columns = [
                   headerName: "Total Sales (LKR)",
                   flex: 1,
                   valueGetter: (value) => {
-                    
                     return isNaN(value)
                       ? "LKR 0.00"
                       : `LKR ${value.toLocaleString(undefined, {
@@ -344,7 +364,6 @@ const columns = [
                   headerName: "Total Sales (LKR)",
                   flex: 1,
                   valueGetter: (value) => {
-                    
                     return isNaN(value)
                       ? "LKR 0.00"
                       : `LKR ${value.toLocaleString(undefined, {

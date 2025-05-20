@@ -25,7 +25,8 @@ export default function SuppliersList() {
             const res = await axios.get("/api/suppliers");
             const formatted = res.data.map((supplier) => ({
                 id: supplier.id,
-                pid: `S${supplier.id.toString().padStart(4, "0")}`,
+                name: supplier.name,
+                pid: supplier.product_ids,
                 category: supplier.category || "-", // corrected key
                 products: supplier.product_name || "-", // make sure this is the correct field name
                 brand: supplier.brand || "-", // ← Add this if you want to show brand
@@ -54,7 +55,8 @@ export default function SuppliersList() {
 //TODO: brand
     const columns = [
         { field: "id", headerName: "ID", flex: 0.5, headerClassName: "super-app-theme--header" },
-        { field: "pid", headerName: "PID", flex: 0.8, headerClassName: "super-app-theme--header" },
+        { field: "name", headerName: "Name", flex: 0.5, headerClassName: "super-app-theme--header" },
+        { field: "pid", headerName: "Product_id", flex: 0.8, headerClassName: "super-app-theme--header" },
         { field: "category", headerName: "Category", flex: 1, headerClassName: "super-app-theme--header" },
         { field: "brand", headerName: "Brand", flex: 1, headerClassName: "super-app-theme--header" },
         { field: "products", headerName: "Products", flex: 1.5, headerClassName: "super-app-theme--header" },

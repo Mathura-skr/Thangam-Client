@@ -63,7 +63,9 @@ const ProductCard = ({ product, onAddToCart, onBuyNow, onViewDetail }) => {
         {renderStars(product.average_rating)}
 
         <div className="mt-1">
-          {Number(product.discount) > 0 && Number(product.discount_price) > 0 ? (
+          {Number(product.discount) > 0 &&
+          Number(product.discount_price) > 0 ? (
+            // Show discounted price and original price
             <div className="flex flex-col items-center">
               <div className="flex items-center space-x-2">
                 <span className="text-red-600 font-semibold text-base">
@@ -78,6 +80,7 @@ const ProductCard = ({ product, onAddToCart, onBuyNow, onViewDetail }) => {
               </span>
             </div>
           ) : (
+            // Show regular price only
             <p className="text-green-600 font-medium">
               ₨ {Number(product.price).toFixed(2)}
             </p>

@@ -68,8 +68,10 @@ const columns = [
   { field: "supplier", headerName: "Supplier", flex: 1, headerClassName: "super-app-theme--header" },
 
   // Conditionally show these columns for Fertilizer category
-  { field: "manufactured_date", headerName: "Manufac Date", flex: 1, headerClassName: "super-app-theme--header" },
-  { field: "expiry_date", headerName: "Expiry Date", flex: 1, headerClassName: "super-app-theme--header" },
+  { field: "manufactured_date", headerName: "Manufac Date", flex: 1, headerClassName: "super-app-theme--header", 
+    valueGetter: (params) => params && params.row && params.row.manufactured_date ? String(params.row.manufactured_date).split('T')[0] : '' },
+  { field: "expiry_date", headerName: "Expiry Date", flex: 1, headerClassName: "super-app-theme--header", 
+    valueGetter: (params) => params && params.row && params.row.expiry_date ? String(params.row.expiry_date).split('T')[0] : '' },
 
   {
     field: "actions",

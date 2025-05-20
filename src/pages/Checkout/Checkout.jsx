@@ -5,17 +5,21 @@ import Swal from "sweetalert2";
 import Navigation from "../../components/Navbar/Navigation";
 import { Typography, Card, CardContent, Button } from "@mui/material";
 import MockPayHereModal from "../Payment/MockPayHereModal";
+import { useLocation } from "react-router-dom";
 
 const Checkout = () => {
   const { user } = useContext(AuthContext);
+  const location = useLocation();
+  const buyNowItem = location.state?.buyNowItem || null;
   const [addresses, setAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [billingAddressId, setBillingAddressId] = useState(null);
   const [paymentMode, setPaymentMode] = useState("COD");
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(buyNowItem ? [buyNowItem] : []);
   const [invoiceEmail, setInvoiceEmail] = useState(user?.email || "");
   const [showMockModal, setShowMockModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  
 
   useEffect(() => {
     const fetchAddresses = async () => {
@@ -32,6 +36,7 @@ const Checkout = () => {
     };
 
     const fetchCartItems = async () => {
+      if (buyNowItem) return;
       try {
         const res = await axios.get(`/api/cart/user/${user?.userId}`);
         setCartItems(res.data);
@@ -44,7 +49,7 @@ const Checkout = () => {
       fetchAddresses();
       fetchCartItems();
     }
-  }, [user]);
+  }, [user, buyNowItem]);
 
   const calculateTotal = () => {
     return cartItems.reduce((acc, item) => {
@@ -93,7 +98,9 @@ const Checkout = () => {
             });
           }
 
-          await axios.delete(`/api/cart/user/${user.userId}`);
+          if (!buyNowItem) {
+            await axios.delete(`/api/cart/user/${user.userId}`);
+          }
 
           await axios.post("/api/email/send-invoice", {
             userId: user.userId,
@@ -264,12 +271,12 @@ const Checkout = () => {
       {showMockModal && (
         <MockPayHereModal
           amount={calculateTotal()}
-    onClose={() => setShowMockModal(false)}
-    cartItems={cartItems}
-    selectedAddressId={selectedAddressId}
-    billingAddressId={billingAddressId}
-    paymentMode={paymentMode}
-    invoiceEmail={invoiceEmail}
+          onClose={() => setShowMockModal(false)}
+          cartItems={cartItems}
+          selectedAddressId={selectedAddressId}
+          billingAddressId={billingAddressId}
+          paymentMode={paymentMode}
+          invoiceEmail={invoiceEmail}
         />
       )}
     </div>
