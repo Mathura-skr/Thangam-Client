@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import axios from '../../utils/axios';
 import { AuthContext } from '../../context/authContext';
 import { FaStar, FaEdit, FaTrash } from 'react-icons/fa'; // import star, edit, and trash icons
+import Swal from 'sweetalert2';
 
 const StarRating = ({ rating, onRate }) => {
   return (
@@ -78,33 +79,35 @@ const ProductReviewSection = ({ productId, user, onDeleteReview }) => {
   };
 
   const handleDelete = async (id) => {
-    const result = await window.Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to delete this review?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Yes, delete it!'
-    });
-    if (result.isConfirmed) {
-      if (onDeleteReview) {
-        await onDeleteReview(id);
-      } else {
-        try {
-          if (!user) return alert('You need to be logged in to delete a review');
-          const headers = {
-            'Authorization': `Bearer ${user.token}`,
-          };
-          await axios.delete(`/api/reviews/${id}`, { headers });
-          await window.Swal.fire('Deleted!', 'Your review has been deleted.', 'success');
-          fetchReviews();
-        } catch (err) {
-          window.Swal.fire('Error', 'Error deleting review, please try again.', 'error');
-          console.error('Error deleting review:', err);
-        }
-      }
+    const result = await Swal.fire({
+  title: 'Are you sure?',
+  text: 'Do you want to delete this review?',
+  icon: 'warning',
+  showCancelButton: true,
+  confirmButtonColor: '#d33',
+  cancelButtonColor: '#3085d6',
+  confirmButtonText: 'Yes, delete it!'
+});
+
+if (result.isConfirmed) {
+  if (onDeleteReview) {
+    await onDeleteReview(id);
+  } else {
+    try {
+      if (!user) return alert('You need to be logged in to delete a review');
+      const headers = {
+        'Authorization': `Bearer ${user.token}`,
+      };
+      await axios.delete(`/api/reviews/${id}`, { headers });
+      await Swal.fire('Deleted!', 'Your review has been deleted.', 'success');
+      fetchReviews();
+    } catch (err) {
+      Swal.fire('Error', 'Error deleting review, please try again.', 'error');
+      console.error('Error deleting review:', err);
     }
+  }
+}
+
   };
 
   return (
