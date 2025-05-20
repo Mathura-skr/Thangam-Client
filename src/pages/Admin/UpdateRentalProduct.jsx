@@ -237,19 +237,46 @@ export default function UpdateRentalProduct() {
   );
 }
 
-const Input = ({ label, type = "text", value, onChange }) => (
-  <div className="mb-4">
-    <label className="block text-gray-700 font-medium">{label}</label>
-    <input
-      type={type}
-      value={value}
-      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-      onChange={(e) =>
-        onChange(type === "number" ? parseFloat(e.target.value) : e.target.value)
+const Input = ({ label, type = "text", value, onChange, min }) => {
+  const [error, setError] = React.useState("");
+
+  const handleChange = (e) => {
+    let val = type === "number" ? e.target.value : e.target.value;
+    if (type === "number") {
+      if (val === "") {
+        setError("");
+        onChange("");
+        return;
       }
-    />
-  </div>
-);
+      val = parseFloat(val);
+      if (isNaN(val)) {
+        setError("Please enter a valid number");
+      } else if (typeof min !== "undefined" && val < min) {
+        setError(`Value cannot be less than ${min}`);
+      } else {
+        setError("");
+      }
+      onChange(val);
+    } else {
+      setError("");
+      onChange(val);
+    }
+  };
+
+  return (
+    <div className="mb-4">
+      <label className="block text-gray-700 font-medium">{label}</label>
+      <input
+        type={type}
+        value={value}
+        min={min}
+        className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${error ? 'border-red-500' : ''}`}
+        onChange={handleChange}
+      />
+      {error && <span className="text-red-500 text-sm">{error}</span>}
+    </div>
+  );
+};
 
 const Textarea = ({ label, value, onChange }) => (
   <div className="mb-4">

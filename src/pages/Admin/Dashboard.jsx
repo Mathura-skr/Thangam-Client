@@ -66,12 +66,12 @@ export default function Dashboard() {
                 </div>
                 <div className="w-4/5 p-6 overflow-auto bg-gradient-to-br from-gray-50 to-gray-200">
                     <h1 className="my-4 text-3xl font-bold text-center md:text-left text-gray-800">Dashboard</h1>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-                        <div className="flex flex-col items-center justify-center bg-gradient-to-br from-green-100 to-green-200 p-6 rounded-xl shadow-md border border-green-300">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        {/* <div className="flex flex-col items-center justify-center bg-gradient-to-br from-green-100 to-green-200 p-6 rounded-xl shadow-md border border-green-300">
                             <FaMoneyBillWave className="text-4xl text-green-600 mb-2" />
                             <div className="text-lg font-semibold text-green-800">Total Amount</div>
                             <div className="text-2xl font-bold text-green-900 mt-1">LKR {stats.totalAmount.toLocaleString()}</div>
-                        </div>
+                        </div> */}
                         <div className="flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 p-6 rounded-xl shadow-md border border-blue-300">
                             <FaBoxOpen className="text-4xl text-blue-600 mb-2" />
                             <div className="text-lg font-semibold text-blue-800">Products</div>

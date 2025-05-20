@@ -248,6 +248,7 @@ export default function UpdateProduct() {
                 type="number"
                 value={price}
                 onChange={setPrice}
+                min={0}
               />
               <textarea
                 className="description-input"
@@ -268,6 +269,7 @@ export default function UpdateProduct() {
                 type="number"
                 value={discount}
                 onChange={setDiscount}
+                min={0}
               />
 
               <div className="mb-4">
@@ -346,6 +348,7 @@ export default function UpdateProduct() {
                 type="number"
                 value={stock}
                 onChange={setStock}
+                min={0}
               />
 
               <label
@@ -396,14 +399,45 @@ export default function UpdateProduct() {
   );
 }
 
-const Input = ({ label, type = "text", value, onChange }) => (
-  <div className="mb-4">
-    <label className="block text-gray-700 font-medium">{label}</label>
-    <input
-      type={type}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-    />
-  </div>
-);
+const Input = ({ label, type = "text", value, onChange, min }) => {
+  const [error, setError] = React.useState("");
+
+  const handleChange = (e) => {
+    let val = type === "number" ? e.target.value : e.target.value;
+    if (type === "number") {
+      if (val === "") {
+        setError("");
+        onChange("");
+        return;
+      }
+      val = parseFloat(val);
+      if (isNaN(val)) {
+        setError("Please enter a valid number");
+      } else if (typeof min !== "undefined" && val < min) {
+        setError(`Value cannot be less than ${min}`);
+      } else {
+        setError("");
+      }
+      onChange(val);
+    } else {
+      setError("");
+      onChange(val);
+    }
+  };
+
+  return (
+    <div className="mb-4">
+      <label className="block text-gray-700 font-medium">{label}</label>
+      <input
+        type={type}
+        value={value}
+        min={min}
+        className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${
+          error ? "border-red-500" : ""
+        }`}
+        onChange={handleChange}
+      />
+      {error && <span className="text-red-500 text-sm">{error}</span>}
+    </div>
+  );
+};

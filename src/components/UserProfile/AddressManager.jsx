@@ -37,7 +37,13 @@ export default function AddressManager() {
 
   const billingExists = addresses.some((a) => a.address_type === "billing");
 
+  const isZipCodeValid = (zip) => /^\d+$/.test(zip);
+
   const handleAdd = async () => {
+    if (!isZipCodeValid(newAddress.zip_code)) {
+      Swal.fire("Error", "Zip code must be numeric only.", "error");
+      return;
+    }
     if (newAddress.address_type === "billing" && billingExists) {
       // Convert the existing billing address to delivery before adding new billing address
       const currentBilling = addresses.find((a) => a.address_type === "billing");
@@ -108,6 +114,10 @@ export default function AddressManager() {
   };
 
   const handleSaveEdit = async () => {
+    if (!isZipCodeValid(editedAddress.zip_code)) {
+      Swal.fire("Error", "Zip code must be numeric only.", "error");
+      return;
+    }
     if (
       editedAddress.address_type === "billing" &&
       billingExists &&
