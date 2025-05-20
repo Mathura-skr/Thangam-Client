@@ -22,34 +22,45 @@ export default function UserList() {
   const [userAddresses, setUserAddresses] = useState({});
 
   useEffect(() => {
-    if (data && Array.isArray(data)) {
-      const filteredUsers = data
-        .filter((user) => user.role === "user")
-        .map((user) => ({
-          ...user,
-          id: user.id,
-          totalOrders: Math.floor(Math.random() * 10),
-        }));
+    const fetchUsersWithOrders = async () => {
+      if (data && Array.isArray(data)) {
+        const filteredUsers = await Promise.all(
+          data
+            .filter((user) => user.role === "user")
+            .map(async (user) => {
+              let totalOrders = 0;
+              try {
+                const res = await axios.get(`/api/orders/user/${user.id}`); // get order details for user
+                totalOrders = Array.isArray(res.data) ? res.data.length : 0;
+              } catch (err) {
+                console.error(`Failed to fetch orders for user ${user.id}`);
+              }
+              return {
+                ...user,
+                id: user.id,
+                totalOrders,
+              };
+            })
+        );
+        setUsers(filteredUsers);
 
-      setUsers(filteredUsers);
-
-      // Fetch addresses for each user
-      const fetchAddresses = async () => {
-        const addressesMap = {};
-        for (let user of filteredUsers) {
-          try {
-            const res = await axios.get(`/api/addresses/user/${user.id}`);
-            
-            addressesMap[user.id] = res.data; // or res.data[0]?.address if only one
-          } catch (err) {
-            console.error(`Failed to fetch address for user ${user.id}`);
+        // Fetch addresses for each user
+        const fetchAddresses = async () => {
+          const addressesMap = {};
+          for (let user of filteredUsers) {
+            try {
+              const res = await axios.get(`/api/addresses/user/${user.id}`);
+              addressesMap[user.id] = res.data;
+            } catch (err) {
+              console.error(`Failed to fetch address for user ${user.id}`);
+            }
           }
-        }
-        setUserAddresses(addressesMap);
-      };
-
-      fetchAddresses();
-    }
+          setUserAddresses(addressesMap);
+        };
+        fetchAddresses();
+      }
+    };
+    fetchUsersWithOrders();
   }, [data]);
 
   const deleteUser = async (id) => {

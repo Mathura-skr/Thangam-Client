@@ -306,13 +306,13 @@ export default function UpdateProduct() {
                   <Input
                     label="Manufactured Date"
                     type="date"
-                    value={manufacturedDate}
+                    value={manufacturedDate ? manufacturedDate.slice(0, 10) : ""}
                     onChange={setManufacturedDate}
                   />
                   <Input
                     label="Expiry Date"
                     type="date"
-                    value={expiryDate}
+                    value={expiryDate ? expiryDate.slice(0, 10) : ""}
                     onChange={setExpiryDate}
                   />
                 </>

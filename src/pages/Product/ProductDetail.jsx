@@ -190,7 +190,26 @@ const ProductDetailPage = () => {
       {/* Reviews */}
       <div className="container mx-auto mt-10 px-6">
         <h2 className="text-xl font-semibold mb-4">Customer Reviews</h2>
-        <ProductReviewSection productId={product.id} user={user} />
+        <ProductReviewSection productId={product.id} user={user} onDeleteReview={
+          async (reviewId) => {
+            try {
+              setReviews((prev) => Array.isArray(prev) ? prev.filter((r) => r.id !== reviewId) : []);
+              await axios.delete(`/api/reviews/${reviewId}`);
+              Swal.fire({
+                icon: "success",
+                title: "Review deleted",
+                timer: 1200,
+                showConfirmButton: false,
+              });
+            } catch (err) {
+              Swal.fire({
+                icon: "error",
+                title: "Delete failed",
+                text: err?.response?.data?.message || err.message,
+              });
+            }
+          }
+        } />
         {reviews.length === 0 && <p className="text-gray-500">No reviews yet.</p>}
       </div>
 
