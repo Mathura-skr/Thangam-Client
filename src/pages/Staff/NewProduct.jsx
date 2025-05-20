@@ -152,7 +152,7 @@ export default function NewProduct() {
         timer: 2000,
       });
 
-      navigate("/admin/products");
+      navigate("/staff/products");
     } catch (err) {
       Swal.fire({
         icon: "error",
@@ -174,7 +174,7 @@ export default function NewProduct() {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-semibold">Add New Product</h1>
             <button
-              onClick={() => navigate("/admin/products")}
+              onClick={() => navigate("/staff/products")}
               className="bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700"
             >
               Back to List

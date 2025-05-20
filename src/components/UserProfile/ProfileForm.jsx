@@ -68,11 +68,34 @@ export default function ProfileForm() {
     };
   }, [preview]);
 
+  const validateEmail = (email) => {
+    // Simple email regex
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const validatePassword = (password) => {
+    // At least 8 chars, 1 uppercase, 1 lowercase, 1 number
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (password && password !== confirmPassword) {
-      return Swal.fire("Error", "Passwords do not match", "error");
+    if (!validateEmail(email)) {
+      return Swal.fire("Error", "Please enter a valid email address.", "error");
+    }
+
+    if (password) {
+      if (!validatePassword(password)) {
+        return Swal.fire(
+          "Error",
+          "Password must be at least 8 characters, include an uppercase letter, a lowercase letter, and a number.",
+          "error"
+        );
+      }
+      if (password !== confirmPassword) {
+        return Swal.fire("Error", "Passwords do not match", "error");
+      }
     }
 
     const updateData = { name, email, phone, image_url };

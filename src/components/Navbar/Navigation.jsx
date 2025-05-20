@@ -169,7 +169,7 @@ const Navbar = () => {
             />
             <button
               type="submit"
-              className="absolute right-0 top-0 h-full px-4 bg-green-600 text-white rounded-r hover:bg-green-700 transition"
+              className="absolute right-0 top-0 h-full px-4 bg-black text-white rounded-r hover:bg-green-700 transition"
             >
               Search
             </button>

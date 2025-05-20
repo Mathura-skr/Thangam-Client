@@ -84,6 +84,21 @@ export default function OrderList() {
     }
   };
   
+  // Add cancelOrderHandler function
+  const cancelOrderHandler = async (id) => {
+    try {
+      await axios.patch(`/api/orders/cancel/${id}`);
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.id === id ? { ...order, status: "Cancelled" } : order
+        )
+      );
+      toast.success("Order cancelled successfully!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to cancel order.");
+    }
+  };
 
   const columns = [
     { field: "id", headerName: "Order ID", flex: 0.7, headerClassName: "super-app-theme--header" },
@@ -120,39 +135,41 @@ export default function OrderList() {
       headerClassName: "super-app-theme--header" ,
       renderCell: (params) => {
         const { status, id } = params.row;
-    
+
         return (
           <Box sx={{ display: "flex", gap: 1 }}>
-            {status !== "Shipped" && status !== "Completed" && (
+            {status !== "Shipped" && status !== "Completed" && status !== "Cancelled" && (
               <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              onClick={() => updateOrderStatus(id, "Shipped")}
-            >
-              <LocalShippingIcon sx={{ color: "white" }} />
-            </Button>
+                variant="contained"
+                color="primary"
+                size="small"
+                onClick={() => updateOrderStatus(id, "Shipped")}
+              >
+                <LocalShippingIcon sx={{ color: "white" }} />
+              </Button>
             )}
-    
+
             {status === "Shipped" && (
               <Button
-              variant="contained"
-              color="success"
-              size="small"
-              onClick={() => updateOrderStatus(id, "Completed")}
-            >
-              <TaskAltIcon/>
-            </Button>
+                variant="contained"
+                color="success"
+                size="small"
+                onClick={() => updateOrderStatus(id, "Completed")}
+              >
+                <TaskAltIcon/>
+              </Button>
             )}
-    
-            {/* <Button
-              variant="contained"
-              color="error"
-              size="small"
-              onClick={() => deleteOrder(id)}
-            >
-              <DeleteIcon />
-            </Button> */}
+
+            {status !== "Completed" && status !== "Cancelled" && (
+              <Button
+                variant="contained"
+                color="error"
+                size="small"
+                onClick={() => cancelOrderHandler(id)}
+              >
+                Cancel
+              </Button>
+            )}
           </Box>
         );
       },

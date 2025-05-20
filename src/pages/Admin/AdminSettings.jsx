@@ -83,15 +83,42 @@ export default function AdminSettings() {
     };
   }, [preview]);
 
+  // Email and password validation helpers
+  const validateEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+  const validatePassword = (password) => {
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (password && password !== confirmPassword) {
+    if (!validateEmail(email)) {
       Swal.fire({
         icon: "error",
-        title: "Passwords do not match",
+        title: "Invalid Email",
+        text: "Please enter a valid email address.",
       });
       return;
+    }
+
+    if (password) {
+      if (!validatePassword(password)) {
+        Swal.fire({
+          icon: "error",
+          title: "Weak Password",
+          text: "Password must be at least 8 characters, include an uppercase letter, a lowercase letter, and a number.",
+        });
+        return;
+      }
+      if (password !== confirmPassword) {
+        Swal.fire({
+          icon: "error",
+          title: "Passwords do not match",
+        });
+        return;
+      }
     }
 
     const updateData = {

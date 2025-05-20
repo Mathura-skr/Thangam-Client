@@ -69,7 +69,7 @@ export default function SuppliersList() {
             renderCell: (params) => (
                 <Box sx={{ display: "flex", justifyContent: "center", gap: 0.5, width: "100%" }}>
                     <Box>
-                        <Link to={`/admin/supplier/${params.row.id}`}>
+                        <Link to={`/staff/supplier/${params.row.id}`}>
                             <Button variant="contained" color="primary" size="small">
                                 <EditIcon />
                             </Button>
@@ -101,7 +101,7 @@ export default function SuppliersList() {
                 <div className="w-4/5 p-6 overflow-auto">
                     <div className="flex justify-between items-center mb-4">
                         <h1 className="text-2xl font-bold">Suppliers List</h1>
-                        <Link to="/admin/suppliers/create">
+                        <Link to="/staff/suppliers/create">
                             <Button
                                 variant="contained"
                                 color="primary"

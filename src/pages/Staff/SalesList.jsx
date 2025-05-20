@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axios from "../../utils/axios";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
 } from "recharts";
 import { Button } from "@mui/material";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import jsPDF from "jspdf";
-import autoTable from 'jspdf-autotable';
+import autoTable from "jspdf-autotable";
 import AdminNav from "../../components/Navbar/StaffNav";
 import Sidebar from "./StaffSidebar";
 import dayjs from "dayjs";
@@ -21,74 +27,79 @@ const SalesReport = () => {
   const [categorySummary, setCategorySummary] = useState([]);
   const [subcategorySummary, setSubcategorySummary] = useState([]);
   const [topProducts, setTopProducts] = useState([]);
+  const [monthlySummary, setMonthlySummary] = useState([]);
+  const [quarterlySummary, setQuarterlySummary] = useState([]);
+  const [annualSummary, setAnnualSummary] = useState([]);
 
   useEffect(() => {
-    const fetchSales = async () => {
+    const fetchAll = async () => {
       try {
-        const res = await axios.get("/api/orders/sales");
-        const data = res.data;
-        setSalesData(data);
-        processSalesData(data);
+        // Product summary (for tables)
+        const salesRes = await axios.get("/api/orders/sales");
+        setSalesData(salesRes.data);
+        processSalesData(salesRes.data);
+
+        // Monthly summary (for chart and monthly total)
+        const monthlyRes = await axios.get("/api/orders/summary/monthly");
+        setMonthlySummary(monthlyRes.data);
+
+        // Quarterly summary (for quarterly total)
+        const quarterlyRes = await axios.get("/api/orders/summary/quarterly");
+        setQuarterlySummary(quarterlyRes.data);
+
+        // Annual summary (for annual total)
+        const annualRes = await axios.get("/api/orders/summary/annual");
+        setAnnualSummary(annualRes.data);
+
+        // Set totals
+        setMonthlyTotal(monthlyRes.data[0]?.total_sales || 0);
+        setQuarterlyTotal(quarterlyRes.data[0]?.total_sales || 0);
+        setAnnualTotal(annualRes.data[0]?.total_sales || 0);
+
+        // Set monthly trend for chart (reverse for chronological order)
+        setMonthlySalesTrend(
+          monthlyRes.data
+            .slice()
+            .reverse()
+            .map((row) => ({
+              month: row.month,
+              total_sales: Number(row.total_sales) || 0,
+            }))
+        );
       } catch (error) {
         console.error("Error fetching sales data:", error);
       }
     };
-    fetchSales();
+    fetchAll();
   }, []);
 
+  // Add currency formatter utility at top
+  const formatLKR = (value) => {
+    const numericValue = Number(value) || 0;
+    return `LKR ${numericValue.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  };
+
+  // Remove fake date logic and time-based calculations from processSalesData
   const processSalesData = (data) => {
-    const dataWithDates = data.map((item, i) => ({
+    const sanitizedData = data.map((item) => ({
       ...item,
-      date: dayjs().subtract(i % 12, "month").format("YYYY-MM-DD"),
+      total_sales: Number(item.total_sales) || 0,
+      total_units: Number(item.total_units) || 0,
     }));
-
-    calculateSummaries(dataWithDates);
-    calculateMonthlyTrend(dataWithDates);
-    generateCategorySummary(dataWithDates);
-    generateSubcategorySummary(dataWithDates);
-    generateTopProducts(dataWithDates);
-  };
-
-  const calculateSummaries = (data) => {
-    let monthly = 0, quarterly = 0, annual = 0;
-    const now = dayjs();
-
-    data.forEach((item) => {
-      const sales = Number(item.total_sales) || 0;
-      const date = dayjs(item.date);
-
-      if (now.diff(date, "month") < 1) monthly += sales;
-      if (now.diff(date, "month") < 3) quarterly += sales;
-      if (now.diff(date, "year") < 1) annual += sales;
-    });
-
-    setMonthlyTotal(monthly);
-    setQuarterlyTotal(quarterly);
-    setAnnualTotal(annual);
-  };
-
-  const calculateMonthlyTrend = (data) => {
-    const map = {};
-
-    data.forEach(item => {
-      const month = dayjs(item.date).format("MMMM");
-      if (!map[month]) map[month] = 0;
-      map[month] += Number(item.total_sales) || 0;
-    });
-
-    const trend = Object.entries(map).map(([month, total_sales]) => ({
-      month,
-      total_sales,
-    }));
-
-    setMonthlySalesTrend(trend);
+    generateCategorySummary(sanitizedData);
+    generateSubcategorySummary(sanitizedData);
+    generateTopProducts(sanitizedData);
   };
 
   const generateCategorySummary = (data) => {
     const map = {};
-    data.forEach(item => {
+    data.forEach((item) => {
       const key = item.category;
-      if (!map[key]) map[key] = { category: key, total_sales: 0, total_units: 0 };
+      if (!map[key])
+        map[key] = { category: key, total_sales: 0, total_units: 0 };
       map[key].total_sales += Number(item.total_sales);
       map[key].total_units += Number(item.total_units);
     });
@@ -97,9 +108,10 @@ const SalesReport = () => {
 
   const generateSubcategorySummary = (data) => {
     const map = {};
-    data.forEach(item => {
+    data.forEach((item) => {
       const key = item.subCategory;
-      if (!map[key]) map[key] = { subCategory: key, total_sales: 0, total_units: 0 };
+      if (!map[key])
+        map[key] = { subCategory: key, total_sales: 0, total_units: 0 };
       map[key].total_sales += Number(item.total_sales);
       map[key].total_units += Number(item.total_units);
     });
@@ -107,7 +119,9 @@ const SalesReport = () => {
   };
 
   const generateTopProducts = (data) => {
-    const sorted = [...data].sort((a, b) => b.total_units - a.total_units).slice(0, 5);
+    const sorted = [...data]
+      .sort((a, b) => b.total_units - a.total_units)
+      .slice(0, 5);
     setTopProducts(sorted);
   };
 
@@ -119,32 +133,40 @@ const SalesReport = () => {
     logo.onload = () => {
       const pageWidth = doc.internal.pageSize.getWidth();
       doc.addImage(logo, "PNG", 10, 10, 30, 10);
+      // Set contact info below logo, left-aligned, with spacing
+      const contact = [
+        "thangamtools@gmail.com",
+        "+94 770 427 773",
+        "No:23, Dockyard Road",
+        "Trincomalee",
+      ];
+      let contactY = 25; // Start just below the logo
+      doc.setFontSize(10);
+      contact.forEach((line, i) => {
+        doc.text(line, 10, contactY + i * 6); // 6pt vertical spacing
+      });
+      // Move y below contact info for the rest of the content
+      let y = contactY + contact.length * 6 + 10;
       doc.setFontSize(18);
       doc.text("Sales Report", pageWidth / 2, 20, { align: "center" });
       doc.setFontSize(10);
       doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth - 50, 10);
 
-      const contact = [
-        "        thangamtools@gmail.com",
-        "        +94 770 427 773",
-        "        No:23, Dockyard Road, Trincomalee"
-      ];
-      contact.forEach((line, i) => doc.text(line, pageWidth - 80, 15 + (i + 1) * 5));
+      
 
-      let y = 50;
-
+      // Use 'y' for the first table header
       doc.setFontSize(14);
       doc.text("Detailed Sales", 14, y);
       autoTable(doc, {
         startY: y + 5,
         head: [["Product", "Category", "SubCategory", "Units", "Total Sales"]],
-        body: salesData.map(item => [
+        body: salesData.map((item) => [
           item.product_name,
           item.category,
           item.subCategory,
           item.total_units,
-          `LKR ${Number(item.total_sales).toLocaleString()}`
-        ])
+          `LKR ${Number(item.total_sales).toLocaleString()}`,
+        ]),
       });
 
       y = doc.lastAutoTable.finalY + 10;
@@ -152,11 +174,11 @@ const SalesReport = () => {
       autoTable(doc, {
         startY: y + 5,
         head: [["Category", "Units", "Total Sales"]],
-        body: categorySummary.map(item => [
+        body: categorySummary.map((item) => [
           item.category,
           item.total_units,
-          `LKR ${Number(item.total_sales).toLocaleString()}`
-        ])
+          `LKR ${Number(item.total_sales).toLocaleString()}`,
+        ]),
       });
 
       y = doc.lastAutoTable.finalY + 10;
@@ -164,11 +186,11 @@ const SalesReport = () => {
       autoTable(doc, {
         startY: y + 5,
         head: [["SubCategory", "Units", "Total Sales"]],
-        body: subcategorySummary.map(item => [
+        body: subcategorySummary.map((item) => [
           item.subCategory,
           item.total_units,
-          `LKR ${Number(item.total_sales).toLocaleString()}`
-        ])
+          `LKR ${Number(item.total_sales).toLocaleString()}`,
+        ]),
       });
 
       y = doc.lastAutoTable.finalY + 10;
@@ -176,38 +198,45 @@ const SalesReport = () => {
       autoTable(doc, {
         startY: y + 5,
         head: [["Product", "Category", "SubCategory", "Units", "Total Sales"]],
-        body: topProducts.map(item => [
+        body: topProducts.map((item) => [
           item.product_name,
           item.category,
           item.subCategory,
           item.total_units,
-          `LKR ${Number(item.total_sales).toLocaleString()}`
-        ])
+          `LKR ${Number(item.total_sales).toLocaleString()}`,
+        ]),
       });
 
       doc.save("sales_report.pdf");
     };
   };
 
+  // Updated columns configuration
   const columns = [
     { field: "product_name", headerName: "Product", flex: 1 },
     { field: "category", headerName: "Category", flex: 1 },
     { field: "subCategory", headerName: "SubCategory", flex: 1 },
-    { field: "total_units", headerName: "Units Sold", flex: 1 },
+    {
+      field: "total_units",
+      headerName: "Units Sold",
+      flex: 1,
+      valueGetter: (value) => value?.toLocaleString() || "0",
+    },
     {
       field: "total_sales",
       headerName: "Total Sales (LKR)",
       flex: 1,
-      valueFormatter: (params) => {
-  const value = Number(params.value);
-  return isNaN(value) ? "LKR 0.00" : `LKR ${value.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-}
-
+      valueGetter: (value) => formatLKR(value),
     },
   ];
+
+  // Utility to format month labels (e.g., '2025-01' to 'Jan 2025')
+  const formatMonthLabel = (monthStr) => {
+    if (!monthStr) return "";
+    const [year, month] = monthStr.split("-");
+    const date = new Date(year, month - 1);
+    return date.toLocaleString("default", { month: "short", year: "numeric" });
+  };
 
   return (
     <div className="flex flex-col h-screen">
@@ -219,7 +248,12 @@ const SalesReport = () => {
         <div className="w-4/5 p-6 overflow-auto space-y-6">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold">Sales Report</h1>
-            <Button variant="contained" color="secondary" onClick={exportPDF} startIcon={<PictureAsPdfIcon />}>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={exportPDF}
+              startIcon={<PictureAsPdfIcon />}
+            >
               Export to PDF
             </Button>
           </div>
@@ -227,27 +261,54 @@ const SalesReport = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-green-100 p-4 rounded-lg text-center">
               <h2 className="text-sm text-gray-600">This Month</h2>
-              <p className="text-xl font-bold text-green-700">LKR {monthlyTotal.toLocaleString()}</p>
+              <p className="text-xl font-bold text-green-700">
+                LKR {monthlyTotal.toLocaleString()}
+              </p>
             </div>
             <div className="bg-blue-100 p-4 rounded-lg text-center">
               <h2 className="text-sm text-gray-600">This Quarter</h2>
-              <p className="text-xl font-bold text-blue-700">LKR {quarterlyTotal.toLocaleString()}</p>
+              <p className="text-xl font-bold text-blue-700">
+                LKR {quarterlyTotal.toLocaleString()}
+              </p>
             </div>
             <div className="bg-purple-100 p-4 rounded-lg text-center">
               <h2 className="text-sm text-gray-600">This Year</h2>
-              <p className="text-xl font-bold text-purple-700">LKR {annualTotal.toLocaleString()}</p>
+              <p className="text-xl font-bold text-purple-700">
+                LKR {annualTotal.toLocaleString()}
+              </p>
             </div>
           </div>
 
           <div className="bg-white p-4 rounded-lg shadow">
             <h2 className="text-lg font-semibold mb-4">Monthly Sales Trend</h2>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={monthlySalesTrend}>
+              <LineChart
+                data={Array.isArray(monthlySalesTrend) && monthlySalesTrend.length > 0 ? monthlySalesTrend.slice().sort((a, b) => {
+                  if (a.month && b.month && a.month.length === 7 && b.month.length === 7) {
+                    return a.month.localeCompare(b.month);
+                  }
+                  return 0;
+                }) : [{ month: '', total_sales: 0 }]}
+                margin={{ top: 20, right: 30, left: 0, bottom: 40 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip formatter={(value) => `LKR ${Number(value).toLocaleString()}`} />
-                <Line type="monotone" dataKey="total_sales" stroke="#8884d8" />
+                <XAxis
+                  dataKey="month"
+                  tickFormatter={formatMonthLabel}
+                  interval={0}
+                  angle={-30}
+                  textAnchor="end"
+                  height={60}
+                  minTickGap={10}
+                />
+                <YAxis
+                  tickFormatter={(value) => `LKR ${Number(value).toLocaleString()}`}
+                />
+                <Tooltip
+                  formatter={(value) => `LKR ${Number(value).toLocaleString()}`}
+                  labelFormatter={formatMonthLabel}
+                />
+                <Line type="monotone" dataKey="total_sales" stroke="#82ca9d" strokeWidth={3} dot={{ r: 5 }} activeDot={{ r: 8 }} isAnimationActive={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -275,14 +336,14 @@ const SalesReport = () => {
                   field: "total_sales",
                   headerName: "Total Sales (LKR)",
                   flex: 1,
-                  valueFormatter: (params) => {
-  const value = Number(params.value);
-  return isNaN(value) ? "LKR 0.00" : `LKR ${value.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-}
-
+                  valueGetter: (value) => {
+                    return isNaN(value)
+                      ? "LKR 0.00"
+                      : `LKR ${value.toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}`;
+                  },
                 },
               ]}
               getRowId={(row) => row.category}
@@ -302,14 +363,14 @@ const SalesReport = () => {
                   field: "total_sales",
                   headerName: "Total Sales (LKR)",
                   flex: 1,
-                  valueFormatter: (params) => {
-  const value = Number(params.value);
-  return isNaN(value) ? "LKR 0.00" : `LKR ${value.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-}
-
+                  valueGetter: (value) => {
+                    return isNaN(value)
+                      ? "LKR 0.00"
+                      : `LKR ${value.toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}`;
+                  },
                 },
               ]}
               getRowId={(row) => row.subCategory}

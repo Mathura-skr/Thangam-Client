@@ -43,6 +43,14 @@ export default function AddEmployee() {
     if (url) setImage(url);
   };
 
+  // Email and password validation helpers
+  const validateEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+  const validatePassword = (password) => {
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password);
+  };
+
   const sendData = async (e) => {
     e.preventDefault();
 
@@ -51,6 +59,20 @@ export default function AddEmployee() {
         icon: "error",
         title: "Missing Fields",
         text: "Name, email, and password are required.",
+      });
+    }
+    if (!validateEmail(email)) {
+      return Swal.fire({
+        icon: "error",
+        title: "Invalid Email",
+        text: "Please enter a valid email address.",
+      });
+    }
+    if (!validatePassword(password)) {
+      return Swal.fire({
+        icon: "error",
+        title: "Weak Password",
+        text: "Password must be at least 8 characters, include an uppercase letter, a lowercase letter, and a number.",
       });
     }
 
