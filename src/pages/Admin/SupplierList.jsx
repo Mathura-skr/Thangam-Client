@@ -27,9 +27,10 @@ export default function SuppliersList() {
                 id: supplier.id,
                 name: supplier.name,
                 pid: supplier.product_ids,
-                category: supplier.category || "-", // corrected key
-                products: supplier.product_name || "-", // make sure this is the correct field name
-                brand: supplier.brand || "-", // ← Add this if you want to show brand
+                category: supplier.category || "-", 
+                products: supplier.product_name || "-", 
+                brand: supplier.brand || "-", 
+                stock: supplier.stock ?? "-", 
                 date: new Date(supplier.created_at || Date.now()).toISOString().split("T")[0],
                 phone: supplier.phone || "-",
                 address: supplier.address || "-",
@@ -60,6 +61,7 @@ export default function SuppliersList() {
         { field: "category", headerName: "Category", flex: 1, headerClassName: "super-app-theme--header" },
         { field: "brand", headerName: "Brand", flex: 1, headerClassName: "super-app-theme--header" },
         { field: "products", headerName: "Products", flex: 1.5, headerClassName: "super-app-theme--header" },
+        { field: "stock", headerName: "Stock", flex: 1, headerClassName: "super-app-theme--header" },
         { field: "date", headerName: "Date", flex: 1, headerClassName: "super-app-theme--header" },
         { field: "phone", headerName: "Mobile", flex: 1.2, headerClassName: "super-app-theme--header" },
         { field: "address", headerName: "Address", flex: 1.5, headerClassName: "super-app-theme--header" },

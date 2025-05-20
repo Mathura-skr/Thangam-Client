@@ -210,7 +210,7 @@ const ProductDetailPage = () => {
             }
           }
         } />
-        {reviews.length === 0 && <p className="text-gray-500">No reviews yet.</p>}
+        
       </div>
 
       {/* Related Products */}
