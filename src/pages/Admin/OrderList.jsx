@@ -135,10 +135,18 @@ export default function OrderList() {
       headerClassName: "super-app-theme--header" ,
       renderCell: (params) => {
         const { status, id } = params.row;
+        const normalizedStatus = (status || "").toLowerCase();
+
+        // Only show Ship button if order is Processing or Pending (case-insensitive)
+        const canShip = normalizedStatus === "processing" || normalizedStatus === "pending";
+        // Only show Complete button if order is Shipped
+        const canComplete = normalizedStatus === "shipped";
+        // Only show Cancel button if order is Processing or Pending
+        const canCancel = normalizedStatus === "processing" || normalizedStatus === "pending";
 
         return (
           <Box sx={{ display: "flex", gap: 1 }}>
-            {status !== "Shipped" && status !== "Completed" && status !== "Cancelled" && (
+            {canShip && (
               <Button
                 variant="contained"
                 color="primary"
@@ -149,7 +157,7 @@ export default function OrderList() {
               </Button>
             )}
 
-            {status === "Shipped" && (
+            {canComplete && (
               <Button
                 variant="contained"
                 color="success"
@@ -160,7 +168,7 @@ export default function OrderList() {
               </Button>
             )}
 
-            {status !== "Completed" && status !== "Cancelled" && (
+            {canCancel && (
               <Button
                 variant="contained"
                 color="error"
