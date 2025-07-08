@@ -17,8 +17,6 @@ The project is built using **React** (bootstrapped with Create React App) and co
 5. [Setup Instructions](#setup-instructions)
 6. [Application Structure](#application-structure)
 7. [Key Pages and Components](#key-pages-and-components)
-8. [Contributing](#contributing)
-9. [License](#license)
 
 ---
 
