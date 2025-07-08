@@ -1,70 +1,204 @@
-# Getting Started with Create React App
+# Thangam Client – Complete Documentation
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Project Overview
 
-## Available Scripts
+**Thangam Client** is a web application designed for the rental and sales of gardening tools and fertilizers. It caters to home gardeners, landscaping businesses, and professionals who wish to buy or rent high-quality gardening equipment and agricultural inputs.
 
-In the project directory, you can run:
+The project is built using **React** (bootstrapped with Create React App) and communicates with a backend API (not included in this client repository) to manage products, rentals, orders, users, suppliers, and reviews.
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-<!-- Open [http://localhost:3000](http://localhost:3000) to view it in your browser. -->
+## Table of Contents
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+1. [Project Features](#project-features)
+2. [Use Case Diagram](#use-case-diagram)
+3. [Sequence Diagrams](#sequence-diagrams)
+4. [ER Diagram](#er-diagram)
+5. [Setup Instructions](#setup-instructions)
+6. [Application Structure](#application-structure)
+7. [Key Pages and Components](#key-pages-and-components)
+8. [Contributing](#contributing)
+9. [License](#license)
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Project Features
 
-### `npm run build`
+- **Product Catalog**: Browse gardening tools and fertilizers, available for sale or rent.
+- **Rental Management**: Staff and admins can add, update, and manage rental products.
+- **Order Management**: Users can place orders for purchase or rental; staff/admins can manage these.
+- **Supplier Management**: Add and update supplier details for inventory tracking.
+- **User Management**: Authentication, role-based access (admin, staff, user), and profile management.
+- **Reviews**: Users can review products; admins can moderate reviews.
+- **Dashboard**: Role-based dashboards for staff and admins to view statistics and manage inventory.
+- **Search**: Live product search with suggestions.
+- **Responsive UI**: Modern, responsive interface with clear navigation.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Use Case Diagram
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```mermaid
 
-### `npm run eject`
+graph TD
+  User((User))
+  Staff((Staff))
+  Admin((Admin))
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+  User -- Browse Products --> BP[Browse Products]
+  User -- Search Products --> SP[Search Products]
+  User -- Place Order --> PO[Place Order]
+  User -- Rent Product --> RP[Rent Product]
+  User -- Write Review --> WR[Write Review]
+  User -- View Profile --> VP[View Profile]
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+  Staff -- Add/Update Products --> AUP[Add/Update Products]
+  Staff -- Add/Update Rentals --> AUR[Add/Update Rentals]
+  Staff -- Manage Orders --> MO[Manage Orders]
+  Staff -- Manage Suppliers --> MS[Manage Suppliers]
+  Staff -- View Dashboard --> VD[View Dashboard]
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+  Admin -- All Staff Use Cases --> Staff
+  Admin -- Manage Users --> MU[Manage Users]
+  Admin -- Moderate Reviews --> MR[Moderate Reviews]
+  Admin -- View Sales/Rental Reports --> SRR[View Sales/Rental Reports]
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+---
 
-## Learn More
+## Sequence Diagrams
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Sequence: User Places a Rental Order
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```mermaid
+  sequenceDiagram
+    participant User
+    participant Frontend
+    participant Backend API
+    participant Staff
 
-### Code Splitting
+    User->>Frontend: Login
+    User->>Frontend: Browse/Rent Product
+    Frontend->>Backend API: Request Product List
+    Backend API-->>Frontend: Return Products
+    User->>Frontend: Select Rental & Provide Details
+    Frontend->>Backend API: Submit Rental Order
+    Backend API-->>Frontend: Confirm Order
+    Backend API->>Staff: Notify New Rental Order
+    Frontend-->>User: Show Confirmation
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+---
 
-### Analyzing the Bundle Size
+## ER Diagram
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```mermaid
+erDiagram
+    USERS {
+      int id PK
+      string name
+      string email
+      string password
+      string role
+      string phone
+    }
+    PRODUCTS {
+      int id PK
+      string name
+      string category
+      string description
+      float price
+      int supplier_id FK
+      bool is_rental
+    }
+    SUPPLIERS {
+      int id PK
+      string name
+      string brand
+      string contact
+    }
+    ORDERS {
+      int id PK
+      int user_id FK
+      int product_id FK
+      int quantity
+      float total
+      string type
+      date order_date
+    }
+    REVIEWS {
+      int id PK
+      int user_id FK
+      int product_id FK
+      int rating
+      string comment
+      date date
+    }
 
-### Making a Progressive Web App
+    USERS ||--o{ ORDERS : places
+    USERS ||--o{ REVIEWS : writes
+    PRODUCTS ||--o{ ORDERS : included_in
+    PRODUCTS ||--o{ REVIEWS : reviewed
+    SUPPLIERS ||--o{ PRODUCTS : supplies
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## Setup Instructions
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Mathura-skr/Thangam-Client.git
+   cd Thangam-Client
+   ```
 
-### Deployment
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+3. **Start the development server:**
+   ```bash
+   npm start
+   ```
+   The app will run at `http://localhost:3000/`.
 
-### `npm run build` fails to minify
+4. **Build for production:**
+   ```bash
+   npm run build
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+5. **Run tests:**
+   ```bash
+   npm test
+   ```
+
+> **Note:** This is a client-only repository. Ensure the backend API is running and the API endpoints are correctly configured in the project.
+
+---
+
+## Application Structure
+
+- `src/components/`: Reusable UI components (e.g., Navigation)
+- `src/pages/`: Main pages (Home, About Us, Staff/Admin dashboards, Product lists)
+- `src/Routes/`: Routing configuration
+- `src/context/`: Authentication context
+- `src/assets/`: Static images and assets
+
+Example route imports (from `src/Routes/RouteLayout.jsx`):
+
+- `/admin/*` — Admin functions (products, rentals, sales, reviews)
+- `/staff/*` — Staff functions (products, rentals, suppliers)
+- `/` — Public pages (Home, About, Product catalog, etc.)
+
+---
+
+## Key Pages and Components
+
+- **Home Page (`src/pages/home/HomePage.jsx`)**: Promotional hero, quick actions, and navigation to main features.
+- **About Us (`src/pages/AboutUs/Aboutus.jsx`)**: Overview of company and mission.
+- **Product Management (`src/pages/Staff/NewProduct.jsx`, `src/pages/Staff/NewRentalProduct.jsx`)**: Forms for staff to add new products or rental items, fetching suppliers dynamically.
+- **User Authentication and Context (`src/context/authContext.js`)**: Handles user login, logout, and role management.
+- **Navigation Bar (`src/components/Navbar/Navigation.jsx`)**: Responsive nav with live search and user context.
+
+---
